@@ -1132,6 +1132,24 @@ def run_map_command(args):
         
         print("\nAll YAML files generated successfully!")
         
+        # === Generate New Multi-File Migration Structure ===
+        print(f"\n=== Generating New Multi-File Migration Structure ===")
+        try:
+            generated_migration_files = generate_migration_structure(base_dir, args.object, args.variant, df)
+            if generated_migration_files:
+                print(f"Generated {len(generated_migration_files)} migration files in migrations/ directory")
+                print("New structure provides:")
+                print("  ✓ Clear separation of concerns (fields, mappings, validation, transformations)")
+                print("  ✓ Non-redundant field definitions")
+                print("  ✓ SAP object-anchored structure")
+                print("  ✓ Table-scoped value rules (not object-wide)")
+                print("  ✓ Auditable mapping decisions")
+            else:
+                print("Migration structure generation skipped (no data)")
+        except Exception as e:
+            print(f"Warning: Could not generate migration structure: {e}")
+            print("Legacy YAML files are still available in config/ directory")
+        
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
@@ -1378,6 +1396,369 @@ def main():
     else:
         parser.print_help()
         sys.exit(1)
+
+
+def generate_migration_structure(base_path, object_code, table_name, df):
+    """Generate the new multi-file YAML structure in migrations/ directory."""
+    if df is None:
+        return None
+    
+    migrations_path = base_path / "migrations"
+    object_path = migrations_path / object_code.upper()
+    table_path = object_path / table_name.lower()
+    
+    # Create directory structure
+    table_path.mkdir(parents=True, exist_ok=True)
+    
+    # Generate each file in the new structure
+    generated_files = []
+    
+    # 1. Update objects.yaml catalog
+    objects_file = migrations_path / "objects.yaml"
+    update_objects_catalog(objects_file, object_code, table_name)
+    generated_files.append(objects_file)
+    
+    # 2. Generate fields.yaml
+    fields_file = generate_migration_fields_yaml(table_path, object_code, table_name, df)
+    if fields_file:
+        generated_files.append(fields_file)
+    
+    # 3. Generate mappings.yaml (from existing column_map logic)
+    mappings_file = generate_migration_mappings_yaml(table_path, object_code, table_name, df)
+    if mappings_file:
+        generated_files.append(mappings_file)
+    
+    # 4. Generate validation.yaml
+    validation_file = generate_migration_validation_yaml(table_path, object_code, table_name, df)
+    if validation_file:
+        generated_files.append(validation_file)
+    
+    # 5. Generate transformations.yaml
+    transformations_file = generate_migration_transformations_yaml(table_path, object_code, table_name, df)
+    if transformations_file:
+        generated_files.append(transformations_file)
+    
+    return generated_files
+
+
+def update_objects_catalog(objects_file, object_code, table_name):
+    """Update or create the migrations/objects.yaml catalog file."""
+    objects_data = {"objects": []}
+    
+    # Load existing data if file exists
+    if objects_file.exists():
+        try:
+            with open(objects_file, 'r', encoding='utf-8') as f:
+                objects_data = yaml.safe_load(f) or {"objects": []}
+        except Exception:
+            objects_data = {"objects": []}
+    
+    # Find or create object entry
+    object_entry = None
+    for obj in objects_data["objects"]:
+        if obj.get("object_code") == object_code.upper():
+            object_entry = obj
+            break
+    
+    if not object_entry:
+        # Create new object entry with business descriptions
+        object_descriptions = {
+            "M120": "Profit Centers",
+            "M140": "Banks",
+            "M100": "GL Accounts",
+            "M130": "Cost Centers",
+            "M150": "Material",
+        }
+        
+        sap_anchors = {
+            "M120": "CEPC",
+            "M140": "BNKA", 
+            "M100": "SKA1",
+            "M130": "CSKS",
+            "M150": "MARA",
+        }
+        
+        object_entry = {
+            "object_code": object_code.upper(),
+            "object_description": object_descriptions.get(object_code.upper(), f"Object {object_code}"),
+            "sap_object_anchor": sap_anchors.get(object_code.upper(), f"Unknown"),
+            "tables": []
+        }
+        objects_data["objects"].append(object_entry)
+    
+    # Add table if not already present
+    if table_name.lower() not in object_entry["tables"]:
+        object_entry["tables"].append(table_name.lower())
+        object_entry["tables"].sort()
+    
+    # Write updated catalog
+    objects_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(objects_file, 'w', encoding='utf-8') as f:
+        f.write("# Migration Objects Catalog\n")
+        f.write("# Generated by transform-myd-minimal\n")
+        f.write("# This file provides an overview of all SAP migration objects and their target tables\n\n")
+        yaml.dump(objects_data, f, default_flow_style=False, allow_unicode=True)
+
+
+def generate_migration_fields_yaml(table_path, object_code, table_name, df):
+    """Generate fields.yaml for the new migrations structure."""
+    target_fields = df[df['field'] == 'Target'].copy()
+    
+    fields_data = {
+        'metadata': {
+            'object_code': object_code.upper(),
+            'table_name': table_name.lower(),
+            'sap_table': f"{object_code.upper()}_{table_name.upper()}",
+            'description': f"{object_code} {table_name} field definitions",
+            'last_updated': datetime.now().strftime('%Y-%m-%d')
+        },
+        'fields': []
+    }
+    
+    for _, row in target_fields.iterrows():
+        field_info = {
+            'name': row.get('field_name', ''),
+            'description': row.get('field_description', ''),
+            'data_type': 'CHAR',  # Default, should be determined from metadata
+            'length': 20,  # Default, should be from metadata
+            'required': bool(row.get('field_is_mandatory', False)),
+            'key_field': bool(row.get('field_is_key', False)),
+            'business_key': bool(row.get('field_is_key', False))
+        }
+        fields_data['fields'].append(field_info)
+    
+    # Add field groups for better organization
+    fields_data['field_groups'] = {
+        'keys': {
+            'description': 'Key fields that uniquely identify records',
+            'fields': [f['name'] for f in fields_data['fields'] if f['key_field']]
+        },
+        'required': {
+            'description': 'Mandatory fields',
+            'fields': [f['name'] for f in fields_data['fields'] if f['required']]
+        }
+    }
+    
+    # Write to file
+    output_path = table_path / "fields.yaml"
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(f"# Field Definitions for {object_code.upper()} {table_name.title()} - {table_name.upper()} Table\n")
+        f.write(f"# Generated by transform-myd-minimal @ {datetime.now().strftime('%Y%m%d %H%M')}\n")
+        f.write(f"# This file defines the target SAP fields and their properties\n\n")
+        yaml.dump(fields_data, f, default_flow_style=False, allow_unicode=True)
+    
+    print(f"Generated: {output_path}")
+    return output_path
+
+
+def generate_migration_mappings_yaml(table_path, object_code, table_name, df):
+    """Generate mappings.yaml for the new migrations structure."""
+    source_fields = df[df['field'] == 'Source'].copy()
+    target_fields = df[df['field'] == 'Target'].copy()
+    
+    mappings_data = {
+        'metadata': {
+            'object_code': object_code.upper(),
+            'table_name': table_name.lower(),
+            'source_system': 'Legacy System',
+            'mapping_version': '1.0',
+            'last_updated': datetime.now().strftime('%Y-%m-%d')
+        },
+        'direct_mappings': [],
+        'derived_mappings': [],
+        'central_memory_mappings': [],
+        'skip_rules': [],
+        'unmapped_sources': [],
+        'unmapped_targets': [],
+        'mapping_stats': {
+            'total_source_fields': len(source_fields),
+            'mapped_source_fields': 0,
+            'unmapped_source_fields': 0,
+            'total_target_fields': len(target_fields),
+            'mapped_target_fields': 0,
+            'unmapped_target_fields': 0,
+            'coverage_percentage': 0.0
+        }
+    }
+    
+    # Basic mapping structure - this would be enhanced with actual matching logic
+    for _, source_row in source_fields.iterrows():
+        source_name = source_row.get('field_name', '')
+        source_desc = source_row.get('field_description', '')
+        
+        # Simple exact match for demonstration
+        target_match = target_fields[target_fields['field_name'] == source_name]
+        if not target_match.empty:
+            target_row = target_match.iloc[0]
+            mapping_info = {
+                'source_field': source_name,
+                'source_description': source_desc,
+                'target_field': target_row.get('field_name', ''),
+                'target_description': target_row.get('field_description', ''),
+                'mapping_type': 'direct',
+                'confidence': 1.0,
+                'comments': 'Exact field name match'
+            }
+            mappings_data['direct_mappings'].append(mapping_info)
+            mappings_data['mapping_stats']['mapped_source_fields'] += 1
+        else:
+            unmapped_info = {
+                'source_field': source_name,
+                'source_description': source_desc,
+                'skip_reason': 'No exact target match found'
+            }
+            mappings_data['unmapped_sources'].append(unmapped_info)
+            mappings_data['mapping_stats']['unmapped_source_fields'] += 1
+    
+    # Calculate coverage
+    total_sources = mappings_data['mapping_stats']['total_source_fields']
+    mapped_sources = mappings_data['mapping_stats']['mapped_source_fields']
+    if total_sources > 0:
+        mappings_data['mapping_stats']['coverage_percentage'] = round((mapped_sources / total_sources) * 100, 1)
+    
+    # Write to file
+    output_path = table_path / "mappings.yaml"
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(f"# Source-to-Target Field Mappings for {object_code.upper()} {table_name.title()} - {table_name.upper()} Table\n")
+        f.write(f"# Generated by transform-myd-minimal @ {datetime.now().strftime('%Y%m%d %H%M')}\n")
+        f.write(f"# This file defines how source fields map to SAP target fields\n\n")
+        yaml.dump(mappings_data, f, default_flow_style=False, allow_unicode=True)
+    
+    print(f"Generated: {output_path}")
+    return output_path
+
+
+def generate_migration_validation_yaml(table_path, object_code, table_name, df):
+    """Generate validation.yaml for the new migrations structure."""
+    target_fields = df[df['field'] == 'Target'].copy()
+    
+    validation_data = {
+        'metadata': {
+            'object_code': object_code.upper(),
+            'table_name': table_name.lower(),
+            'validation_version': '1.0',
+            'last_updated': datetime.now().strftime('%Y-%m-%d')
+        },
+        'field_validations': {},
+        'cross_field_validations': [],
+        'business_rules': [],
+        'data_quality_checks': [],
+        'audit_rules': []
+    }
+    
+    # Generate field-level validations
+    for _, row in target_fields.iterrows():
+        field_name = row.get('field_name', '')
+        is_mandatory = bool(row.get('field_is_mandatory', False))
+        is_key = bool(row.get('field_is_key', False))
+        
+        field_rules = []
+        
+        if is_mandatory or is_key:
+            field_rules.append({
+                'rule_type': 'required',
+                'description': f'{field_name} must be provided',
+                'error_level': 'critical'
+            })
+        
+        if field_rules:
+            validation_data['field_validations'][field_name] = field_rules
+    
+    # Add standard business rules
+    validation_data['business_rules'].append({
+        'rule_name': 'record_uniqueness',
+        'description': 'Records must be unique based on key fields',
+        'scope': 'table',
+        'error_level': 'critical'
+    })
+    
+    # Add audit requirements
+    validation_data['audit_rules'].append({
+        'rule_name': 'source_traceability',
+        'requirement': 'Maintain source system reference',
+        'acceptance_criteria': '100% of records have source reference'
+    })
+    
+    # Write to file
+    output_path = table_path / "validation.yaml"
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(f"# Validation Rules for {object_code.upper()} {table_name.title()} - {table_name.upper()} Table\n")
+        f.write(f"# Generated by transform-myd-minimal @ {datetime.now().strftime('%Y%m%d %H%M')}\n")
+        f.write(f"# This file defines validation rules to ensure data quality and SAP compliance\n\n")
+        yaml.dump(validation_data, f, default_flow_style=False, allow_unicode=True)
+    
+    print(f"Generated: {output_path}")
+    return output_path
+
+
+def generate_migration_transformations_yaml(table_path, object_code, table_name, df):
+    """Generate transformations.yaml for the new migrations structure."""
+    target_fields = df[df['field'] == 'Target'].copy()
+    
+    transformations_data = {
+        'metadata': {
+            'object_code': object_code.upper(),
+            'table_name': table_name.lower(),
+            'transformation_version': '1.0',
+            'last_updated': datetime.now().strftime('%Y-%m-%d')
+        },
+        'field_transformations': {},
+        'conditional_transformations': [],
+        'value_mappings': {},
+        'cleansing_rules': [],
+        'audit_requirements': []
+    }
+    
+    # Generate basic transformations for common fields
+    for _, row in target_fields.iterrows():
+        field_name = row.get('field_name', '')
+        field_desc = row.get('field_description', '')
+        is_mandatory = bool(row.get('field_is_mandatory', False))
+        
+        # Add client field transformation
+        if 'MANDT' in field_name.upper() or 'CLIENT' in field_name.upper():
+            transformations_data['field_transformations'][field_name] = {
+                'transformation_type': 'constant',
+                'target_value': '100',
+                'description': 'Set client to production client 100',
+                'business_rule': 'All migrated data goes to client 100'
+            }
+        
+        # Add transformations for mandatory fields
+        elif is_mandatory:
+            transformations_data['field_transformations'][field_name] = {
+                'transformation_type': 'direct',
+                'description': f'Direct mapping for mandatory field {field_name}',
+                'null_handling': 'reject_record'
+            }
+    
+    # Add standard cleansing rules
+    transformations_data['cleansing_rules'].append({
+        'field': 'all_text_fields',
+        'rules': {
+            'remove_leading_trailing_spaces': True,
+            'normalize_unicode': True,
+            'remove_control_characters': True
+        }
+    })
+    
+    # Add audit requirements
+    transformations_data['audit_requirements'].append({
+        'track_field': 'all',
+        'requirement': 'Log original and transformed values',
+        'retention_period': '7_years'
+    })
+    
+    # Write to file
+    output_path = table_path / "transformations.yaml"
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(f"# Value Transformations for {object_code.upper()} {table_name.title()} - {table_name.upper()} Table\n")
+        f.write(f"# Generated by transform-myd-minimal @ {datetime.now().strftime('%Y%m%d %H%M')}\n")
+        f.write(f"# This file defines how source values should be transformed to target values\n\n")
+        yaml.dump(transformations_data, f, default_flow_style=False, allow_unicode=True)
+    
+    print(f"Generated: {output_path}")
+    return output_path
 
 
 if __name__ == "__main__":
