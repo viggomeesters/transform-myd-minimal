@@ -4,7 +4,7 @@ CLI tool voor het genereren van column mapping en YAML bestanden uit Excel field
 
 **Nu met geïntegreerde YAML workflow, geavanceerde field matching algoritmen én nieuwe multi-file migration structuur!**
 
-## 🆕 New Multi-File Migration Structure (v3.1)
+## 🆕 New Multi-File Migration Structure (v3.0)
 
 De nieuwe multi-file YAML structuur lost de pijnpunten van de vorige single-file aanpak op:
 
