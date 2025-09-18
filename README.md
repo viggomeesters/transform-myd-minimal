@@ -330,10 +330,36 @@ output_dir: "output"        # Output directory for generated YAML files
 
 ### Snelle Referentie
 
-- `--fuzzy-threshold FLOAT`: Fuzzy matching threshold (0.0-1.0, default: configs/config.yaml of 0.6)
-- `--max-suggestions INT`: Maximum aantal fuzzy match suggesties (default: configs/config.yaml of 3)
+**Minimaal commando:**
+```bash
+# Met expliciete argumenten
+./transform-myd-minimal map --object m140 --variant bnka
+
+# Met config defaults (object/variant in config.yaml)
+./transform-myd-minimal map
+```
+
+**Voorbeeld config.yaml met alle CLI opties:**
+```yaml
+# Standaard object en variant (optioneel) 
+object: "m140"
+variant: "bnka"
+
+# Fuzzy matching instellingen
+fuzzy_threshold: 0.7
+max_suggestions: 5
+disable_fuzzy: false
+
+# Directory instellingen  
+input_dir: "data/02_fields"
+output_dir: "output"
+```
+
+**Belangrijke CLI opties:**
+- `--fuzzy-threshold FLOAT`: Fuzzy matching threshold (0.0-1.0, default: config.yaml of 0.6)
+- `--max-suggestions INT`: Maximum aantal fuzzy match suggesties (default: config.yaml of 3)
 - `--disable-fuzzy`: Schakel fuzzy matching uit
-- `configs/config.yaml`: Centraal configuratiebestand voor default waarden
+- `config/config.yaml`: Centraal configuratiebestand voor default waarden
 
 ## Uitvoer
 

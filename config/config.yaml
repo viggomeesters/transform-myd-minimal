@@ -14,7 +14,7 @@ disable_fuzzy: false        # Whether to disable fuzzy matching
 input_dir: "data/02_fields" # Input directory for Excel files
 output_dir: "output"        # Output directory for generated YAML files
 
-# New mapping configuration for direct source file processing
+# Advanced mapping configuration for direct source file processing
 mapping:
   from_sources: true        # Enable direct mapping from source files
 
