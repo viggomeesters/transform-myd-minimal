@@ -10,11 +10,17 @@ Implements direct mapping generation from source files:
 
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
+from datetime import datetime
 import pandas as pd
+import yaml
 
 from .parsers import parse_source_and_targets
 from .fuzzy import FuzzyConfig, FieldNormalizer, FuzzyMatcher
 from .synonym import SynonymMatcher
+from .logging_config import get_logger
+
+# Initialize logger for this module
+logger = get_logger(__name__)
 
 
 class SourceBasedMatcher:
@@ -203,7 +209,7 @@ def generate_targets_yaml(target_fields: List[Dict[str, Any]], output_path: Path
         f.write(f"# Generated at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
         yaml.dump(targets_data, f, default_flow_style=False, allow_unicode=True)
     
-    print(f"Generated targets.yaml: {output_path}")
+    logger.info(f"Generated targets.yaml: {output_path}")
 
 
 def generate_mapping_yaml(mapping_result: Dict[str, Any], output_path: Path) -> None:
@@ -269,7 +275,7 @@ def generate_mapping_yaml(mapping_result: Dict[str, Any], output_path: Path) -> 
         f.write(f"# Coverage: {mapping_result['stats']['coverage_percentage']:.1f}%\n\n")
         yaml.dump(mapping_data, f, default_flow_style=False, allow_unicode=True)
     
-    print(f"Generated mapping.yaml: {output_path}")
+    logger.info(f"Generated mapping.yaml: {output_path}")
 
 
 def run_source_based_mapping(config, args=None) -> None:
@@ -280,17 +286,17 @@ def run_source_based_mapping(config, args=None) -> None:
         config: Configuration object
         args: CLI arguments (optional)
     """
-    print("=== Source-Based Mapping Pipeline ===")
+    logger.info("=== Source-Based Mapping Pipeline ===")
     
     # Determine file paths
     source_path = Path(config.source_headers['path'])
     target_path = Path(config.target_xml['path'])
     
-    print(f"Source headers file: {source_path}")
-    print(f"Target XML file: {target_path}")
+    logger.info(f"Source headers file: {source_path}")
+    logger.info(f"Target XML file: {target_path}")
     
     # Parse source headers and target fields
-    print("\nParsing source and target files...")
+    logger.info("\nParsing source and target files...")
     try:
         source_headers, target_fields = parse_source_and_targets(
             source_path, target_path,
@@ -299,15 +305,15 @@ def run_source_based_mapping(config, args=None) -> None:
                           'header_match': config.target_xml['header_match']}
         )
         
-        print(f"✓ Found {len(source_headers)} source headers")
-        print(f"✓ Found {len(target_fields)} target fields")
+        logger.info(f"✓ Found {len(source_headers)} source headers")
+        logger.info(f"✓ Found {len(target_fields)} target fields")
         
     except Exception as e:
-        print(f"Error parsing files: {e}")
+        logger.info(f"Error parsing files: {e}")
         return
     
     # Run matching
-    print("\nRunning field matching...")
+    logger.info("\nRunning field matching...")
     fuzzy_config = FuzzyConfig(
         enabled=not config.disable_fuzzy,
         threshold=config.fuzzy_threshold,
@@ -321,19 +327,19 @@ def run_source_based_mapping(config, args=None) -> None:
     )
     
     # Print results
-    print(f"\n=== Matching Results ===")
-    print(f"Total source fields: {mapping_result['stats']['total_sources']}")
-    print(f"Total target fields: {mapping_result['stats']['total_targets']}")
-    print(f"Successful matches: {mapping_result['stats']['matched_sources']}")
-    print(f"Coverage: {mapping_result['stats']['coverage_percentage']:.1f}%")
-    print(f"Unmatched sources: {len(mapping_result['unmatched_sources'])}")
-    print(f"Unmatched targets: {len(mapping_result['unmatched_targets'])}")
+    logger.info(f"\n=== Matching Results ===")
+    logger.info(f"Total source fields: {mapping_result['stats']['total_sources']}")
+    logger.info(f"Total target fields: {mapping_result['stats']['total_targets']}")
+    logger.info(f"Successful matches: {mapping_result['stats']['matched_sources']}")
+    logger.info(f"Coverage: {mapping_result['stats']['coverage_percentage']:.1f}%")
+    logger.info(f"Unmatched sources: {len(mapping_result['unmatched_sources'])}")
+    logger.info(f"Unmatched targets: {len(mapping_result['unmatched_targets'])}")
     
     # Generate output files
     output_dir = Path(config.output_dir)
     
-    print(f"\n=== Generating Output Files ===")
+    logger.info(f"\n=== Generating Output Files ===")
     generate_targets_yaml(target_fields, output_dir / "targets.yaml")
     generate_mapping_yaml(mapping_result, output_dir / "mapping.yaml")
     
-    print("\n✓ Source-based mapping pipeline completed successfully!")
+    logger.info("\n✓ Source-based mapping pipeline completed successfully!")

@@ -12,6 +12,11 @@ from typing import Optional, Dict, Any
 
 import yaml
 
+from .logging_config import get_logger
+
+# Initialize logger for this module
+logger = get_logger(__name__)
+
 
 class Config:
     """Configuration management class for transform-myd-minimal."""
@@ -114,8 +119,8 @@ class Config:
                     self.matching.update(config_data['matching'])
                     
         except Exception as e:
-            print(f"Warning: Could not load config.yaml: {e}")
-            print("Using default values")
+            logger.warning(f"Could not load config.yaml: {e}")
+            logger.info("Using default values")
     
     def merge_with_cli_args(self, args) -> None:
         """Merge CLI arguments with config values. CLI args take precedence."""

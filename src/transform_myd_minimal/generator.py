@@ -18,6 +18,11 @@ from typing import Dict, List, Optional, Tuple
 import pandas as pd
 import yaml
 
+from .logging_config import get_logger
+
+# Initialize logger for this module
+logger = get_logger(__name__)
+
 from .fuzzy import FuzzyConfig
 
 
@@ -43,7 +48,7 @@ def scan_data_structure(base_path, output_dir="config"):
     config_path = base_path / output_dir
     
     if not config_path.exists():
-        print(f"Warning: {config_path} does not exist")
+        logger.warning(f"{config_path} does not exist")
         return {}
     
     # Scan for objects and variants
@@ -86,7 +91,7 @@ def generate_object_list_yaml(base_path, output_dir="config"):
         f.write("# Overview of all objects and their tables\n\n")
         yaml.dump(yaml_data, f, default_flow_style=False, allow_unicode=True)
     
-    print(f"Generated: {output_path}")
+    logger.info(f"Generated: {output_path}")
     return output_path
 
 
@@ -168,7 +173,7 @@ def generate_fields_yaml(base_path, object_name, variant, df, output_dir="config
         f.write(f"# Source: {input_dir}/{excel_filename}\n\n")
         yaml.dump(fields_data, f, default_flow_style=False, allow_unicode=True)
     
-    print(f"Generated: {output_path}")
+    logger.info(f"Generated: {output_path}")
     return output_path
 
 
@@ -225,7 +230,7 @@ def generate_value_rules_yaml(base_path, object_name, variant, df, output_dir="c
         f.write(f"# Source: {input_dir}/{excel_filename}\n\n")
         yaml.dump(rules_data, f, default_flow_style=False, allow_unicode=True)
     
-    print(f"Generated: {output_path}")
+    logger.info(f"Generated: {output_path}")
     return output_path
 
 
@@ -607,7 +612,7 @@ def generate_migration_fields_yaml(table_path, object_code, table_name, df):
         f.write(f"# This file defines the structure and metadata of target fields\n\n")
         yaml.dump(fields_data, f, default_flow_style=False, allow_unicode=True)
     
-    print(f"Generated: {output_path}")
+    logger.info(f"Generated: {output_path}")
     return output_path
 
 
@@ -793,7 +798,7 @@ def generate_migration_mappings_yaml(table_path, object_code, table_name, df, ma
         
         yaml.dump(mappings_data, f, default_flow_style=False, allow_unicode=True)
     
-    print(f"Generated: {output_path}")
+    logger.info(f"Generated: {output_path}")
     return output_path
 
 
@@ -873,7 +878,7 @@ def generate_migration_validation_yaml(table_path, object_code, table_name, df):
         f.write(f"# This file defines validation rules to ensure data quality\n\n")
         yaml.dump(validation_data, f, default_flow_style=False, allow_unicode=True)
     
-    print(f"Generated: {output_path}")
+    logger.info(f"Generated: {output_path}")
     return output_path
 
 
@@ -951,5 +956,5 @@ def generate_migration_transformations_yaml(table_path, object_code, table_name,
         f.write(f"# This file defines how source values should be transformed to target values\n\n")
         yaml.dump(transformations_data, f, default_flow_style=False, allow_unicode=True)
     
-    print(f"Generated: {output_path}")
+    logger.info(f"Generated: {output_path}")
     return output_path

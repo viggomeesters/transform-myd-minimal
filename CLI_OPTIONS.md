@@ -7,8 +7,8 @@
 | `-h`, `--help` | flag | No | - | Show help message and exit | v1.0 |
 | `--version` | flag | No | - | Show program's version number and exit | v3.0 |
 | `map` | subcommand | No* | - | Generate column mapping and YAML files | v3.0 |
-| `-object OBJECT`, `--object OBJECT` | string | **Yes** | - | Object name (e.g., m140) | v1.0 |
-| `-variant VARIANT`, `--variant VARIANT` | string | **Yes** | - | Variant name (e.g., bnka) | v1.0 |
+| `--object OBJECT` | string | **Yes** | - | Object name (e.g., m140) | v1.0 |
+| `--variant VARIANT` | string | **Yes** | - | Variant name (e.g., bnka) | v1.0 |
 | `--fuzzy-threshold FUZZY_THRESHOLD` | float | No | 0.6 | Fuzzy matching threshold (0.0-1.0) | v2.0 |
 | `--max-suggestions MAX_SUGGESTIONS` | int | No | 3 | Maximum fuzzy match suggestions | v2.0 |
 | `--disable-fuzzy` | flag | No | False | Disable fuzzy matching completely | v2.0 |
@@ -33,13 +33,13 @@ All examples in this document use the new wrapper script format.
 ### Integrated Workflow (Recommended - v3.0+)
 ```bash
 # Generate all YAML files (column_map, fields, value_rules, object_list)
-./transform-myd-minimal map -object m140 -variant bnka
+./transform-myd-minimal map --object m140 --variant bnka
 
 # With advanced fuzzy matching options
-./transform-myd-minimal map -object m140 -variant bnka --fuzzy-threshold 0.8
+./transform-myd-minimal map --object m140 --variant bnka --fuzzy-threshold 0.8
 
 # Disable fuzzy matching
-./transform-myd-minimal map -object m140 -variant bnka --disable-fuzzy
+./transform-myd-minimal map --object m140 --variant bnka --disable-fuzzy
 ```
 
 ### Legacy Format (Backward Compatible)
@@ -54,16 +54,16 @@ All examples in this document use the new wrapper script format.
 ### Source-Based Mapping Options (v3.1+)
 ```bash
 # Override source headers file
-./transform-myd-minimal map -object m140 -variant bnka --source-headers-xlsx "custom/path/headers.xlsx"
+./transform-myd-minimal map --object m140 --variant bnka --source-headers-xlsx "custom/path/headers.xlsx"
 
 # Override XML target file
-./transform-myd-minimal map -object m140 -variant bnka --target-xml "custom/path/targets.xml"
+./transform-myd-minimal map --object m140 --variant bnka --target-xml "custom/path/targets.xml"
 
 # Override specific worksheet in target XML
-./transform-myd-minimal map -object m140 -variant bnka --target-xml-worksheet "Custom Field List"
+./transform-myd-minimal map --object m140 --variant bnka --target-xml-worksheet "Custom Field List"
 
 # Combine multiple source-based overrides
-./transform-myd-minimal map -object m140 -variant bnka \
+./transform-myd-minimal map --object m140 --variant bnka \
   --source-headers-xlsx "data/custom_headers.xlsx" \
   --source-headers-sheet "Sheet2" \
   --target-xml "data/custom_targets.xml"
@@ -72,13 +72,13 @@ All examples in this document use the new wrapper script format.
 ### Advanced Fuzzy Matching Options
 ```bash
 # High precision fuzzy matching (stricter threshold)
-./transform-myd-minimal map -object m140 -variant bnka --fuzzy-threshold 0.8
+./transform-myd-minimal map --object m140 --variant bnka --fuzzy-threshold 0.8
 
 # More fuzzy suggestions
-./transform-myd-minimal map -object m140 -variant bnka --max-suggestions 5
+./transform-myd-minimal map --object m140 --variant bnka --max-suggestions 5
 
 # Combined advanced options
-./transform-myd-minimal map -object m140 -variant bnka --fuzzy-threshold 0.7 --max-suggestions 2
+./transform-myd-minimal map --object m140 --variant bnka --fuzzy-threshold 0.7 --max-suggestions 2
 ```
 
 ### Getting Help
@@ -97,17 +97,17 @@ All examples in this document use the new wrapper script format.
 
 ### Required Parameters
 
-#### `-object` / `--object`
+#### `--object`
 - **Purpose**: Specifies the object name for the transformation
 - **Format**: String, typically alphanumeric (e.g., "m140", "p100")
 - **Usage**: Determines the input Excel file path: `data/02_fields/fields_{object}_{variant}.xlsx`
-- **Example**: `-object m140`
+- **Example**: `--object m140`
 
-#### `-variant` / `--variant` 
+#### `--variant` 
 - **Purpose**: Specifies the variant name for the transformation
 - **Format**: String, typically alphanumeric (e.g., "bnka", "test")
 - **Usage**: Determines both input file and output directory paths
-- **Example**: `-variant bnka`
+- **Example**: `--variant bnka`
 
 ### Advanced Matching Parameters (v2.0+)
 
@@ -243,7 +243,7 @@ Upgrade to the integrated workflow for automatic YAML generation:
 ./transform-myd-minimal -object m140 -variant bnka
 
 # v3.0 integrated workflow (recommended)
-./transform-myd-minimal map -object m140 -variant bnka
+./transform-myd-minimal map --object m140 --variant bnka
 ```
 
 **Benefits of v3.0:**
@@ -260,7 +260,7 @@ All existing commands continue to work without changes. New features are opt-in:
 ./transform-myd-minimal -object m140 -variant bnka
 
 # v2.0 with advanced features
-./transform-myd-minimal map -object m140 -variant bnka --fuzzy-threshold 0.7
+./transform-myd-minimal map --object m140 --variant bnka --fuzzy-threshold 0.7
 ```
 
 ## Tips and Best Practices

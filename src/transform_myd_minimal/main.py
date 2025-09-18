@@ -24,6 +24,10 @@ from .generator import (
     read_excel_fields, generate_object_list_yaml, generate_fields_yaml, 
     generate_value_rules_yaml, generate_column_map_yaml, generate_migration_structure
 )
+from .logging_config import get_logger
+
+# Initialize logger for this module
+logger = get_logger(__name__)
 
 
 @dataclass
@@ -456,7 +460,7 @@ def load_central_mapping_memory(base_path: Path) -> Optional[CentralMappingMemor
         )
     
     except Exception as e:
-        print(f"Warning: Could not load central mapping memory: {e}")
+        logger.warning(f"Could not load central mapping memory: {e}")
         return None
 
 
@@ -516,21 +520,21 @@ def run_map_command(args, config):
     
     try:
         # Load central mapping memory
-        print("Loading central mapping memory...")
+        logger.info("Loading central mapping memory...")
         central_memory = load_central_mapping_memory(base_dir)
         if central_memory:
-            print("Central mapping memory loaded successfully")
+            logger.info("Central mapping memory loaded successfully")
             skip_rules, manual_mappings = get_effective_rules_for_table(central_memory, args.object, args.variant)
-            print(f"Found {len(skip_rules)} skip rules and {len(manual_mappings)} manual mappings for {args.object}_{args.variant}")
+            logger.info(f"Found {len(skip_rules)} skip rules and {len(manual_mappings)} manual mappings for {args.object}_{args.variant}")
         else:
-            print("No central mapping memory found or failed to load")
+            logger.info("No central mapping memory found or failed to load")
         
         # Read Excel file
-        print(f"Reading Excel file: {excel_path}")
+        logger.info(f"Reading Excel file: {excel_path}")
         source_fields, target_fields = read_excel_fields(excel_path)
         
-        print(f"Found {len(source_fields)} source fields and {len(target_fields)} target fields")
-        print("Initializing advanced field matching system...")
+        logger.info(f"Found {len(source_fields)} source fields and {len(target_fields)} target fields")
+        logger.info("Initializing advanced field matching system...")
         
         # Configure fuzzy matching using config values
         fuzzy_config = FuzzyConfig(
@@ -546,37 +550,42 @@ def run_map_command(args, config):
         mapping_lines, exact_matches, fuzzy_matches, unmapped_sources, audit_matches, central_skip_matches, central_manual_matches = mapping_result
         
         # Print matching statistics
-        print("\n=== Advanced Matching Results ===")
+        logger.info("")
+        logger.info("=== Advanced Matching Results ===")
         if central_skip_matches:
-            print(f"Central memory skip rules applied: {len(central_skip_matches)}")
+            logger.info(f"Central memory skip rules applied: {len(central_skip_matches)}")
         if central_manual_matches:
-            print(f"Central memory manual mappings applied: {len(central_manual_matches)}")
-        print(f"Exact matches: {len(exact_matches)}")
-        print(f"Fuzzy/Synonym matches: {len(fuzzy_matches)}")
-        print(f"Unmapped sources: {len(unmapped_sources)}")
-        print(f"Audit matches (fuzzy to exact-mapped targets): {len(audit_matches)}")
-        print(f"Mapping coverage: {((len(exact_matches) + len(fuzzy_matches)) / len(source_fields) * 100):.1f}%")
+            logger.info(f"Central memory manual mappings applied: {len(central_manual_matches)}")
+        logger.info(f"Exact matches: {len(exact_matches)}")
+        logger.info(f"Fuzzy/Synonym matches: {len(fuzzy_matches)}")
+        logger.info(f"Unmapped sources: {len(unmapped_sources)}")
+        logger.info(f"Audit matches (fuzzy to exact-mapped targets): {len(audit_matches)}")
+        logger.info(f"Mapping coverage: {((len(exact_matches) + len(fuzzy_matches)) / len(source_fields) * 100):.1f}%")
         
         # Show central memory rule applications
         if central_skip_matches:
-            print("\nCentral memory skip rules applied:")
+            logger.info("")
+            logger.info("Central memory skip rules applied:")
             for match in central_skip_matches:
-                print(f"  SKIP: {match.source_field} - {match.reason}")
+                logger.info(f"  SKIP: {match.source_field} - {match.reason}")
         
         if central_manual_matches:
-            print("\nCentral memory manual mappings applied:")
+            logger.info("")
+            logger.info("Central memory manual mappings applied:")
             for match in central_manual_matches:
-                print(f"  MANUAL: {match.source_field} → {match.target_field} - {match.reason}")
+                logger.info(f"  MANUAL: {match.source_field} → {match.target_field} - {match.reason}")
         
         if fuzzy_matches:
-            print("\nFuzzy/Synonym matches found:")
+            logger.info("")
+            logger.info("Fuzzy/Synonym matches found:")
             for match in fuzzy_matches:
-                print(f"  {match.source_field} → {match.target_field} ({match.match_type}, confidence: {match.confidence_score:.2f})")
+                logger.info(f"  {match.source_field} → {match.target_field} ({match.match_type}, confidence: {match.confidence_score:.2f})")
         
         if audit_matches:
-            print("\nAudit matches found (fuzzy matches to exact-mapped targets):")
+            logger.info("")
+            logger.info("Audit matches found (fuzzy matches to exact-mapped targets):")
             for match in audit_matches:
-                print(f"  {match.source_field} → {match.target_field} (audit, confidence: {match.confidence_score:.2f})")
+                logger.info(f"  {match.source_field} → {match.target_field} (audit, confidence: {match.confidence_score:.2f})")
         
         # Skip legacy column_map.yaml generation - deprecated in favor of migrations structure
         
@@ -598,30 +607,36 @@ def run_map_command(args, config):
         # Skip legacy config generation - deprecated in favor of migrations structure
         
         # === Generate New Multi-File Migration Structure ===
-        print(f"\n=== Generating New Multi-File Migration Structure ===")
+        logger.info("")
+        logger.info("=== Generating New Multi-File Migration Structure ===")
         try:
             generated_migration_files = generate_migration_structure(base_dir, args.object, args.variant, df, mapping_results)
             if generated_migration_files:
-                print(f"Generated {len(generated_migration_files)} migration files in migrations/ directory")
-                print("New structure provides:")
-                print("  ✓ Clear separation of concerns (fields, mappings, validation, transformations)")
-                print("  ✓ Non-redundant field definitions")
-                print("  ✓ SAP object-anchored structure")
-                print("  ✓ Table-scoped value rules (not object-wide)")
-                print("  ✓ Auditable mapping decisions")
+                logger.info(f"Generated {len(generated_migration_files)} migration files in migrations/ directory")
+                logger.info("New structure provides:")
+                logger.info("  ✓ Clear separation of concerns (fields, mappings, validation, transformations)")
+                logger.info("  ✓ Non-redundant field definitions")
+                logger.info("  ✓ SAP object-anchored structure")
+                logger.info("  ✓ Table-scoped value rules (not object-wide)")
+                logger.info("  ✓ Auditable mapping decisions")
             else:
-                print("Migration structure generation skipped (no data)")
+                logger.info("Migration structure generation skipped (no data)")
         except Exception as e:
-            print(f"Warning: Could not generate migration structure: {e}")
-            print("Legacy YAML files are still available in config/ directory")
+            logger.warning(f"Could not generate migration structure: {e}")
+            logger.info("Legacy YAML files are still available in config/ directory")
         
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
+        logger.error(f"Error: {e}")
         sys.exit(1)
 
 
 def main():
     """Main entry point for the application."""
+    from .logging_config import setup_logging
+    
+    # Initialize logging
+    setup_logging()
+    
     args, config, is_legacy = setup_cli()
     
     # Execute the map command

@@ -13,6 +13,10 @@ import argparse
 import sys
 
 from .config_loader import load_config
+from .logging_config import get_logger
+
+# Initialize logger for this module
+logger = get_logger(__name__)
 
 
 __version__ = "3.0.0"
@@ -26,7 +30,7 @@ def setup_cli():
     # Check if this is the old format (no subcommand)
     if len(sys.argv) > 1 and not sys.argv[1] in ['map', '-h', '--help', '--version']:
         # Old format detected, handle backward compatibility
-        print("Note: Using legacy format. Consider using 'map' subcommand: python3 transform_myd_minimal.py map -object {} -variant {}".format(
+        logger.info("Note: Using legacy format. Consider using 'map' subcommand: python3 transform_myd_minimal.py map --object {} --variant {}".format(
             sys.argv[sys.argv.index('-object') + 1] if '-object' in sys.argv else 'OBJECT',
             sys.argv[sys.argv.index('-variant') + 1] if '-variant' in sys.argv else 'VARIANT'
         ))
@@ -57,8 +61,8 @@ def setup_cli():
     
     # Map subcommand (default behavior)
     map_parser = subparsers.add_parser('map', help='Generate column mapping and YAML files')
-    map_parser.add_argument('-object', '--object', required=True, help='Object name (e.g., m140)')
-    map_parser.add_argument('-variant', '--variant', required=True, help='Variant name (e.g., bnka)')
+    map_parser.add_argument('--object', required=True, help='Object name (e.g., m140)')
+    map_parser.add_argument('--variant', required=True, help='Variant name (e.g., bnka)')
     map_parser.add_argument('--fuzzy-threshold', type=float, default=config.fuzzy_threshold, help=f'Fuzzy matching threshold (0.0-1.0, default: {config.fuzzy_threshold})')
     map_parser.add_argument('--max-suggestions', type=int, default=config.max_suggestions, help=f'Maximum fuzzy match suggestions (default: {config.max_suggestions})')
     map_parser.add_argument('--disable-fuzzy', action='store_true', default=config.disable_fuzzy, help='Disable fuzzy matching')
