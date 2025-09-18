@@ -62,7 +62,7 @@ migrations/
 - `rule: derive` voor velden die business logica vereisen
 
 ### 📋 Central Mapping Memory System
-- **Centraal geheugenbestand** (`central_mapping_memory.yaml`) voor herbruikbare mapping regels
+- **Centraal geheugenbestand** (`configs/central_mapping_memory.yaml`) voor herbruikbare mapping regels
 - **Skip rules** - velden uitsluiten van mapping met auditeerbare comments
 - **Manual mappings** - handmatige veld-naar-veld mappings met business context
 - **Global + table-specific overrides** - flexibele regel hiërarchie
@@ -86,7 +86,10 @@ transform-myd-minimal/
 │       ├── generator.py                # YAML generatie logica
 │       └── synonym.py                  # Synonym matching
 ├── transform-myd-minimal               # Wrapper script
-├── config/                             # Configuratie bestanden
+├── configs/                            # Centrale configuratie bestanden
+│   ├── config.yaml                     # Applicatie configuratie
+│   └── central_mapping_memory.yaml     # Centrale mapping regels
+├── config/                             # Gegenereerde output bestanden
 ├── data/                               # Input data (Excel bestanden)
 ├── migrations/                         # Nieuwe multi-file structuur
 └── README.md
@@ -208,9 +211,9 @@ Genereert: `migrations/M140/bnka/` met alle 4 YAML bestanden
 
 Voor een volledig overzicht van alle CLI opties, zie: **[CLI_OPTIONS.md](CLI_OPTIONS.md)**
 
-## Configuratie (config.yaml)
+## Configuratie (configs/config.yaml)
 
-Het script ondersteunt een centraal configuratiebestand `config.yaml` voor het instellen van default waarden. CLI argumenten hebben altijd voorrang op config.yaml instellingen.
+Het script ondersteunt een centraal configuratiebestand `configs/config.yaml` voor het instellen van default waarden. CLI argumenten hebben altijd voorrang op config.yaml instellingen.
 
 ### Ondersteunde Parameters
 
@@ -239,28 +242,30 @@ output_dir: "config"        # Output directory for generated YAML files
 ### Voorrang (Precedence)
 
 1. **CLI argumenten** - Hoogste prioriteit
-2. **config.yaml** - Middel prioriteit  
+2. **configs/config.yaml** - Middel prioriteit  
 3. **Hardcoded defaults** - Laagste prioriteit
+
+**Opmerking**: Voor backward compatibility ondersteunt het systeem ook config bestanden in de project root. Het zoekt eerst in `configs/` en valt terug naar de root directory.
 
 ### Voorbeelden
 
 ```bash
-# Gebruik config.yaml defaults
+# Gebruik configs/config.yaml defaults
 ./transform-myd-minimal map -object m140 -variant bnka
 
-# Override config.yaml met CLI argumenten
+# Override configs/config.yaml met CLI argumenten
 ./transform-myd-minimal map -object m140 -variant bnka --fuzzy-threshold 0.8 --max-suggestions 5
 
-# Configuratie wordt automatisch geladen als config.yaml bestaat
+# Configuratie wordt automatisch geladen als configs/config.yaml bestaat
 # Anders worden hardcoded defaults gebruikt
 ```
 
 ### Snelle Referentie
 
-- `--fuzzy-threshold FLOAT`: Fuzzy matching threshold (0.0-1.0, default: config.yaml of 0.6)
-- `--max-suggestions INT`: Maximum aantal fuzzy match suggesties (default: config.yaml of 3)
+- `--fuzzy-threshold FLOAT`: Fuzzy matching threshold (0.0-1.0, default: configs/config.yaml of 0.6)
+- `--max-suggestions INT`: Maximum aantal fuzzy match suggesties (default: configs/config.yaml of 3)
 - `--disable-fuzzy`: Schakel fuzzy matching uit
-- `config.yaml`: Centraal configuratiebestand voor default waarden
+- `configs/config.yaml`: Centraal configuratiebestand voor default waarden
 
 ## Uitvoer
 
@@ -386,11 +391,13 @@ Velden die niet als constant worden herkend krijgen `rule: derive` en vereisen b
 
 ## Central Mapping Memory System
 
-Het central mapping memory systeem maakt gebruik van een centraal configuratiebestand (`central_mapping_memory.yaml`) in de project root voor herbruikbare mapping regels.
+Het central mapping memory systeem maakt gebruik van een centraal configuratiebestand (`configs/central_mapping_memory.yaml`) voor herbruikbare mapping regels.
+
+**Opmerking**: Voor backward compatibility ondersteunt het systeem ook het bestand in de project root. Het zoekt eerst in `configs/` en valt terug naar de root directory.
 
 ### 📋 Configuratie Structuur
 
-Het `central_mapping_memory.yaml` bestand ondersteunt:
+Het `configs/central_mapping_memory.yaml` bestand ondersteunt:
 
 1. **Global skip fields** - Skip regels die op alle tabellen van toepassing zijn
 2. **Global manual mappings** - Handmatige mappings die op alle tabellen van toepassing zijn  

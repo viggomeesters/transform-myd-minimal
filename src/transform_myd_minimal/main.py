@@ -410,7 +410,10 @@ def create_column_mapping(source_fields, target_fields):
 
 def load_central_mapping_memory(base_path: Path) -> Optional[CentralMappingMemory]:
     """Load central mapping memory from YAML file."""
-    central_memory_path = base_path / "central_mapping_memory.yaml"
+    # Look in configs directory first, fallback to root for backward compatibility
+    central_memory_path = base_path / "configs" / "central_mapping_memory.yaml"
+    if not central_memory_path.exists():
+        central_memory_path = base_path / "central_mapping_memory.yaml"
     
     if not central_memory_path.exists():
         return None

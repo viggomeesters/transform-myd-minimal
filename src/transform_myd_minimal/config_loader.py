@@ -27,7 +27,10 @@ class Config:
         
         # Load from config file if it exists
         if config_path is None:
-            config_path = Path.cwd() / "config.yaml"
+            # Look in configs directory first, fallback to root for backward compatibility
+            config_path = Path.cwd() / "configs" / "config.yaml"
+            if not config_path.exists():
+                config_path = Path.cwd() / "config.yaml"
         
         if config_path.exists():
             self._load_from_file(config_path)
