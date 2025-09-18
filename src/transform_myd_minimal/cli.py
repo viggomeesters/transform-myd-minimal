@@ -39,6 +39,14 @@ def setup_cli():
         old_parser.add_argument('--max-suggestions', type=int, default=config.max_suggestions, help=f'Maximum fuzzy match suggestions (default: {config.max_suggestions})')
         old_parser.add_argument('--disable-fuzzy', action='store_true', default=config.disable_fuzzy, help='Disable fuzzy matching')
         
+        # New optional flags for source-based mapping (legacy format)
+        old_parser.add_argument('--source-headers-xlsx', type=str, help='Path to source headers XLSX file')
+        old_parser.add_argument('--source-headers-sheet', type=str, help='Sheet name in source XLSX')
+        old_parser.add_argument('--source-headers-row', type=int, help='Header row number in source XLSX')
+        old_parser.add_argument('--target-xml', type=str, help='Path to target XML file')
+        old_parser.add_argument('--target-xml-worksheet', type=str, help='Worksheet name in target XML')
+        old_parser.add_argument('--target-field-xpath', type=str, help='XPath for target field elements')
+        
         args = old_parser.parse_args()
         config.merge_with_cli_args(args)
         return args, config, True  # True indicates legacy format
@@ -55,6 +63,14 @@ def setup_cli():
     map_parser.add_argument('--fuzzy-threshold', type=float, default=config.fuzzy_threshold, help=f'Fuzzy matching threshold (0.0-1.0, default: {config.fuzzy_threshold})')
     map_parser.add_argument('--max-suggestions', type=int, default=config.max_suggestions, help=f'Maximum fuzzy match suggestions (default: {config.max_suggestions})')
     map_parser.add_argument('--disable-fuzzy', action='store_true', default=config.disable_fuzzy, help='Disable fuzzy matching')
+    
+    # New optional flags for source-based mapping
+    map_parser.add_argument('--source-headers-xlsx', type=str, help='Path to source headers XLSX file (overrides config)')
+    map_parser.add_argument('--source-headers-sheet', type=str, help='Sheet name in source XLSX (overrides config)')
+    map_parser.add_argument('--source-headers-row', type=int, help='Header row number in source XLSX (overrides config)')
+    map_parser.add_argument('--target-xml', type=str, help='Path to target XML file (overrides config)')
+    map_parser.add_argument('--target-xml-worksheet', type=str, help='Worksheet name in target XML (overrides config)')
+    map_parser.add_argument('--target-field-xpath', type=str, help='XPath for target field elements (optional)')
     
     # Parse arguments
     args = parser.parse_args()

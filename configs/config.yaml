@@ -9,3 +9,39 @@ disable_fuzzy: false        # Whether to disable fuzzy matching
 # Directory configuration
 input_dir: "data/02_fields" # Input directory for Excel files
 output_dir: "config"        # Output directory for generated YAML files
+
+# New mapping configuration for direct source file processing
+mapping:
+  from_sources: true        # Enable direct mapping from source files
+
+  source_headers:
+    path: data/02_fields/BNKA_headers.xlsx
+    sheet: Sheet1
+    header_row: 1
+    ignore_data_below: true
+
+  target_xml:
+    path: data/02_fields/Source data for Bank.xml
+    worksheet_name: "Field List"
+    header_match:
+      sheet_name: "Sheet Name"
+      group_name: "Group Name"
+      description: "Field Description"
+      importance: "Importance"
+      type: "Type"
+      length: "Length"
+      decimal: "Decimal"
+      sap_table: "SAP Structure"
+      sap_field: "SAP Field"
+    normalization:
+      strip_table_prefix: "S_"
+      uppercase_table_field: true
+    output_naming:
+      transformer_id_template: "{sap_table}#{sap_field}"
+      internal_id_template: "{internal_table}.{sap_field}"
+
+matching:
+  target_label_priority:
+    - description
+    - sap_field
+    - group_name
