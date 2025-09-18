@@ -1,13 +1,50 @@
-# Transform MYD Minimal - Integrated YAML Workflow
+# Transform MYD Minimal - Multi-File YAML Migration Workflow
 
-CLI tool voor het genereren van column mapping en YAML bestanden uit Excel field definities.
+CLI tool voor het genereren van column mapping en YAML bestanden uit Excel field definities met een nieuwe, verbeterde multi-file structuur.
 
-**Nu met geïntegreerde YAML workflow en geavanceerde field matching algoritmen!**
+**Nu met geïntegreerde YAML workflow, geavanceerde field matching algoritmen én nieuwe multi-file migration structuur!**
+
+## 🆕 New Multi-File Migration Structure (v3.1)
+
+De nieuwe multi-file YAML structuur lost de pijnpunten van de vorige single-file aanpak op:
+
+### ✅ Voordelen van de Nieuwe Structuur
+- **Clear separation of concerns**: Gescheiden veld definities, mappings, validatie regels en value transformaties
+- **Non-redundant**: Informatie verschijnt slechts op één plek; geen duplicatie tussen bestanden
+- **SAP object-anchored**: Migratie structuur volgt SAP business objecten
+- **Table-scoped rules**: Value rules zijn tabel-specifiek, niet object-breed toegepast
+- **Auditable decisions**: Volledige traceerbaarheid van mapping beslissingen met acceptance/rejection tracking
+
+### 📁 Directory Structuur
+```
+migrations/
+├── objects.yaml                           # Catalog van alle migratie objecten
+├── M120/                                  # Profit Centers
+│   └── cepc/                             # CEPC tabel variant
+│       ├── fields.yaml                   # Target veld definities
+│       ├── mappings.yaml                 # Source-naar-target mappings
+│       ├── validation.yaml               # Validatie regels en constraints
+│       └── transformations.yaml          # Value transformatie logica
+├── M140/                                  # Banks
+│   └── bnka/                             # BNKA tabel variant
+│       ├── fields.yaml                   # Target veld definities
+│       ├── mappings.yaml                 # Source-naar-target mappings
+│       ├── validation.yaml               # Validatie regels en constraints
+│       └── transformations.yaml          # Value transformatie logica
+└── SCHEMA.md                             # Schema documentatie
+```
+
+### 🎯 Implementatie Status
+- [x] **M120 (Profit Centers)**: Volledig geïmplementeerd met CEPC tabel voorbeeld
+- [x] **M140 (Banks)**: Volledig geïmplementeerd met BNKA tabel voorbeeld  
+- [x] **Schema documentatie**: Uitgebreide documentatie van file structuren
+- [x] **Loader code**: Bijgewerkt om nieuwe structuur te genereren
+- [x] **Backward compatibility**: Legacy config/ structuur blijft werken
 
 ## Features
 
 ### 🔄 Integrated YAML Workflow (v3.0)
-- **Single command** genereert alle benodigde YAML bestanden
+- **Single command** genereert alle benodigde YAML bestanden (legacy + nieuwe structuur)
 - **Automatische generatie** van fields.yaml, value_rules.yaml, object_list.yaml
 - **Geïntegreerde workflow** zonder aparte scripts
 - **Backward compatibility** met legacy command format
@@ -33,6 +70,57 @@ CLI tool voor het genereren van column mapping en YAML bestanden uit Excel field
 - **Prioriteit**: Central memory regels worden eerst toegepast, daarna automatische matching
 
 ## Gebruik
+
+### ✨ Multi-File Migration Structure Generation
+
+Elke `map` opdracht genereert nu **beide** structuren:
+- **Legacy**: `config/{object}/{variant}/` - Bestaande single-file structuur
+- **New**: `migrations/{OBJECT}/{table}/` - Nieuwe multi-file structuur
+
+```bash
+# Genereert zowel legacy als nieuwe structuur
+python3 transform_myd_minimal.py map -object m140 -variant bnka
+```
+
+**Output:**
+```
+=== Advanced Matching Results ===
+... (matching details) ...
+
+=== Generating Additional YAML Files ===
+Generated: config/m140/bnka/fields.yaml
+Generated: config/m140/bnka/value_rules.yaml
+Generated: config/m140/bnka/column_map.yaml
+
+=== Generating New Multi-File Migration Structure ===
+Generated: migrations/M140/bnka/fields.yaml
+Generated: migrations/M140/bnka/mappings.yaml
+Generated: migrations/M140/bnka/validation.yaml
+Generated: migrations/M140/bnka/transformations.yaml
+Generated 5 migration files in migrations/ directory
+```
+
+### 📋 Nieuwe Structure Voordelen
+
+1. **Clear Separation**: Elke file heeft een specifieke verantwoordelijkheid
+2. **SAP-Anchored**: Structuur volgt SAP business objecten (M120=CEPC, M140=BNKA)
+3. **Table-Scoped**: Value rules zijn tabel-specifiek, niet object-breed
+4. **Non-Redundant**: Geen dubbele informatie tussen bestanden
+5. **Auditable**: Volledige traceerbaarheid van mapping beslissingen
+
+### 🎯 Voorbeelden
+
+#### M120 Profit Centers
+```bash
+python3 transform_myd_minimal.py map -object m120 -variant cepc
+```
+Genereert: `migrations/M120/cepc/` met alle 4 YAML bestanden
+
+#### M140 Banks  
+```bash
+python3 transform_myd_minimal.py map -object m140 -variant bnka
+```
+Genereert: `migrations/M140/bnka/` met alle 4 YAML bestanden
 
 ### Nieuwe format (aanbevolen)
 ```bash
