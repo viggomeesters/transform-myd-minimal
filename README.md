@@ -162,19 +162,68 @@ python3 transform_myd_minimal.py map -object m140 -variant bnka --max-suggestion
 | `map` | subcommand | Nee* | - | Genereer column mapping en YAML files |
 | `-object OBJECT` | string | **Ja** | - | Object naam (bijv. m140) |
 | `-variant VARIANT` | string | **Ja** | - | Variant naam (bijv. bnka) |
-| `--fuzzy-threshold` | float | Nee | 0.6 | Fuzzy matching threshold (0.0-1.0) |
-| `--max-suggestions` | int | Nee | 3 | Maximum fuzzy match suggesties |
-| `--disable-fuzzy` | flag | Nee | False | Fuzzy matching uitschakelen |
+| `--fuzzy-threshold` | float | Nee | 0.6** | Fuzzy matching threshold (0.0-1.0) |
+| `--max-suggestions` | int | Nee | 3** | Maximum fuzzy match suggesties |
+| `--disable-fuzzy` | flag | Nee | False** | Fuzzy matching uitschakelen |
 
-*Het `map` subcommand is optioneel voor backward compatibility
+*Het `map` subcommand is optioneel voor backward compatibility  
+**Default waarden kunnen worden aangepast via config.yaml
 
 Voor een volledig overzicht van alle CLI opties, zie: **[CLI_OPTIONS.md](CLI_OPTIONS.md)**
 
+## Configuratie (config.yaml)
+
+Het script ondersteunt een centraal configuratiebestand `config.yaml` voor het instellen van default waarden. CLI argumenten hebben altijd voorrang op config.yaml instellingen.
+
+### Ondersteunde Parameters
+
+```yaml
+# Transform MYD Minimal Configuration
+# Fuzzy matching configuration
+fuzzy_threshold: 0.6        # Fuzzy matching threshold (0.0-1.0)
+max_suggestions: 3          # Maximum number of fuzzy match suggestions  
+disable_fuzzy: false        # Whether to disable fuzzy matching
+
+# Directory configuration
+input_dir: "data/02_fields" # Input directory for Excel files
+output_dir: "config"        # Output directory for generated YAML files
+```
+
+### Parameter Beschrijvingen
+
+| Parameter | Type | Default | Beschrijving |
+|-----------|------|---------|--------------|
+| `fuzzy_threshold` | float | 0.6 | Fuzzy matching threshold (0.0-1.0) |
+| `max_suggestions` | int | 3 | Maximum aantal fuzzy match suggesties |
+| `disable_fuzzy` | boolean | false | Schakel fuzzy matching uit |
+| `input_dir` | string | "data/02_fields" | Input directory voor Excel bestanden |
+| `output_dir` | string | "config" | Output directory voor YAML bestanden |
+
+### Voorrang (Precedence)
+
+1. **CLI argumenten** - Hoogste prioriteit
+2. **config.yaml** - Middel prioriteit  
+3. **Hardcoded defaults** - Laagste prioriteit
+
+### Voorbeelden
+
+```bash
+# Gebruik config.yaml defaults
+python3 transform_myd_minimal.py map -object m140 -variant bnka
+
+# Override config.yaml met CLI argumenten
+python3 transform_myd_minimal.py map -object m140 -variant bnka --fuzzy-threshold 0.8 --max-suggestions 5
+
+# Configuratie wordt automatisch geladen als config.yaml bestaat
+# Anders worden hardcoded defaults gebruikt
+```
+
 ### Snelle Referentie
 
-- `--fuzzy-threshold FLOAT`: Fuzzy matching threshold (0.0-1.0, default: 0.6)
-- `--max-suggestions INT`: Maximum aantal fuzzy match suggesties (default: 3)
+- `--fuzzy-threshold FLOAT`: Fuzzy matching threshold (0.0-1.0, default: config.yaml of 0.6)
+- `--max-suggestions INT`: Maximum aantal fuzzy match suggesties (default: config.yaml of 3)
 - `--disable-fuzzy`: Schakel fuzzy matching uit
+- `config.yaml`: Centraal configuratiebestand voor default waarden
 
 ## Uitvoer
 
