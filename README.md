@@ -20,30 +20,51 @@ CLI tool voor het genereren van column mapping YAML bestanden uit Excel field de
 
 ## Gebruik
 
+### Nieuwe format (aanbevolen)
 ```bash
-./transform-myd-minimal -object <object_name> -variant <variant_name> [OPTIONS]
+python3 transform_myd_minimal.py map -object <object_name> -variant <variant_name> [OPTIONS]
+```
+
+### Legacy format (backward compatible)
+```bash
+python3 transform_myd_minimal.py -object <object_name> -variant <variant_name> [OPTIONS]
 ```
 
 ### Basis Voorbeeld
 
 ```bash
-./transform-myd-minimal -object m140 -variant bnka
+# Nieuwe format
+python3 transform_myd_minimal.py map -object m140 -variant bnka
+
+# Legacy format (toont waarschuwing)
+python3 transform_myd_minimal.py -object m140 -variant bnka
 ```
 
 ### Geavanceerde Opties
 
 ```bash
 # Met aangepaste fuzzy threshold
-./transform-myd-minimal -object m140 -variant bnka --fuzzy-threshold 0.8
+python3 transform_myd_minimal.py map -object m140 -variant bnka --fuzzy-threshold 0.8
 
 # Fuzzy matching uitschakelen
-./transform-myd-minimal -object m140 -variant bnka --disable-fuzzy
+python3 transform_myd_minimal.py map -object m140 -variant bnka --disable-fuzzy
 
 # Maximum suggesties aanpassen
-./transform-myd-minimal -object m140 -variant bnka --max-suggestions 5
+python3 transform_myd_minimal.py map -object m140 -variant bnka --max-suggestions 5
 ```
 
 ## Command Line Opties
+
+| Option | Type | Required | Default | Description |
+|--------|------|----------|---------|-------------|
+| `map` | subcommand | Nee* | - | Genereer column mapping en YAML files |
+| `-object OBJECT` | string | **Ja** | - | Object naam (bijv. m140) |
+| `-variant VARIANT` | string | **Ja** | - | Variant naam (bijv. bnka) |
+| `--fuzzy-threshold` | float | Nee | 0.6 | Fuzzy matching threshold (0.0-1.0) |
+| `--max-suggestions` | int | Nee | 3 | Maximum fuzzy match suggesties |
+| `--disable-fuzzy` | flag | Nee | False | Fuzzy matching uitschakelen |
+
+*Het `map` subcommand is optioneel voor backward compatibility
 
 Voor een volledig overzicht van alle CLI opties, zie: **[CLI_OPTIONS.md](CLI_OPTIONS.md)**
 
@@ -155,26 +176,27 @@ Velden die niet als constant worden herkend krijgen `rule: derive` en vereisen b
 **Voorbeeld:**
 - `CUSTOMER_TOTAL` met beschrijving "Total amount for customer" → `rule: derive`
 
-## YAML Generator Script
+## Geïntegreerde YAML Generator
 
-### generate_yaml_files.py
+De YAML generatie functionaliteit is nu geïntegreerd in het hoofdscript. Bij elke `map` opdracht worden automatisch alle benodigde YAML-bestanden gegenereerd:
 
-Een aanvullend script dat automatisch YAML-bestanden genereert op basis van de mappenstructuur en Excel-definities:
-
-**Functionaliteit:**
+**Automatisch gegenereerde bestanden:**
 1. **object_list.yaml** - Overzicht van alle objecten en hun tables uit `data/config/{object}/{variant}`
 2. **fields.yaml** per table - Uitgebreide veldinfo (name, description, type, required, key) uit Excel-bestanden  
 3. **value_rules.yaml** per table - Automatische rules voor mandatory/operational/derived velden
+4. **column_map.yaml** per table - Geavanceerde field mapping met fuzzy matching
 
 **Gebruik:**
 ```bash
-python3 generate_yaml_files.py
+# Genereert alle YAML files automatisch
+python3 transform_myd_minimal.py map -object m140 -variant bnka
 ```
 
 **Gegenereerde bestanden:**
-- `data/config/object_list.yaml` - Master overzicht
-- `data/config/{object}/{variant}/fields.yaml` - Per table velddefinitiess
+- `data/config/object_list.yaml` - Master overzicht (updated bij elke run)
+- `data/config/{object}/{variant}/fields.yaml` - Per table velddefinities
 - `data/config/{object}/{variant}/value_rules.yaml` - Per table value rules
+- `data/config/{object}/{variant}/column_map.yaml` - Per table column mapping
 
 **Rule types:**
 - `required` - Voor mandatory velden (field_is_mandatory=True)
