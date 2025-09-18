@@ -24,6 +24,14 @@ CLI tool voor het genereren van column mapping en YAML bestanden uit Excel field
 - Automatische toewijzing van `rule: constant` voor operationele velden
 - `rule: derive` voor velden die business logica vereisen
 
+### 📋 Central Mapping Memory System
+- **Centraal geheugenbestand** (`central_mapping_memory.yaml`) voor herbruikbare mapping regels
+- **Skip rules** - velden uitsluiten van mapping met auditeerbare comments
+- **Manual mappings** - handmatige veld-naar-veld mappings met business context
+- **Global + table-specific overrides** - flexibele regel hiërarchie
+- **Comments** worden bewaard in output voor transparante overdracht tussen collega's
+- **Prioriteit**: Central memory regels worden eerst toegepast, daarna automatische matching
+
 ## Gebruik
 
 ### Nieuwe format (aanbevolen)
@@ -201,6 +209,105 @@ Velden die niet als constant worden herkend krijgen `rule: derive` en vereisen b
 
 **Voorbeeld:**
 - `CUSTOMER_TOTAL` met beschrijving "Total amount for customer" → `rule: derive`
+
+## Central Mapping Memory System
+
+Het central mapping memory systeem maakt gebruik van een centraal configuratiebestand (`central_mapping_memory.yaml`) in de project root voor herbruikbare mapping regels.
+
+### 📋 Configuratie Structuur
+
+Het `central_mapping_memory.yaml` bestand ondersteunt:
+
+1. **Global skip fields** - Skip regels die op alle tabellen van toepassing zijn
+2. **Global manual mappings** - Handmatige mappings die op alle tabellen van toepassing zijn  
+3. **Table-specific overrides** - Tabelspecifieke regels die global regels overschrijven
+
+### 🚫 Skip Rules
+
+Skip rules zorgen ervoor dat bepaalde source velden worden uitgesloten van mapping:
+
+```yaml
+global_skip_fields:
+  - source_field: "ZRES1"
+    source_description: "Reserved field 1" 
+    skip: true
+    comment: "Reserved field not used in current implementation"
+
+table_specific:
+  m140_bnka:
+    skip_fields:
+      - source_field: "TEMP_FIELD"
+        source_description: "Temporary processing field"
+        skip: true
+        comment: "BNKA specific: Field only used during ETL processing"
+```
+
+### 🎯 Manual Mappings
+
+Manual mappings definiëren expliciete veld-naar-veld toewijzingen:
+
+```yaml
+global_manual_mappings:
+  - source_field: "IBAN_RULE"
+    source_description: "IBAN Validation Rule"
+    target: "SWIFT"
+    target_description: "SWIFT Code for international transfers"
+    comment: "Business rule: Map IBAN validation to SWIFT for process alignment"
+
+table_specific:
+  m140_bnka:
+    manual_mappings:
+      - source_field: "ERNAM"
+        source_description: "Name of Person who Created the Object"
+        target: "BANKL"
+        target_description: "Bank Key"
+        comment: "BNKA specific: Creator field mapped to bank key for audit trail"
+```
+
+### 🔄 Verwerkingsvolgorde
+
+1. **Central memory skip rules** - Velden worden uitgesloten van verdere verwerking
+2. **Central memory manual mappings** - Expliciete mappings worden toegepast
+3. **Automatische matching algoritmen** - Voor overige velden (exact, synonym, fuzzy)
+
+### 📊 Output & Auditability
+
+Het systeem toont welke central memory regels zijn toegepast:
+
+**Console output:**
+```
+Central memory skip rules applied: 2
+Central memory manual mappings applied: 2
+
+Central memory skip rules applied:
+  SKIP: ZRES1 - Central memory skip rule: Reserved field not used
+  SKIP: ZRES2 - Central memory skip rule: Reserved field not used
+
+Central memory manual mappings applied:
+  MANUAL: IBAN_RULE → SWIFT - Business rule mapping for process alignment
+  MANUAL: ERNAM → BANKL - Creator mapped to bank key for audit trail
+```
+
+**YAML output bevat gedetailleerde comments:**
+```yaml
+# Central Memory Skip Rules Applied:
+# SKIP: ZRES1
+#   source_description: "Residue"
+#   skip_reason: "Central memory skip rule: Reserved field not used"
+#   confidence: 1.00
+#   rule_type: central_skip
+
+# Central Memory Manual Mappings Applied:
+#  - source: IBAN_RULE
+#    source_description: "IBAN Rule"
+#    target: SWIFT
+#    target_description: "SWIFT Code for international transfers"
+#    decision: MANUAL_MAP
+#    confidence: 1.00
+#    match_type: central_manual
+#    rule: copy
+#    reason: "Business rule mapping for process alignment"
+```
 
 ## Geïntegreerde YAML Generator
 

@@ -13,14 +13,25 @@ global_skip_fields:
     source_description: "Debug flag for development"
     skip: true
     comment: "Development field, not needed in production mapping"
+  
+  - source_field: "SYSTEM_INTERNAL"
+    source_description: "System internal processing field"
+    skip: true
+    comment: "Global rule: System internal fields should never be mapped"
 
 # Global manual mappings - apply to all tables unless overridden  
 global_manual_mappings:
-  - source_field: "ID_FIELD"
-    source_description: "Generic identifier field"
-    target: "COMMON_ID"
-    target_description: "Common identifier in target system"
-    comment: "Standard mapping for all ID fields across tables"
+  - source_field: "CLIENT_ID"
+    source_description: "Client identifier"
+    target: "MANDT"
+    target_description: "Client (Mandant)"
+    comment: "Standard mapping: All client IDs map to MANDT field across all tables"
+    
+  - source_field: "CREATION_USER"
+    source_description: "User who created the record"
+    target: "ERNAM"
+    target_description: "Name of Person who Created the Object"
+    comment: "Standard audit field mapping for data lineage"
 
 # Table-specific overrides - these take precedence over global rules
 table_specific:
@@ -35,6 +46,11 @@ table_specific:
         source_description: "Reserved field 2"
         skip: true
         comment: "BNKA table specific: Reserved field not used in current implementation"
+        
+      - source_field: "ZRES3"
+        source_description: "Reserved field 3"
+        skip: true
+        comment: "BNKA table specific: Future reserved field, skip for now"
     
     manual_mappings:
       - source_field: "IBAN_RULE"
@@ -48,8 +64,31 @@ table_specific:
         target: "BANKL"
         target_description: "Bank Key"
         comment: "BNKA table specific: Business rule mapping creator to bank key for audit trail"
+        
+      - source_field: "BANK_SORT_CODE"
+        source_description: "Legacy bank sort code"
+        target: "BNKLZ"
+        target_description: "Bank Number"
+        comment: "BNKA table specific: Legacy field mapping to standardized bank number format"
 
-# Example fields from the existing data for reference
-# These would be processed by the automatic matching system if not overridden above:
-# Source fields: BANKS, BANKL, BANKA, PROVZ, STRAS, ORT01, SWIFT, BGRUP, XPGRO, BNKLZ, BRNCH
-# Target fields: BANKS, BANKL, BANKA, PROVZ, STRAS, ORT01, SWIFT, BGRUP, XPGRO, BNKLZ, BRNCH, ISNOTOVERWRITE
+  # Example for another table
+  m140_example:
+    skip_fields:
+      - source_field: "LEGACY_FIELD"
+        source_description: "Old legacy field no longer used"
+        skip: true
+        comment: "Table specific: Legacy field deprecated in this table"
+    
+    manual_mappings:
+      - source_field: "CUSTOM_AMOUNT"
+        source_description: "Custom amount calculation"
+        target: "AMOUNT"
+        target_description: "Standard amount field"
+        comment: "Table specific: Custom business logic mapping"
+
+# Documentation:
+# - Skip rules are processed first, removing fields from further consideration
+# - Manual mappings are processed next, creating explicit field-to-field mappings
+# - Remaining fields are processed by automatic matching algorithms (exact, synonym, fuzzy)
+# - Comments are preserved in output for full auditability and team collaboration
+# - Table-specific rules override global rules for the same source field
