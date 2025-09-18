@@ -5,13 +5,18 @@
 | Option | Type | Required | Default | Description | Version Added |
 |--------|------|----------|---------|-------------|---------------|
 | `-h`, `--help` | flag | No | - | Show help message and exit | v1.0 |
-| `--version` | flag | No | - | Show version information and exit | v3.0 |
+| `--version` | flag | No | - | Show program's version number and exit | v3.0 |
 | `map` | subcommand | No* | - | Generate column mapping and YAML files | v3.0 |
 | `-object OBJECT`, `--object OBJECT` | string | **Yes** | - | Object name (e.g., m140) | v1.0 |
 | `-variant VARIANT`, `--variant VARIANT` | string | **Yes** | - | Variant name (e.g., bnka) | v1.0 |
 | `--fuzzy-threshold FUZZY_THRESHOLD` | float | No | 0.6 | Fuzzy matching threshold (0.0-1.0) | v2.0 |
 | `--max-suggestions MAX_SUGGESTIONS` | int | No | 3 | Maximum fuzzy match suggestions | v2.0 |
 | `--disable-fuzzy` | flag | No | False | Disable fuzzy matching completely | v2.0 |
+| `--source-headers-xlsx SOURCE_HEADERS_XLSX` | string | No | config | Path to source headers XLSX file (overrides config) | v3.1 |
+| `--source-headers-sheet SOURCE_HEADERS_SHEET` | string | No | config | Sheet name in source XLSX (overrides config) | v3.1 |
+| `--source-headers-row SOURCE_HEADERS_ROW` | int | No | config | Header row number in source XLSX (overrides config) | v3.1 |
+| `--target-xml TARGET_XML` | string | No | config | Path to target XML file (overrides config) | v3.1 |
+| `--target-xml-worksheet TARGET_XML_WORKSHEET` | string | No | config | Worksheet name in target XML (overrides config) | v3.1 |
 
 *The `map` subcommand is optional for backward compatibility. Legacy format without subcommand is supported.
 
@@ -44,6 +49,24 @@ All examples in this document use the new wrapper script format.
 
 # With advanced options
 ./transform-myd-minimal -object m140 -variant bnka --fuzzy-threshold 0.8
+```
+
+### Source-Based Mapping Options (v3.1+)
+```bash
+# Override source headers file
+./transform-myd-minimal map -object m140 -variant bnka --source-headers-xlsx "custom/path/headers.xlsx"
+
+# Override XML target file
+./transform-myd-minimal map -object m140 -variant bnka --target-xml "custom/path/targets.xml"
+
+# Override specific worksheet in target XML
+./transform-myd-minimal map -object m140 -variant bnka --target-xml-worksheet "Custom Field List"
+
+# Combine multiple source-based overrides
+./transform-myd-minimal map -object m140 -variant bnka \
+  --source-headers-xlsx "data/custom_headers.xlsx" \
+  --source-headers-sheet "Sheet2" \
+  --target-xml "data/custom_targets.xml"
 ```
 
 ### Advanced Fuzzy Matching Options
@@ -118,6 +141,38 @@ All examples in this document use the new wrapper script format.
   - When only high-confidence matches are desired
   - Debugging exact matching behavior
 
+### Source-Based Mapping Parameters (v3.1+)
+
+#### `--source-headers-xlsx`
+- **Purpose**: Overrides the source headers XLSX file path from config
+- **Format**: File path string (relative or absolute)
+- **Default**: Uses `mapping.source_headers.path` from config.yaml
+- **Example**: `--source-headers-xlsx "data/custom_headers.xlsx"`
+
+#### `--source-headers-sheet`
+- **Purpose**: Overrides the sheet name in the source headers XLSX
+- **Format**: String (sheet name)
+- **Default**: Uses `mapping.source_headers.sheet` from config.yaml
+- **Example**: `--source-headers-sheet "Sheet2"`
+
+#### `--source-headers-row`
+- **Purpose**: Overrides the header row number in the source XLSX
+- **Format**: Integer (1-based row number)
+- **Default**: Uses `mapping.source_headers.header_row` from config.yaml
+- **Example**: `--source-headers-row 2`
+
+#### `--target-xml`
+- **Purpose**: Overrides the target XML file path from config
+- **Format**: File path string (relative or absolute)
+- **Default**: Uses `mapping.target_xml.path` from config.yaml
+- **Example**: `--target-xml "data/custom_targets.xml"`
+
+#### `--target-xml-worksheet`
+- **Purpose**: Overrides the worksheet name in the target XML
+- **Format**: String (worksheet name)
+- **Default**: Uses `mapping.target_xml.worksheet_name` from config.yaml
+- **Example**: `--target-xml-worksheet "Custom Field List"`
+
 ## Exit Codes
 
 | Code | Meaning | Description |
@@ -132,11 +187,9 @@ All examples in this document use the new wrapper script format.
 - **Example**: `data/02_fields/fields_m140_bnka.xlsx`
 
 ### Output Files  
-- **Column Mapping**: `config/{object}/{variant}/column_map.yaml`
-- **Field Definitions**: `config/{object}/{variant}/fields.yaml`  
-- **Value Rules**: `config/{object}/{variant}/value_rules.yaml`
-- **Object Overview**: `config/object_list.yaml`
-- **Example**: `config/m140/bnka/`
+- **Global Config Files**: `config/object_list.yaml`, `config/mapping.yaml`, `config/targets.yaml`
+- **Migration Structure**: `migrations/{OBJECT}/{table}/fields.yaml`, `migrations/{OBJECT}/{table}/mappings.yaml`, etc.
+- **Example**: `migrations/M140/bnka/`
 
 ## Changelog
 

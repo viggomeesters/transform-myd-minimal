@@ -45,7 +45,6 @@ def setup_cli():
         old_parser.add_argument('--source-headers-row', type=int, help='Header row number in source XLSX')
         old_parser.add_argument('--target-xml', type=str, help='Path to target XML file')
         old_parser.add_argument('--target-xml-worksheet', type=str, help='Worksheet name in target XML')
-        old_parser.add_argument('--target-field-xpath', type=str, help='XPath for target field elements')
         
         args = old_parser.parse_args()
         config.merge_with_cli_args(args)
@@ -70,7 +69,6 @@ def setup_cli():
     map_parser.add_argument('--source-headers-row', type=int, help='Header row number in source XLSX (overrides config)')
     map_parser.add_argument('--target-xml', type=str, help='Path to target XML file (overrides config)')
     map_parser.add_argument('--target-xml-worksheet', type=str, help='Worksheet name in target XML (overrides config)')
-    map_parser.add_argument('--target-field-xpath', type=str, help='XPath for target field elements (optional)')
     
     # Parse arguments
     args = parser.parse_args()

@@ -109,8 +109,8 @@ migrations/
 ## Features
 
 ### 🔄 Integrated YAML Workflow (v3.0)
-- **Single command** genereert alle benodigde YAML bestanden (legacy + nieuwe structuur)
-- **Automatische generatie** van fields.yaml, value_rules.yaml, object_list.yaml
+- **Single command** genereert migration YAML bestanden 
+- **Automatische generatie** van fields.yaml, mappings.yaml, validation.yaml, transformations.yaml
 - **Geïntegreerde workflow** zonder aparte scripts
 - **Backward compatibility** met legacy command format
 
@@ -154,7 +154,7 @@ transform-myd-minimal/
 ├── configs/                            # Centrale configuratie bestanden
 │   ├── config.yaml                     # Applicatie configuratie
 │   └── central_mapping_memory.yaml     # Centrale mapping regels
-├── config/                             # Gegenereerde output bestanden
+├── config/                             # Globale output bestanden (voor source-based mapping)
 ├── data/                               # Input data (Excel bestanden)
 ├── migrations/                         # Nieuwe multi-file structuur
 └── README.md
@@ -176,14 +176,13 @@ De wrapper script zorgt automatisch voor de juiste Python module aanroep en path
 
 ## Gebruik
 
-### ✨ Multi-File Migration Structure Generation
+### ✨ Migration Structure Generation
 
-Elke `map` opdracht genereert nu **beide** structuren:
-- **Legacy**: `config/{object}/{variant}/` - Bestaande single-file structuur
-- **New**: `migrations/{OBJECT}/{table}/` - Nieuwe multi-file structuur
+Het systeem genereert nu alleen de nieuwe migration structuur:
+- **Migration Files**: `migrations/{OBJECT}/{table}/` - Nieuwe multi-file structuur
 
 ```bash
-# Genereert zowel legacy als nieuwe structuur
+# Genereert alleen nieuwe migration structuur
 ./transform-myd-minimal map -object m140 -variant bnka
 ```
 
@@ -191,11 +190,6 @@ Elke `map` opdracht genereert nu **beide** structuren:
 ```
 === Advanced Matching Results ===
 ... (matching details) ...
-
-=== Generating Additional YAML Files ===
-Generated: config/m140/bnka/fields.yaml
-Generated: config/m140/bnka/value_rules.yaml
-Generated: config/m140/bnka/column_map.yaml
 
 === Generating New Multi-File Migration Structure ===
 Generated: migrations/M140/bnka/fields.yaml
@@ -555,35 +549,31 @@ Central memory manual mappings applied:
 #    reason: "Business rule mapping for process alignment"
 ```
 
-## Geïntegreerde YAML Generator
+## Geïntegreerde Migration Generator
 
-De YAML generatie functionaliteit is nu geïntegreerd in het hoofdscript. Bij elke `map` opdracht worden automatisch alle benodigde YAML-bestanden gegenereerd:
+De migration generator is geïntegreerd in het hoofdscript. Bij elke `map` opdracht worden automatisch alle benodigde migration YAML-bestanden gegenereerd:
 
 **Automatisch gegenereerde bestanden:**
-1. **object_list.yaml** - Overzicht van alle objecten en hun tables uit `config/{object}/{variant}`
-2. **fields.yaml** per table - Uitgebreide veldinfo (name, description, type, required, key) uit Excel-bestanden  
-3. **value_rules.yaml** per table - Automatische rules voor mandatory/operational/derived velden
-4. **column_map.yaml** per table - Geavanceerde field mapping met fuzzy matching
+1. **objects.yaml** - Catalog van alle migratie objecten 
+2. **fields.yaml** per table - Target veld definities uit Excel-bestanden  
+3. **mappings.yaml** per table - Source-naar-target mappings met confidence scores
+4. **validation.yaml** per table - Validatie regels en constraints
+5. **transformations.yaml** per table - Value transformatie logica
 
 **Gebruik:**
 ```bash
-# Genereert alle YAML files automatisch
+# Genereert alle migration files automatisch
 ./transform-myd-minimal map -object m140 -variant bnka
 ```
 
 **Gegenereerde bestanden:**
-- `config/object_list.yaml` - Master overzicht (updated bij elke run)
-- `config/{object}/{variant}/fields.yaml` - Per table velddefinities
-- `config/{object}/{variant}/value_rules.yaml` - Per table value rules
-- `config/{object}/{variant}/column_map.yaml` - Per table column mapping
+- `migrations/objects.yaml` - Master catalog (updated bij elke run)
+- `migrations/{OBJECT}/{table}/fields.yaml` - Per table velddefinities
+- `migrations/{OBJECT}/{table}/mappings.yaml` - Per table mappings
+- `migrations/{OBJECT}/{table}/validation.yaml` - Per table validatie regels
+- `migrations/{OBJECT}/{table}/transformations.yaml` - Per table transformaties
 
-**Rule types:**
-- `required` - Voor mandatory velden (field_is_mandatory=True)
-- `constant` - Voor operationele velden (automatisch gedetecteerd)
-- `derive` - Voor berekende velden (automatisch gedetecteerd)  
-- `map` - Voor directe mapping velden
-
-Het script scant automatisch de bestaande mappenstructuur en Excel-bestanden in `data/02_fields/fields_{object}_{variant}.xlsx`.
+Het script scant automatisch de bestaande Excel-bestanden in `data/02_fields/fields_{object}_{variant}.xlsx`.
 
 ## Versie Informatie
 
