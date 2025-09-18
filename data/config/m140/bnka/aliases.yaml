@@ -1,0 +1,27 @@
+# aliases_bank.yaml — domeinspecifieke aliasset voor bankgegevens
+schema: 1
+
+# Example field name aliases (commented out by default):
+#  field_name:
+#    BANKS:
+#    - BANKS
+#    - BANK COUNTRY/REGION KEY
+#    BANKL:
+#    - BANKL
+#    - BANK KEY
+#    - BANK KEYS
+#  description_keywords:
+#    BANKS:
+#    - country
+#    - region
+#    BANKL:
+#    - key
+#    - code
+
+aliases:
+  field_name:
+    BANKS:
+    - BANKS(k/*)
+  description_keywords:
+    BANKS:
+    - Bankcountry

@@ -1,0 +1,173 @@
+# Transform MYD Minimal - CLI Options Overview
+
+## Complete CLI Options Reference
+
+| Option | Type | Required | Default | Description | Version Added |
+|--------|------|----------|---------|-------------|---------------|
+| `-h`, `--help` | flag | No | - | Show help message and exit | v1.0 |
+| `-object OBJECT`, `--object OBJECT` | string | **Yes** | - | Object name (e.g., m140) | v1.0 |
+| `-variant VARIANT`, `--variant VARIANT` | string | **Yes** | - | Variant name (e.g., bnka) | v1.0 |
+| `--fuzzy-threshold FUZZY_THRESHOLD` | float | No | 0.6 | Fuzzy matching threshold (0.0-1.0) | v2.0 |
+| `--max-suggestions MAX_SUGGESTIONS` | int | No | 3 | Maximum fuzzy match suggestions | v2.0 |
+| `--disable-fuzzy` | flag | No | False | Disable fuzzy matching completely | v2.0 |
+
+## Usage Examples
+
+### Basic Usage
+```bash
+# Minimal required parameters
+./transform-myd-minimal -object m140 -variant bnka
+
+# Using long parameter names
+./transform-myd-minimal --object m140 --variant bnka
+```
+
+### Advanced Fuzzy Matching Options
+```bash
+# High precision fuzzy matching (stricter threshold)
+./transform-myd-minimal -object m140 -variant bnka --fuzzy-threshold 0.8
+
+# More fuzzy suggestions
+./transform-myd-minimal -object m140 -variant bnka --max-suggestions 5
+
+# Disable fuzzy matching (exact and synonym matching only)
+./transform-myd-minimal -object m140 -variant bnka --disable-fuzzy
+
+# Combined advanced options
+./transform-myd-minimal -object m140 -variant bnka --fuzzy-threshold 0.7 --max-suggestions 2
+```
+
+### Getting Help
+```bash
+# Show all available options
+./transform-myd-minimal --help
+
+# Alternative help syntax
+python3 transform_myd_minimal.py -h
+```
+
+## Parameter Details
+
+### Required Parameters
+
+#### `-object` / `--object`
+- **Purpose**: Specifies the object name for the transformation
+- **Format**: String, typically alphanumeric (e.g., "m140", "p100")
+- **Usage**: Determines the input Excel file path: `02_fields/fields_{object}_{variant}.xlsx`
+- **Example**: `-object m140`
+
+#### `-variant` / `--variant` 
+- **Purpose**: Specifies the variant name for the transformation
+- **Format**: String, typically alphanumeric (e.g., "bnka", "test")
+- **Usage**: Determines both input file and output directory paths
+- **Example**: `-variant bnka`
+
+### Advanced Matching Parameters (v2.0+)
+
+#### `--fuzzy-threshold`
+- **Purpose**: Controls the minimum similarity score required for fuzzy matches
+- **Range**: 0.0 to 1.0 (decimal values)
+- **Default**: 0.6 (60% similarity)
+- **Impact**: 
+  - Higher values (0.8-1.0): Fewer but more accurate matches
+  - Lower values (0.4-0.6): More matches but potentially less accurate
+- **Examples**:
+  - `--fuzzy-threshold 0.8` (strict matching)
+  - `--fuzzy-threshold 0.4` (loose matching)
+
+#### `--max-suggestions`
+- **Purpose**: Limits the number of fuzzy match suggestions returned
+- **Range**: Positive integers (1-10 recommended)
+- **Default**: 3
+- **Impact**: Controls console output verbosity and processing time
+- **Examples**:
+  - `--max-suggestions 1` (only best match)
+  - `--max-suggestions 5` (up to 5 suggestions)
+
+#### `--disable-fuzzy`
+- **Purpose**: Completely disables fuzzy matching algorithms
+- **Type**: Boolean flag (no value required)
+- **Default**: False (fuzzy matching enabled)
+- **Impact**: Falls back to exact and synonym matching only
+- **Use cases**: 
+  - Performance optimization for large datasets
+  - When only high-confidence matches are desired
+  - Debugging exact matching behavior
+
+## Exit Codes
+
+| Code | Meaning | Description |
+|------|---------|-------------|
+| 0 | Success | Transformation completed successfully |
+| 1 | Error | General error (file not found, invalid parameters, etc.) |
+
+## File Path Patterns
+
+### Input Files
+- **Excel Input**: `02_fields/fields_{object}_{variant}.xlsx`
+- **Example**: `02_fields/fields_m140_bnka.xlsx`
+
+### Output Files  
+- **YAML Output**: `config/{object}/{variant}/column_map.yaml`
+- **Example**: `config/m140/bnka/column_map.yaml`
+
+## Changelog
+
+### Version 2.0 (Advanced Matching) - Current
+**Added:**
+- `--fuzzy-threshold`: Configurable fuzzy matching threshold
+- `--max-suggestions`: Configurable maximum suggestions limit  
+- `--disable-fuzzy`: Option to disable fuzzy matching
+- Advanced field matching system with Levenshtein and Jaro-Winkler algorithms
+- Synonym matching with NL/EN dictionary
+- Enhanced console output with matching statistics
+- YAML version 2 format with algorithm metadata
+
+**Changed:**
+- Description updated to "Advanced Version"
+- Enhanced help text with parameter descriptions
+- Output format includes matching statistics and confidence scores
+
+### Version 1.0 (Basic Matching) - Legacy
+**Initial Features:**
+- `-object`: Basic object name parameter
+- `-variant`: Basic variant name parameter  
+- `-h`/`--help`: Standard help functionality
+- Simple exact matching algorithm
+- Basic YAML output format
+- Smart transformation logic for derived targets
+
+## Migration Guide
+
+### From v1.0 to v2.0
+All existing commands continue to work without changes. New features are opt-in:
+
+```bash
+# v1.0 command (still works)
+./transform-myd-minimal -object m140 -variant bnka
+
+# v2.0 with advanced features
+./transform-myd-minimal -object m140 -variant bnka --fuzzy-threshold 0.7
+```
+
+## Tips and Best Practices
+
+### Performance Optimization
+- Use `--disable-fuzzy` for large datasets where speed is critical
+- Increase `--fuzzy-threshold` to reduce processing time
+- Reduce `--max-suggestions` to minimize console output
+
+### Accuracy Tuning
+- Start with default settings (`--fuzzy-threshold 0.6`)
+- Increase threshold for stricter matching: `--fuzzy-threshold 0.8`
+- Decrease threshold for more suggestions: `--fuzzy-threshold 0.4`
+- Review console output to assess match quality
+
+### Debugging
+- Use `--disable-fuzzy` to isolate exact matching issues
+- Increase `--max-suggestions` to see more potential matches
+- Lower `--fuzzy-threshold` to understand why matches might be missed
+
+---
+
+*This document is automatically updated as new CLI options are added.*

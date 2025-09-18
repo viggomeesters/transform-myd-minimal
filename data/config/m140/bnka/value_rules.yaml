@@ -1,0 +1,11 @@
+# value_rules.yaml — simpele, auditeerbare datakwaliteitsregels (geen kolommen in code)
+
+BANKA:
+  required: true
+
+rules:
+- name: reject_missing_key
+  when: BANKS == '' or BANKL == ''
+  action: reject
+  message: Missing mandatory key (BANKS of BANKL).
+
