@@ -896,7 +896,7 @@ def run_map_command(args):
         
         # Generate YAML content
         yaml_content = generate_column_map_yaml(args.object, args.variant, source_fields, target_fields, 
-                                              f".\\data\\02_fields\\{excel_filename}")
+                                              f".\\data\\02_fields\\{excel_filename}", audit_matches)
         
         # Ensure output directory exists
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -929,7 +929,7 @@ def run_map_command(args):
         sys.exit(1)
 
 
-def generate_column_map_yaml(object_name, variant, source_fields, target_fields, excel_source_path):
+def generate_column_map_yaml(object_name, variant, source_fields, target_fields, excel_source_path, external_audit_matches=None):
     """Generate the complete column_map.yaml content with advanced matching."""
     
     # Generate timestamp
@@ -946,6 +946,10 @@ def generate_column_map_yaml(object_name, variant, source_fields, target_fields,
     mapping_lines, exact_matches, fuzzy_matches, unmapped_sources, audit_matches = create_advanced_column_mapping(
         source_fields, target_fields, fuzzy_config
     )
+    
+    # Use external audit matches if provided (from run_map_command)
+    if external_audit_matches is not None:
+        audit_matches = external_audit_matches
     
     # Generate the YAML content
     yaml_content = []

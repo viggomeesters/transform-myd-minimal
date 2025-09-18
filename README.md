@@ -92,12 +92,13 @@ Het script genereert nu:
 ```
 === Advanced Matching Results ===
 Exact matches: 11
-Fuzzy/Synonym matches: 1
-Unmapped sources: 25
-Mapping coverage: 32.4%
+Fuzzy/Synonym matches: 0
+Unmapped sources: 26
+Audit matches (fuzzy to exact-mapped targets): 1
+Mapping coverage: 29.7%
 
-Fuzzy/Synonym matches found:
-  IBAN_RULE → BANKL (fuzzy, confidence: 0.60)
+Audit matches found (fuzzy matches to exact-mapped targets):
+  IBAN_RULE → BANKL (audit, confidence: 0.60)
 ```
 
 ## Algoritme Details
@@ -121,12 +122,31 @@ Fuzzy/Synonym matches found:
 - Gecombineerde score: 70% veldnaam + 30% beschrijving
 - Instelbare threshold (default: 0.6)
 
+### 🚫 Duplicate Target Prevention
+Het script implementeert een geavanceerde twee-fase matching strategie om te voorkomen dat een target veld (bijv. BANKL) meerdere keren wordt toegewezen:
+
+**Fase 1: Exact Matching**
+- Eerst worden alle exacte matches geïdentificeerd
+- Deze target velden worden gemarkeerd als "bezet"
+
+**Fase 2: Fuzzy Matching**
+- Fuzzy matching wordt alleen uitgevoerd voor nog niet toegewezen target velden
+- Dit voorkomt dat BANKL zowel exact als fuzzy gemapt wordt
+
+**Audit Logging**
+- Fuzzy matches naar reeds exact-gemapte targets worden alsnog geregistreerd als audit commentaren
+- Deze verschijnen in de YAML output als `# AUDIT: source -> target` 
+- Voorbeeld: Als IBAN_RULE fuzzy zou matchen met BANKL (die al exact gemapt is), wordt dit gelogd voor auditdoeleinden
+- Audit matches tellen niet mee voor coverage percentage
+
 ### 📊 Matching Statistics
 Elk run toont:
 - Totaal aantal source/target velden
 - Aantal exact/fuzzy/unmapped matches
-- Mapping coverage percentage
+- Aantal audit matches (fuzzy matches naar exact-gemapte targets)
+- Mapping coverage percentage (exclusief audit matches)
 - Details van fuzzy matches met confidence scores
+- Details van audit matches voor transparency
 
 Dit commando:
 1. Leest het bestand `data/02_fields/fields_{object}_{variant}.xlsx`
