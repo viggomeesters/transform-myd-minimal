@@ -1,6 +1,10 @@
 # Transform MYD Minimal Configuration
 # This file contains default configuration parameters that can be overridden via CLI arguments
 
+# Default object and variant (optional - can be overridden by CLI)
+# object: "m140"       # Uncomment and set default object name
+# variant: "bnka"      # Uncomment and set default variant name
+
 # Fuzzy matching configuration
 fuzzy_threshold: 0.6        # Fuzzy matching threshold (0.0-1.0)
 max_suggestions: 3          # Maximum number of fuzzy match suggestions  
@@ -8,7 +12,7 @@ disable_fuzzy: false        # Whether to disable fuzzy matching
 
 # Directory configuration
 input_dir: "data/02_fields" # Input directory for Excel files
-output_dir: "config"        # Output directory for generated YAML files
+output_dir: "output"        # Output directory for generated YAML files
 
 # New mapping configuration for direct source file processing
 mapping:

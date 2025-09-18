@@ -623,7 +623,7 @@ def run_map_command(args, config):
                 logger.info("Migration structure generation skipped (no data)")
         except Exception as e:
             logger.warning(f"Could not generate migration structure: {e}")
-            logger.info("Legacy YAML files are still available in config/ directory")
+            logger.info("Legacy YAML files are still available in output/ directory")
         
     except Exception as e:
         logger.error(f"Error: {e}")

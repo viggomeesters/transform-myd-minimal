@@ -61,8 +61,21 @@ def setup_cli():
     
     # Map subcommand (default behavior)
     map_parser = subparsers.add_parser('map', help='Generate column mapping and YAML files')
-    map_parser.add_argument('--object', required=True, help='Object name (e.g., m140)')
-    map_parser.add_argument('--variant', required=True, help='Variant name (e.g., bnka)')
+    
+    # Object and variant are required unless provided in config
+    object_required = config.object is None
+    variant_required = config.variant is None
+    
+    object_help = 'Object name (e.g., m140)'
+    variant_help = 'Variant name (e.g., bnka)'
+    
+    if not object_required:
+        object_help += f' (default from config: {config.object})'
+    if not variant_required:
+        variant_help += f' (default from config: {config.variant})'
+    
+    map_parser.add_argument('--object', required=object_required, help=object_help)
+    map_parser.add_argument('--variant', required=variant_required, help=variant_help)
     map_parser.add_argument('--fuzzy-threshold', type=float, default=config.fuzzy_threshold, help=f'Fuzzy matching threshold (0.0-1.0, default: {config.fuzzy_threshold})')
     map_parser.add_argument('--max-suggestions', type=int, default=config.max_suggestions, help=f'Maximum fuzzy match suggestions (default: {config.max_suggestions})')
     map_parser.add_argument('--disable-fuzzy', action='store_true', default=config.disable_fuzzy, help='Disable fuzzy matching')
@@ -88,4 +101,13 @@ def setup_cli():
         sys.exit(1)
     
     config.merge_with_cli_args(args)
+    
+    # Validate that we have object and variant after merging
+    if not config.object:
+        logger.error("Object must be provided either via --object argument or config.yaml")
+        sys.exit(1)
+    if not config.variant:
+        logger.error("Variant must be provided either via --variant argument or config.yaml")
+        sys.exit(1)
+    
     return args, config, False  # False indicates new format

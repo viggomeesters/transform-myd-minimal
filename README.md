@@ -270,14 +270,18 @@ Genereert: `migrations/M140/bnka/` met alle 4 YAML bestanden
 
 Voor een volledig overzicht van alle CLI opties, zie: **[CLI_OPTIONS.md](CLI_OPTIONS.md)**
 
-## Configuratie (configs/config.yaml)
+## Configuratie (config/config.yaml)
 
-Het script ondersteunt een centraal configuratiebestand `configs/config.yaml` voor het instellen van default waarden. CLI argumenten hebben altijd voorrang op config.yaml instellingen.
+Het script ondersteunt een centraal configuratiebestand `config/config.yaml` voor het instellen van default waarden. CLI argumenten hebben altijd voorrang op config.yaml instellingen.
 
 ### Ondersteunde Parameters
 
 ```yaml
 # Transform MYD Minimal Configuration
+# Default object and variant (optional - can be overridden by CLI)
+object: "m140"       # Default object name
+variant: "bnka"      # Default variant name
+
 # Fuzzy matching configuration
 fuzzy_threshold: 0.6        # Fuzzy matching threshold (0.0-1.0)
 max_suggestions: 3          # Maximum number of fuzzy match suggestions  
@@ -285,37 +289,42 @@ disable_fuzzy: false        # Whether to disable fuzzy matching
 
 # Directory configuration
 input_dir: "data/02_fields" # Input directory for Excel files
-output_dir: "config"        # Output directory for generated YAML files
+output_dir: "output"        # Output directory for generated YAML files
 ```
 
 ### Parameter Beschrijvingen
 
 | Parameter | Type | Default | Beschrijving |
 |-----------|------|---------|--------------|
+| `object` | string | - | Default object naam (bijv. m140) |
+| `variant` | string | - | Default variant naam (bijv. bnka) |
 | `fuzzy_threshold` | float | 0.6 | Fuzzy matching threshold (0.0-1.0) |
 | `max_suggestions` | int | 3 | Maximum aantal fuzzy match suggesties |
 | `disable_fuzzy` | boolean | false | Schakel fuzzy matching uit |
 | `input_dir` | string | "data/02_fields" | Input directory voor Excel bestanden |
-| `output_dir` | string | "config" | Output directory voor YAML bestanden |
+| `output_dir` | string | "output" | Output directory voor YAML bestanden |
 
 ### Voorrang (Precedence)
 
 1. **CLI argumenten** - Hoogste prioriteit
-2. **configs/config.yaml** - Middel prioriteit  
+2. **config/config.yaml** - Middel prioriteit  
 3. **Hardcoded defaults** - Laagste prioriteit
 
-**Opmerking**: Voor backward compatibility ondersteunt het systeem ook config bestanden in de project root. Het zoekt eerst in `configs/` en valt terug naar de root directory.
+**Opmerking**: Voor backward compatibility ondersteunt het systeem ook config bestanden in de oude `configs/` directory en de project root. Het zoekt eerst in `config/`, dan `configs/` en valt terug naar de root directory.
 
 ### Voorbeelden
 
 ```bash
-# Gebruik configs/config.yaml defaults
-./transform-myd-minimal map -object m140 -variant bnka
+# Basic command (object and variant required)
+./transform-myd-minimal map --object m140 --variant bnka
 
-# Override configs/config.yaml met CLI argumenten
-./transform-myd-minimal map -object m140 -variant bnka --fuzzy-threshold 0.8 --max-suggestions 5
+# With config defaults (object/variant can be set in config/config.yaml)
+./transform-myd-minimal map
 
-# Configuratie wordt automatisch geladen als configs/config.yaml bestaat
+# Override config defaults with CLI arguments
+./transform-myd-minimal map --object m150 --variant cepc --fuzzy-threshold 0.8
+
+# Configuratie wordt automatisch geladen als config/config.yaml bestaat
 # Anders worden hardcoded defaults gebruikt
 ```
 
