@@ -499,6 +499,13 @@ def get_effective_rules_for_table(central_memory: CentralMappingMemory, object_n
 
 def run_map_command(args, config):
     """Run the map command - generates column mapping and YAML files."""
+    # Check if we should use source-based mapping
+    if config.mapping_from_sources:
+        from .source_mapping import run_source_based_mapping
+        run_source_based_mapping(config, args)
+        return
+    
+    # Original workflow below - preserved for backward compatibility
     # Construct paths using configuration
     base_dir = Path.cwd()
     excel_path = config.get_input_path(args.object, args.variant)

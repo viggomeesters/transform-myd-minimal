@@ -2,7 +2,72 @@
 
 CLI tool voor het genereren van column mapping en YAML bestanden uit Excel field definities met een nieuwe, verbeterde multi-file structuur.
 
-**Nu met geïntegreerde YAML workflow, geavanceerde field matching algoritmen én nieuwe multi-file migration structuur!**
+**Nu met geïntegreerde YAML workflow, geavanceerde field matching algoritmen, nieuwe multi-file migration structuur EN directe mapping generatie vanuit bronbestanden!**
+
+## 🆕 Source-Based Mapping Generation (v3.1)
+
+Implementeert directe mappinggeneratie vanuit de bronbestanden i.p.v. fields.xlsx:
+
+### ✅ Ondersteunde Bronbestanden
+- **Source headers (XLSX)**: `data/02_fields/BNKA_headers.xlsx` - bevat source system veldnamen als kolomkoppen
+- **Target velden (SpreadsheetML)**: `data/02_fields/Source data for Bank.xml` - Excel 2003 XML met target field metadata
+
+### 🎯 Source-Based Workflow
+```bash
+# Direct mapping genereren uit bronbestanden (standaard met from_sources: true)
+./transform-myd-minimal map -object test -variant test
+
+# Met CLI overrides
+./transform-myd-minimal map -object test -variant test \
+  --source-headers-xlsx "data/02_fields/BNKA_headers.xlsx" \
+  --target-xml "data/02_fields/Source data for Bank.xml" \
+  --target-xml-worksheet "Field List"
+```
+
+### 📊 Output Artifacts
+- **config/targets.yaml**: Target field metadata met internal_id en transformer_id
+- **config/mapping.yaml**: Source-to-target mappings met confidence scores en match methods
+
+### ⚙️ Configuratie Priority
+CLI arguments > config.yaml instellingen voor maximum flexibiliteit:
+- `--source-headers-xlsx`: Overschrijft config.yaml pad
+- `--source-headers-sheet`: Overschrijft sheet naam
+- `--source-headers-row`: Overschrijft header rij nummer
+- `--target-xml`: Overschrijft XML bestand pad
+- `--target-xml-worksheet`: Overschrijft worksheet naam
+
+### 🔧 Config.yaml Uitbreiding
+```yaml
+mapping:
+  from_sources: true
+
+  source_headers:
+    path: data/02_fields/BNKA_headers.xlsx
+    sheet: Sheet1
+    header_row: 1
+    ignore_data_below: true
+
+  target_xml:
+    path: data/02_fields/Source data for Bank.xml
+    worksheet_name: "Field List"
+    header_match:
+      sheet_name: "Sheet Name"
+      group_name: "Group Name"
+      description: "Field Description"
+      # ... etc
+    normalization:
+      strip_table_prefix: "S_"
+      uppercase_table_field: true
+    output_naming:
+      transformer_id_template: "{sap_table}#{sap_field}"
+      internal_id_template: "{internal_table}.{sap_field}"
+
+matching:
+  target_label_priority:
+    - description
+    - sap_field
+    - group_name
+```
 
 ## 🆕 New Multi-File Migration Structure (v3.0)
 

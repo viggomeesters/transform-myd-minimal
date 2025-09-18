@@ -25,6 +25,41 @@ class Config:
         self.input_dir = "data/02_fields"
         self.output_dir = "config"
         
+        # New mapping configuration defaults
+        self.mapping_from_sources = False
+        self.source_headers = {
+            'path': 'data/02_fields/BNKA_headers.xlsx',
+            'sheet': 'Sheet1',
+            'header_row': 1,
+            'ignore_data_below': True
+        }
+        self.target_xml = {
+            'path': 'data/02_fields/Source data for Bank.xml',
+            'worksheet_name': 'Field List',
+            'header_match': {
+                'sheet_name': 'Sheet Name',
+                'group_name': 'Group Name',
+                'description': 'Field Description',
+                'importance': 'Importance',
+                'type': 'Type',
+                'length': 'Length',
+                'decimal': 'Decimal',
+                'sap_table': 'SAP Structure',
+                'sap_field': 'SAP Field'
+            },
+            'normalization': {
+                'strip_table_prefix': 'S_',
+                'uppercase_table_field': True
+            },
+            'output_naming': {
+                'transformer_id_template': '{sap_table}#{sap_field}',
+                'internal_id_template': '{internal_table}.{sap_field}'
+            }
+        }
+        self.matching = {
+            'target_label_priority': ['description', 'sap_field', 'group_name']
+        }
+        
         # Load from config file if it exists
         if config_path is None:
             # Look in configs directory first, fallback to root for backward compatibility
@@ -42,7 +77,7 @@ class Config:
                 config_data = yaml.safe_load(f)
             
             if config_data:
-                # Update values if they exist in the config file
+                # Update existing configuration values
                 if 'fuzzy_threshold' in config_data:
                     self.fuzzy_threshold = float(config_data['fuzzy_threshold'])
                 if 'max_suggestions' in config_data:
@@ -53,6 +88,30 @@ class Config:
                     self.input_dir = str(config_data['input_dir'])
                 if 'output_dir' in config_data:
                     self.output_dir = str(config_data['output_dir'])
+                
+                # Load new mapping configuration if present
+                mapping_config = config_data.get('mapping', {})
+                if mapping_config:
+                    self.mapping_from_sources = mapping_config.get('from_sources', self.mapping_from_sources)
+                    
+                    # Update source headers config
+                    if 'source_headers' in mapping_config:
+                        source_config = mapping_config['source_headers']
+                        self.source_headers.update(source_config)
+                    
+                    # Update target XML config
+                    if 'target_xml' in mapping_config:
+                        target_config = mapping_config['target_xml']
+                        # Deep merge for nested dictionaries
+                        for key, value in target_config.items():
+                            if key in self.target_xml and isinstance(self.target_xml[key], dict) and isinstance(value, dict):
+                                self.target_xml[key].update(value)
+                            else:
+                                self.target_xml[key] = value
+                
+                # Load matching config
+                if 'matching' in config_data:
+                    self.matching.update(config_data['matching'])
                     
         except Exception as e:
             print(f"Warning: Could not load config.yaml: {e}")
@@ -67,6 +126,18 @@ class Config:
             self.max_suggestions = args.max_suggestions
         if hasattr(args, 'disable_fuzzy') and args.disable_fuzzy is not None:
             self.disable_fuzzy = args.disable_fuzzy
+        
+        # New mapping-related CLI arguments
+        if hasattr(args, 'source_headers_xlsx') and args.source_headers_xlsx is not None:
+            self.source_headers['path'] = args.source_headers_xlsx
+        if hasattr(args, 'source_headers_sheet') and args.source_headers_sheet is not None:
+            self.source_headers['sheet'] = args.source_headers_sheet
+        if hasattr(args, 'source_headers_row') and args.source_headers_row is not None:
+            self.source_headers['header_row'] = args.source_headers_row
+        if hasattr(args, 'target_xml') and args.target_xml is not None:
+            self.target_xml['path'] = args.target_xml
+        if hasattr(args, 'target_xml_worksheet') and args.target_xml_worksheet is not None:
+            self.target_xml['worksheet_name'] = args.target_xml_worksheet
     
     def get_input_path(self, object_name: str, variant: str) -> Path:
         """Get the full input path for Excel file."""
