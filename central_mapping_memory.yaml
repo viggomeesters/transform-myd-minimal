@@ -1,0 +1,55 @@
+# Central Mapping Memory - Centralized Skip Rules and Manual Mappings
+# This file contains global and table-specific field mapping rules that take precedence
+# over automatic mapping algorithms. Comments are preserved for auditability.
+
+# Global skip fields - apply to all tables unless overridden
+global_skip_fields:
+  - source_field: "TEMP_FIELD"
+    source_description: "Temporary processing field"
+    skip: true
+    comment: "This field is only used during data processing and should not be mapped to target"
+  
+  - source_field: "DEBUG_FLAG" 
+    source_description: "Debug flag for development"
+    skip: true
+    comment: "Development field, not needed in production mapping"
+
+# Global manual mappings - apply to all tables unless overridden  
+global_manual_mappings:
+  - source_field: "ID_FIELD"
+    source_description: "Generic identifier field"
+    target: "COMMON_ID"
+    target_description: "Common identifier in target system"
+    comment: "Standard mapping for all ID fields across tables"
+
+# Table-specific overrides - these take precedence over global rules
+table_specific:
+  m140_bnka:
+    skip_fields:
+      - source_field: "ZRES1"
+        source_description: "Reserved field 1"
+        skip: true
+        comment: "BNKA table specific: Reserved field not used in current implementation"
+      
+      - source_field: "ZRES2"
+        source_description: "Reserved field 2"
+        skip: true
+        comment: "BNKA table specific: Reserved field not used in current implementation"
+    
+    manual_mappings:
+      - source_field: "IBAN_RULE"
+        source_description: "IBAN Validation Rule"
+        target: "SWIFT"
+        target_description: "SWIFT Code for international bank transfers"
+        comment: "BNKA table specific: Map IBAN validation rule to SWIFT field for business process alignment"
+      
+      - source_field: "ERNAM"
+        source_description: "Name of Person who Created the Object"
+        target: "BANKL"
+        target_description: "Bank Key"
+        comment: "BNKA table specific: Business rule mapping creator to bank key for audit trail"
+
+# Example fields from the existing data for reference
+# These would be processed by the automatic matching system if not overridden above:
+# Source fields: BANKS, BANKL, BANKA, PROVZ, STRAS, ORT01, SWIFT, BGRUP, XPGRO, BNKLZ, BRNCH
+# Target fields: BANKS, BANKL, BANKA, PROVZ, STRAS, ORT01, SWIFT, BGRUP, XPGRO, BNKLZ, BRNCH, ISNOTOVERWRITE
