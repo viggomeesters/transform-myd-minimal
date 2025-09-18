@@ -12,7 +12,7 @@ Contains all CLI parsing and argument handling including:
 import argparse
 import sys
 
-from config_loader import load_config
+from .config_loader import load_config
 
 
 __version__ = "3.0.0"

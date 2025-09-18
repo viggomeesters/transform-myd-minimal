@@ -18,7 +18,7 @@ from typing import Dict, List, Optional, Tuple
 import pandas as pd
 import yaml
 
-from fuzzy import FuzzyConfig
+from .fuzzy import FuzzyConfig
 
 
 def read_excel_fields(excel_path):

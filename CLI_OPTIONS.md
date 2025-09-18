@@ -15,51 +15,59 @@
 
 *The `map` subcommand is optional for backward compatibility. Legacy format without subcommand is supported.
 
+**⚠️ Script Invocation Change:**
+With the new src-layout structure, the script is now invoked using the wrapper script `./transform-myd-minimal` instead of directly calling Python files. This provides a cleaner interface without visible `.py` extensions:
+
+- **Old format**: `python3 transform_myd_minimal.py [options]`
+- **New format**: `./transform-myd-minimal [options]`
+
+All examples in this document use the new wrapper script format.
+
 ## Usage Examples
 
 ### Integrated Workflow (Recommended - v3.0+)
 ```bash
 # Generate all YAML files (column_map, fields, value_rules, object_list)
-python3 transform_myd_minimal.py map -object m140 -variant bnka
+./transform-myd-minimal map -object m140 -variant bnka
 
 # With advanced fuzzy matching options
-python3 transform_myd_minimal.py map -object m140 -variant bnka --fuzzy-threshold 0.8
+./transform-myd-minimal map -object m140 -variant bnka --fuzzy-threshold 0.8
 
 # Disable fuzzy matching
-python3 transform_myd_minimal.py map -object m140 -variant bnka --disable-fuzzy
+./transform-myd-minimal map -object m140 -variant bnka --disable-fuzzy
 ```
 
 ### Legacy Format (Backward Compatible)
 ```bash
 # Legacy format (shows migration message, generates all YAML files)
-python3 transform_myd_minimal.py -object m140 -variant bnka
+./transform-myd-minimal -object m140 -variant bnka
 
 # With advanced options
-python3 transform_myd_minimal.py -object m140 -variant bnka --fuzzy-threshold 0.8
+./transform-myd-minimal -object m140 -variant bnka --fuzzy-threshold 0.8
 ```
 
 ### Advanced Fuzzy Matching Options
 ```bash
 # High precision fuzzy matching (stricter threshold)
-python3 transform_myd_minimal.py map -object m140 -variant bnka --fuzzy-threshold 0.8
+./transform-myd-minimal map -object m140 -variant bnka --fuzzy-threshold 0.8
 
 # More fuzzy suggestions
-python3 transform_myd_minimal.py map -object m140 -variant bnka --max-suggestions 5
+./transform-myd-minimal map -object m140 -variant bnka --max-suggestions 5
 
 # Combined advanced options
-python3 transform_myd_minimal.py map -object m140 -variant bnka --fuzzy-threshold 0.7 --max-suggestions 2
+./transform-myd-minimal map -object m140 -variant bnka --fuzzy-threshold 0.7 --max-suggestions 2
 ```
 
 ### Getting Help
 ```bash
 # Show all available commands
-python3 transform_myd_minimal.py --help
+./transform-myd-minimal --help
 
 # Show map command options
-python3 transform_myd_minimal.py map --help
+./transform-myd-minimal map --help
 
 # Show version information
-python3 transform_myd_minimal.py --version
+./transform-myd-minimal --version
 ```
 
 ## Parameter Details
@@ -179,10 +187,10 @@ Upgrade to the integrated workflow for automatic YAML generation:
 
 ```bash
 # v2.0 command (still works, shows migration message)
-python3 transform_myd_minimal.py -object m140 -variant bnka
+./transform-myd-minimal -object m140 -variant bnka
 
 # v3.0 integrated workflow (recommended)
-python3 transform_myd_minimal.py map -object m140 -variant bnka
+./transform-myd-minimal map -object m140 -variant bnka
 ```
 
 **Benefits of v3.0:**
@@ -196,10 +204,10 @@ All existing commands continue to work without changes. New features are opt-in:
 
 ```bash
 # v1.0 command (still works)
-python3 transform_myd_minimal.py -object m140 -variant bnka
+./transform-myd-minimal -object m140 -variant bnka
 
 # v2.0 with advanced features
-python3 transform_myd_minimal.py map -object m140 -variant bnka --fuzzy-threshold 0.7
+./transform-myd-minimal map -object m140 -variant bnka --fuzzy-threshold 0.7
 ```
 
 ## Tips and Best Practices

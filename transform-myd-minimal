@@ -4,5 +4,8 @@
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Execute the Python script with all arguments
-python3 "$SCRIPT_DIR/transform_myd_minimal.py" "$@"
+# Add src to PYTHONPATH so the package can be imported
+export PYTHONPATH="$SCRIPT_DIR/src:$PYTHONPATH"
+
+# Execute the Python package as a module with all arguments  
+cd "$SCRIPT_DIR" && python3 -m transform_myd_minimal "$@"

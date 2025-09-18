@@ -17,10 +17,10 @@ from typing import Dict, List, Optional, Tuple, Union
 import pandas as pd
 import yaml
 
-from cli import setup_cli
-from fuzzy import FuzzyConfig, FieldNormalizer, FuzzyMatcher
-from synonym import SynonymMatcher
-from generator import (
+from .cli import setup_cli
+from .fuzzy import FuzzyConfig, FieldNormalizer, FuzzyMatcher
+from .synonym import SynonymMatcher
+from .generator import (
     read_excel_fields, generate_object_list_yaml, generate_fields_yaml, 
     generate_value_rules_yaml, generate_column_map_yaml, generate_migration_structure
 )
