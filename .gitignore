@@ -35,3 +35,19 @@ data/04_raw_validation/
 data/05_rejected/
 data/06_transformed/
 data/07_transformed_validation/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Development environment
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Editor and system files
+*.log
+.env
+.env.local
