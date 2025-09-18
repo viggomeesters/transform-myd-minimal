@@ -287,7 +287,7 @@ def generate_column_map_yaml(object_name, variant, source_fields, target_fields,
     timestamp = datetime.now().strftime("%Y%m%d %H%M")
     
     # Import here to avoid circular imports
-    from main import create_advanced_column_mapping
+    from .main import create_advanced_column_mapping
     
     # Create advanced mapping with detailed results (for YAML generation only, without central memory)
     fuzzy_config = FuzzyConfig(

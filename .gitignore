@@ -29,6 +29,14 @@ Thumbs.db
 test_output/
 *_backup.*
 
+# Generated output files (keep examples but ignore working outputs)
+config/targets.yaml
+config/mapping.yaml
+config/*/column_map.yaml
+config/*/fields.yaml
+config/*/value_rules.yaml
+migrations/*/
+
 # Data files
 data/03_raw/
 data/04_raw_validation/
