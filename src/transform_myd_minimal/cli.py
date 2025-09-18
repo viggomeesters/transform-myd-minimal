@@ -13,6 +13,10 @@ import argparse
 import sys
 
 from .config_loader import load_config
+from .logging_config import get_logger
+
+# Initialize logger for this module
+logger = get_logger(__name__)
 
 
 __version__ = "3.0.0"
@@ -26,7 +30,7 @@ def setup_cli():
     # Check if this is the old format (no subcommand)
     if len(sys.argv) > 1 and not sys.argv[1] in ['map', '-h', '--help', '--version']:
         # Old format detected, handle backward compatibility
-        print("Note: Using legacy format. Consider using 'map' subcommand: python3 transform_myd_minimal.py map -object {} -variant {}".format(
+        logger.info("Note: Using legacy format. Consider using 'map' subcommand: python3 transform_myd_minimal.py map -object {} -variant {}".format(
             sys.argv[sys.argv.index('-object') + 1] if '-object' in sys.argv else 'OBJECT',
             sys.argv[sys.argv.index('-variant') + 1] if '-variant' in sys.argv else 'VARIANT'
         ))
