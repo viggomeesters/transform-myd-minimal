@@ -8,4 +8,4 @@ disable_fuzzy: false        # Whether to disable fuzzy matching
 
 # Directory configuration
 input_dir: "data/02_fields" # Input directory for Excel files
-output_dir: "test_output"   # Output directory for generated YAML files
+output_dir: "config"        # Output directory for generated YAML files
