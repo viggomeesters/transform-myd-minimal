@@ -59,6 +59,33 @@ class FuzzyConfig:
     use_jaro_winkler: bool = True
 
 
+@dataclass
+class SkipRule:
+    """Represents a skip rule from central mapping memory."""
+    source_field: str
+    source_description: str
+    skip: bool
+    comment: str
+
+
+@dataclass
+class ManualMapping:
+    """Represents a manual mapping rule from central mapping memory."""
+    source_field: str
+    source_description: str
+    target: str
+    target_description: str
+    comment: str
+
+
+@dataclass
+class CentralMappingMemory:
+    """Central mapping memory configuration."""
+    global_skip_fields: List[SkipRule]
+    global_manual_mappings: List[ManualMapping]
+    table_specific: Dict[str, Dict[str, List]]
+
+
 class FieldNormalizer:
     """Normalizes field names and descriptions for matching."""
     
@@ -570,14 +597,77 @@ def read_excel_fields(excel_path):
     return source_fields, target_fields
 
 
-def create_advanced_column_mapping(source_fields, target_fields, fuzzy_config=None):
-    """Create advanced column mapping using comprehensive matching strategies."""
+def create_advanced_column_mapping(source_fields, target_fields, fuzzy_config=None, central_memory=None, object_name=None, variant=None):
+    """Create advanced column mapping using comprehensive matching strategies with central mapping memory support."""
     
     # Initialize the advanced matcher
     matcher = AdvancedFieldMatcher(fuzzy_config)
     
-    # Get match results and audit matches
-    match_results, audit_matches = matcher.match_fields(source_fields, target_fields)
+    # Initialize tracking for central memory rules
+    central_skip_matches = []
+    central_manual_matches = []
+    
+    # Get effective rules from central mapping memory
+    skip_rules, manual_mappings = get_effective_rules_for_table(central_memory, object_name or "", variant or "")
+    
+    # Apply skip rules first - remove skipped source fields
+    filtered_source_fields = source_fields.copy()
+    if skip_rules:
+        skip_dict = {rule.source_field: rule for rule in skip_rules if rule.skip}
+        
+        for source_field in skip_dict:
+            # Find matching rows in source_fields and mark for removal
+            mask = filtered_source_fields['field_name'] == source_field
+            if mask.any():
+                # Create skip match result for logging
+                row = filtered_source_fields[mask].iloc[0]
+                rule = skip_dict[source_field]
+                skip_result = FieldMatchResult(
+                    source_field=source_field,
+                    target_field=None,  # Skipped fields have no target
+                    confidence_score=1.0,
+                    match_type="central_skip",
+                    reason=f"Central memory skip rule: {rule.comment}",
+                    source_description=row.get('field_description', ''),
+                    target_description=None,
+                    algorithm="central_memory"
+                )
+                central_skip_matches.append(skip_result)
+                
+                # Remove from source fields for further processing
+                filtered_source_fields = filtered_source_fields[~mask]
+    
+    # Apply manual mappings next
+    remaining_source_fields = filtered_source_fields.copy()
+    if manual_mappings:
+        mapping_dict = {mapping.source_field: mapping for mapping in manual_mappings}
+        
+        for source_field, mapping in mapping_dict.items():
+            # Find matching rows in remaining source fields
+            mask = remaining_source_fields['field_name'] == source_field
+            if mask.any():
+                # Create manual mapping result for logging
+                row = remaining_source_fields[mask].iloc[0]
+                manual_result = FieldMatchResult(
+                    source_field=source_field,
+                    target_field=mapping.target,
+                    confidence_score=1.0,
+                    match_type="central_manual",
+                    reason=f"Central memory manual mapping: {mapping.comment}",
+                    source_description=row.get('field_description', ''),
+                    target_description=mapping.target_description,
+                    algorithm="central_memory"
+                )
+                central_manual_matches.append(manual_result)
+                
+                # Remove from source fields for further processing
+                remaining_source_fields = remaining_source_fields[~mask]
+    
+    # Get match results for remaining fields using automatic algorithms
+    auto_match_results, audit_matches = matcher.match_fields(remaining_source_fields, target_fields)
+    
+    # Combine all results: central manual mappings + automatic matches + skipped fields
+    all_match_results = central_manual_matches + auto_match_results + central_skip_matches
     
     # Create mapping lines based on results
     mapping_lines = []
@@ -585,31 +675,123 @@ def create_advanced_column_mapping(source_fields, target_fields, fuzzy_config=No
     fuzzy_matches = []
     unmapped_sources = []
     
-    for result in match_results:
+    for result in all_match_results:
         if result.target_field:
-            if result.match_type == "exact":
+            if result.match_type in ["exact", "central_manual"]:
                 mapping_lines.append(f"{result.source_field}: {result.target_field}")
                 exact_matches.append(result)
-            else:
+            elif result.match_type != "central_skip":  # Don't add skipped fields to mappings
                 mapping_lines.append(f"{result.source_field}: {result.target_field}")
                 fuzzy_matches.append(result)
         else:
-            unmapped_sources.append(result)
+            if result.match_type != "central_skip":  # Don't count skipped fields as unmapped
+                unmapped_sources.append(result)
     
     # Add derived targets (targets without source mapping)
-    mapped_targets = {result.target_field for result in match_results if result.target_field}
+    mapped_targets = {result.target_field for result in all_match_results if result.target_field}
     for _, target_row in target_fields.iterrows():
         target_name = target_row['field_name']
         if target_name not in mapped_targets:
             mapping_lines.append(f"<NOT_IN_SOURCE_{target_name}>: {target_name}")
     
-    return mapping_lines, exact_matches, fuzzy_matches, unmapped_sources, audit_matches
+    return mapping_lines, exact_matches, fuzzy_matches, unmapped_sources, audit_matches, central_skip_matches, central_manual_matches
 
 
 def create_column_mapping(source_fields, target_fields):
     """Legacy column mapping function - maintained for backward compatibility."""
-    mapping_lines, _, _, _, _ = create_advanced_column_mapping(source_fields, target_fields)
+    result = create_advanced_column_mapping(source_fields, target_fields)
+    # Handle both old and new return formats
+    if len(result) == 7:
+        mapping_lines, _, _, _, _, _, _ = result
+    else:
+        mapping_lines, _, _, _, _ = result
     return mapping_lines
+
+
+def load_central_mapping_memory(base_path: Path) -> Optional[CentralMappingMemory]:
+    """Load central mapping memory from YAML file."""
+    central_memory_path = base_path / "central_mapping_memory.yaml"
+    
+    if not central_memory_path.exists():
+        return None
+    
+    try:
+        with open(central_memory_path, 'r', encoding='utf-8') as f:
+            data = yaml.safe_load(f)
+        
+        if not data:
+            return None
+        
+        # Parse global skip fields
+        global_skip_fields = []
+        for skip_data in data.get('global_skip_fields', []):
+            global_skip_fields.append(SkipRule(
+                source_field=skip_data['source_field'],
+                source_description=skip_data['source_description'],
+                skip=skip_data['skip'],
+                comment=skip_data['comment']
+            ))
+        
+        # Parse global manual mappings
+        global_manual_mappings = []
+        for mapping_data in data.get('global_manual_mappings', []):
+            global_manual_mappings.append(ManualMapping(
+                source_field=mapping_data['source_field'],
+                source_description=mapping_data['source_description'],
+                target=mapping_data['target'],
+                target_description=mapping_data['target_description'],
+                comment=mapping_data['comment']
+            ))
+        
+        # Parse table-specific rules (keep as dict for flexible processing)
+        table_specific = data.get('table_specific', {})
+        
+        return CentralMappingMemory(
+            global_skip_fields=global_skip_fields,
+            global_manual_mappings=global_manual_mappings,
+            table_specific=table_specific
+        )
+    
+    except Exception as e:
+        print(f"Warning: Could not load central mapping memory: {e}")
+        return None
+
+
+def get_effective_rules_for_table(central_memory: CentralMappingMemory, object_name: str, variant: str) -> Tuple[List[SkipRule], List[ManualMapping]]:
+    """Get effective skip rules and manual mappings for a specific table."""
+    if not central_memory:
+        return [], []
+    
+    # Start with global rules
+    effective_skip_rules = central_memory.global_skip_fields.copy()
+    effective_manual_mappings = central_memory.global_manual_mappings.copy()
+    
+    # Apply table-specific overrides
+    table_key = f"{object_name}_{variant}"
+    table_rules = central_memory.table_specific.get(table_key, {})
+    
+    # Add table-specific skip rules
+    table_skip_data = table_rules.get('skip_fields', [])
+    for skip_data in table_skip_data:
+        effective_skip_rules.append(SkipRule(
+            source_field=skip_data['source_field'],
+            source_description=skip_data['source_description'],
+            skip=skip_data['skip'],
+            comment=skip_data['comment']
+        ))
+    
+    # Add table-specific manual mappings
+    table_mapping_data = table_rules.get('manual_mappings', [])
+    for mapping_data in table_mapping_data:
+        effective_manual_mappings.append(ManualMapping(
+            source_field=mapping_data['source_field'],
+            source_description=mapping_data['source_description'],
+            target=mapping_data['target'],
+            target_description=mapping_data['target_description'],
+            comment=mapping_data['comment']
+        ))
+    
+    return effective_skip_rules, effective_manual_mappings
 
 
 def is_constant_field(field_name, field_description):
@@ -857,6 +1039,16 @@ def run_map_command(args):
     output_path = output_dir / "column_map.yaml"
     
     try:
+        # Load central mapping memory
+        print("Loading central mapping memory...")
+        central_memory = load_central_mapping_memory(base_dir)
+        if central_memory:
+            print("Central mapping memory loaded successfully")
+            skip_rules, manual_mappings = get_effective_rules_for_table(central_memory, args.object, args.variant)
+            print(f"Found {len(skip_rules)} skip rules and {len(manual_mappings)} manual mappings for {args.object}_{args.variant}")
+        else:
+            print("No central mapping memory found or failed to load")
+        
         # Read Excel file
         print(f"Reading Excel file: {excel_path}")
         source_fields, target_fields = read_excel_fields(excel_path)
@@ -871,18 +1063,34 @@ def run_map_command(args):
             max_suggestions=args.max_suggestions
         )
         
-        # Create advanced mapping to get statistics
-        mapping_lines, exact_matches, fuzzy_matches, unmapped_sources, audit_matches = create_advanced_column_mapping(
-            source_fields, target_fields, fuzzy_config
+        # Create advanced mapping with central memory support
+        mapping_result = create_advanced_column_mapping(
+            source_fields, target_fields, fuzzy_config, central_memory, args.object, args.variant
         )
+        mapping_lines, exact_matches, fuzzy_matches, unmapped_sources, audit_matches, central_skip_matches, central_manual_matches = mapping_result
         
         # Print matching statistics
         print("\n=== Advanced Matching Results ===")
+        if central_skip_matches:
+            print(f"Central memory skip rules applied: {len(central_skip_matches)}")
+        if central_manual_matches:
+            print(f"Central memory manual mappings applied: {len(central_manual_matches)}")
         print(f"Exact matches: {len(exact_matches)}")
         print(f"Fuzzy/Synonym matches: {len(fuzzy_matches)}")
         print(f"Unmapped sources: {len(unmapped_sources)}")
         print(f"Audit matches (fuzzy to exact-mapped targets): {len(audit_matches)}")
         print(f"Mapping coverage: {((len(exact_matches) + len(fuzzy_matches)) / len(source_fields) * 100):.1f}%")
+        
+        # Show central memory rule applications
+        if central_skip_matches:
+            print("\nCentral memory skip rules applied:")
+            for match in central_skip_matches:
+                print(f"  SKIP: {match.source_field} - {match.reason}")
+        
+        if central_manual_matches:
+            print("\nCentral memory manual mappings applied:")
+            for match in central_manual_matches:
+                print(f"  MANUAL: {match.source_field} → {match.target_field} - {match.reason}")
         
         if fuzzy_matches:
             print("\nFuzzy/Synonym matches found:")
@@ -894,9 +1102,9 @@ def run_map_command(args):
             for match in audit_matches:
                 print(f"  {match.source_field} → {match.target_field} (audit, confidence: {match.confidence_score:.2f})")
         
-        # Generate YAML content
+        # Generate YAML content with central memory data
         yaml_content = generate_column_map_yaml(args.object, args.variant, source_fields, target_fields, 
-                                              f".\\data\\02_fields\\{excel_filename}", audit_matches)
+                                              f".\\data\\02_fields\\{excel_filename}", audit_matches, central_skip_matches, central_manual_matches)
         
         # Ensure output directory exists
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -929,13 +1137,13 @@ def run_map_command(args):
         sys.exit(1)
 
 
-def generate_column_map_yaml(object_name, variant, source_fields, target_fields, excel_source_path, external_audit_matches=None):
-    """Generate the complete column_map.yaml content with advanced matching."""
+def generate_column_map_yaml(object_name, variant, source_fields, target_fields, excel_source_path, external_audit_matches=None, central_skip_matches=None, central_manual_matches=None):
+    """Generate the complete column_map.yaml content with advanced matching and central memory support."""
     
     # Generate timestamp
     timestamp = datetime.now().strftime("%Y%m%d %H%M")
     
-    # Create advanced mapping with detailed results
+    # Create advanced mapping with detailed results (for YAML generation only, without central memory)
     fuzzy_config = FuzzyConfig(
         threshold=0.6,
         max_suggestions=3,
@@ -943,19 +1151,28 @@ def generate_column_map_yaml(object_name, variant, source_fields, target_fields,
         jaro_winkler_weight=0.5
     )
     
-    mapping_lines, exact_matches, fuzzy_matches, unmapped_sources, audit_matches = create_advanced_column_mapping(
-        source_fields, target_fields, fuzzy_config
-    )
+    # For YAML generation, we use the original function without central memory to maintain compatibility
+    result = create_advanced_column_mapping(source_fields, target_fields, fuzzy_config)
+    if len(result) == 7:
+        mapping_lines, exact_matches, fuzzy_matches, unmapped_sources, audit_matches, _, _ = result
+    else:
+        mapping_lines, exact_matches, fuzzy_matches, unmapped_sources, audit_matches = result
     
-    # Use external audit matches if provided (from run_map_command)
+    # Use external matches if provided (from run_map_command)
     if external_audit_matches is not None:
         audit_matches = external_audit_matches
+    if central_skip_matches is None:
+        central_skip_matches = []
+    if central_manual_matches is None:
+        central_manual_matches = []
     
     # Generate the YAML content
     yaml_content = []
     yaml_content.append(f"# generated by transform-myd-minimal advanced map @ {timestamp}")
     yaml_content.append(f"# source: {excel_source_path}")
     yaml_content.append("# Advanced field matching with exact, synonym, and fuzzy algorithms")
+    if central_skip_matches or central_manual_matches:
+        yaml_content.append("# Central mapping memory rules applied")
     yaml_content.append("")
     yaml_content.append("## Match fields")
     yaml_content.append("")
@@ -973,7 +1190,39 @@ def generate_column_map_yaml(object_name, variant, source_fields, target_fields,
     # Add detailed mapping comments with advanced match information
     yaml_content.append("# mappings:")
     
-    # Process exact matches
+    # Process central memory skip rules first
+    if central_skip_matches:
+        yaml_content.append("#")
+        yaml_content.append("# Central Memory Skip Rules Applied:")
+        for result in central_skip_matches:
+            yaml_content.extend([
+                f"# SKIP: {result.source_field}",
+                f"#   source_description: \"{result.source_description}\"",
+                f"#   skip_reason: \"{result.reason}\"",
+                f"#   confidence: {result.confidence_score:.2f}",
+                f"#   rule_type: {result.match_type}",
+                "#"
+            ])
+    
+    # Process central memory manual mappings
+    if central_manual_matches:
+        yaml_content.append("#")
+        yaml_content.append("# Central Memory Manual Mappings Applied:")
+        for result in central_manual_matches:
+            yaml_content.extend([
+                f"#  - source: {result.source_field}",
+                f"#    source_description: \"{result.source_description}\"",
+                f"#    target: {result.target_field}",
+                f"#    target_description: \"{result.target_description}\"",
+                f"#    decision: MANUAL_MAP",
+                f"#    confidence: {result.confidence_score:.2f}",
+                f"#    match_type: {result.match_type}",
+                f"#    rule: copy",
+                f"#    reason: \"{result.reason}\"",
+                "#"
+            ])
+    
+    # Process automatic exact matches
     for result in exact_matches:
         yaml_content.extend([
             f"#  - source: {result.source_field}",
