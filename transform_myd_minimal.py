@@ -1,6 +1,17 @@
 #!/usr/bin/env python3
 """
+DEPRECATED: This file has been replaced by main.py and modular components.
+
 transform-myd-minimal: Generate column mapping YAML from Excel field definitions
+
+This file has been split into logical modules for better maintainability:
+- fuzzy.py: fuzzy matching algorithms and field normalization
+- synonym.py: synonym matching logic and dictionaries
+- cli.py: CLI parsing and argument handling
+- generator.py: YAML generation and file handling
+- main.py: main entry point and orchestration
+
+Please use: python3 main.py [command] [options]
 
 Advanced automatic field matching system with integrated YAML generation workflow.
 
@@ -1762,4 +1773,11 @@ def generate_migration_transformations_yaml(table_path, object_code, table_name,
 
 
 if __name__ == "__main__":
+    print("DEPRECATED: This file has been replaced by modular components.")
+    print("Please use: python3 main.py [command] [options]")
+    print("Redirecting to main.py...")
+    print()
+    
+    # Import and run the new main module
+    from main import main
     main()
