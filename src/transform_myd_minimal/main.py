@@ -578,42 +578,29 @@ def run_map_command(args, config):
             for match in audit_matches:
                 print(f"  {match.source_field} → {match.target_field} (audit, confidence: {match.confidence_score:.2f})")
         
-        # Generate YAML content with central memory data
-        excel_filename = f"fields_{args.object}_{args.variant}.xlsx"
-        excel_relative_path = f".\\{config.input_dir}\\{excel_filename}"
-        yaml_content = generate_column_map_yaml(args.object, args.variant, source_fields, target_fields, 
-                                              excel_relative_path, audit_matches, central_skip_matches, central_manual_matches)
-        
-        # Ensure output directory exists
-        output_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Write the column mapping file
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(yaml_content)
-        
-        print(f"\nGenerated advanced column mapping: {output_path}")
+        # Skip legacy column_map.yaml generation - deprecated in favor of migrations structure
         
         # Read the Excel file into a DataFrame for YAML generation
         df = pd.read_excel(excel_path)
         
-        # Generate additional YAML files
-        print("\n=== Generating Additional YAML Files ===")
+        # Collect mapping results for migrations structure
+        mapping_results = {
+            'exact_matches': exact_matches,
+            'fuzzy_matches': fuzzy_matches,
+            'central_manual_matches': central_manual_matches,
+            'central_skip_matches': central_skip_matches,
+            'audit_matches': audit_matches,
+            'unmapped_sources': unmapped_sources,
+            'source_fields': source_fields,
+            'target_fields': target_fields
+        }
         
-        # Generate object_list.yaml (updated with current structure)
-        generate_object_list_yaml(base_dir, config.output_dir)
-        
-        # Generate fields.yaml for current table
-        generate_fields_yaml(base_dir, args.object, args.variant, df, config.output_dir, config.input_dir)
-        
-        # Generate value_rules.yaml for current table
-        generate_value_rules_yaml(base_dir, args.object, args.variant, df, config.output_dir, config.input_dir)
-        
-        print("\nAll YAML files generated successfully!")
+        # Skip legacy config generation - deprecated in favor of migrations structure
         
         # === Generate New Multi-File Migration Structure ===
         print(f"\n=== Generating New Multi-File Migration Structure ===")
         try:
-            generated_migration_files = generate_migration_structure(base_dir, args.object, args.variant, df)
+            generated_migration_files = generate_migration_structure(base_dir, args.object, args.variant, df, mapping_results)
             if generated_migration_files:
                 print(f"Generated {len(generated_migration_files)} migration files in migrations/ directory")
                 print("New structure provides:")
