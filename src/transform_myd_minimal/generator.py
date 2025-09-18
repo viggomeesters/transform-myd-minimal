@@ -477,7 +477,7 @@ def generate_column_map_yaml(object_name, variant, source_fields, target_fields,
 
 
 # Migration functions
-def generate_migration_structure(base_path, object_code, table_name, df):
+def generate_migration_structure(base_path, object_code, table_name, df, mapping_results=None):
     """Generate the new multi-file YAML structure in migrations/ directory."""
     if df is None:
         return None
@@ -503,7 +503,7 @@ def generate_migration_structure(base_path, object_code, table_name, df):
         generated_files.append(fields_file)
     
     # 3. Generate mappings.yaml (from existing column_map logic)
-    mappings_file = generate_migration_mappings_yaml(table_path, object_code, table_name, df)
+    mappings_file = generate_migration_mappings_yaml(table_path, object_code, table_name, df, mapping_results)
     if mappings_file:
         generated_files.append(mappings_file)
     
@@ -611,7 +611,7 @@ def generate_migration_fields_yaml(table_path, object_code, table_name, df):
     return output_path
 
 
-def generate_migration_mappings_yaml(table_path, object_code, table_name, df):
+def generate_migration_mappings_yaml(table_path, object_code, table_name, df, mapping_results=None):
     """Generate mappings.yaml for the new migrations structure."""
     if df is None:
         return None
@@ -624,23 +624,132 @@ def generate_migration_mappings_yaml(table_path, object_code, table_name, df):
         'mappings': []
     }
     
-    # Filter source and target fields
-    source_fields = df[df['field'] == 'Source'].copy()
-    target_fields = df[df['field'] == 'Target'].copy()
-    
-    # Create simple mapping structure (basic implementation)
-    for _, source_row in source_fields.iterrows():
-        mapping_entry = {
-            'source_field': source_row.get('field_name', ''),
-            'source_description': source_row.get('field_description', ''),
-            'target_field': '',  # Will be populated by advanced matching
-            'target_description': '',
-            'mapping_type': 'direct',
-            'transformation': 'copy',
-            'confidence': 0.0,
-            'status': 'pending'
-        }
-        mappings_data['mappings'].append(mapping_entry)
+    # If mapping results are provided, use them; otherwise fall back to basic implementation
+    if mapping_results:
+        exact_matches = mapping_results.get('exact_matches', [])
+        fuzzy_matches = mapping_results.get('fuzzy_matches', [])
+        central_manual_matches = mapping_results.get('central_manual_matches', [])
+        central_skip_matches = mapping_results.get('central_skip_matches', [])
+        audit_matches = mapping_results.get('audit_matches', [])
+        unmapped_sources = mapping_results.get('unmapped_sources', [])
+        source_fields = mapping_results.get('source_fields')
+        target_fields = mapping_results.get('target_fields')
+        
+        # Create mapping entries based on actual matching results
+        all_matches = exact_matches + fuzzy_matches + central_manual_matches
+        processed_source_fields = set()
+        
+        # Process exact and fuzzy matches first
+        for match in exact_matches + fuzzy_matches:
+            # Get target description from target_fields
+            target_desc = ''
+            if target_fields is not None:
+                target_row = target_fields[target_fields['field_name'] == match.target_field]
+                if not target_row.empty:
+                    target_desc = target_row.iloc[0].get('field_description', '')
+            
+            mapping_entry = {
+                'source_field': match.source_field,
+                'source_description': match.source_description,
+                'target_field': match.target_field,
+                'target_description': target_desc,
+                'mapping_type': match.match_type,
+                'transformation': 'copy',
+                'confidence': match.confidence_score,
+                'status': 'mapped'
+            }
+            mappings_data['mappings'].append(mapping_entry)
+            processed_source_fields.add(match.source_field)
+        
+        # Process central manual matches (skip if already processed by exact/fuzzy)
+        for match in central_manual_matches:
+            if match.source_field in processed_source_fields:
+                continue  # Skip if already processed as exact/fuzzy match
+                
+            # Get target description from target_fields
+            target_desc = match.target_description if hasattr(match, 'target_description') else ''
+            if not target_desc and target_fields is not None:
+                target_row = target_fields[target_fields['field_name'] == match.target_field]
+                if not target_row.empty:
+                    target_desc = target_row.iloc[0].get('field_description', '')
+            
+            mapping_entry = {
+                'source_field': match.source_field,
+                'source_description': match.source_description,
+                'target_field': match.target_field,
+                'target_description': target_desc,
+                'mapping_type': 'manual',
+                'transformation': 'copy',
+                'confidence': match.confidence_score,
+                'status': 'mapped',
+                'reason': match.reason
+            }
+            mappings_data['mappings'].append(mapping_entry)
+            processed_source_fields.add(match.source_field)
+        
+        # Process skipped fields
+        for match in central_skip_matches:
+            mapping_entry = {
+                'source_field': match.source_field,
+                'source_description': match.source_description,
+                'target_field': '',
+                'target_description': '',
+                'mapping_type': 'skip',
+                'transformation': 'none',
+                'confidence': match.confidence_score,
+                'status': 'skipped',
+                'reason': match.reason
+            }
+            mappings_data['mappings'].append(mapping_entry)
+            processed_source_fields.add(match.source_field)
+        
+        # Process unmapped sources (skip if already processed)
+        for source_field in unmapped_sources:
+            # Handle case where source_field might be an object instead of string
+            if hasattr(source_field, 'source_field'):
+                source_field_name = source_field.source_field
+            else:
+                source_field_name = source_field
+                
+            if source_field_name in processed_source_fields:
+                continue  # Skip if already processed
+                
+            # Get source description from source_fields
+            source_desc = ''
+            if source_fields is not None:
+                source_row = source_fields[source_fields['field_name'] == source_field_name]
+                if not source_row.empty:
+                    source_desc = source_row.iloc[0].get('field_description', '')
+            
+            mapping_entry = {
+                'source_field': source_field_name,
+                'source_description': source_desc,
+                'target_field': '',
+                'target_description': '',
+                'mapping_type': 'unmapped',
+                'transformation': 'none',
+                'confidence': 0.0,
+                'status': 'pending',
+                'reason': 'Geen geschikte match gevonden'
+            }
+            mappings_data['mappings'].append(mapping_entry)
+            
+    else:
+        # Fallback to basic implementation if no mapping results provided
+        source_fields = df[df['field'] == 'Source'].copy()
+        
+        for _, source_row in source_fields.iterrows():
+            mapping_entry = {
+                'source_field': source_row.get('field_name', ''),
+                'source_description': source_row.get('field_description', ''),
+                'target_field': '',
+                'target_description': '',
+                'mapping_type': 'direct',
+                'transformation': 'copy',
+                'confidence': 0.0,
+                'status': 'pending'
+            }
+            mappings_data['mappings'].append(mapping_entry)
     
     # Write to file
     output_path = table_path / "mappings.yaml"
@@ -648,6 +757,40 @@ def generate_migration_mappings_yaml(table_path, object_code, table_name, df):
         f.write(f"# Source-to-Target Field Mappings for {object_code.upper()} {table_name.title()} - {table_name.upper()} Table\n")
         f.write(f"# Generated by transform-myd-minimal @ {datetime.now().strftime('%Y%m%d %H%M')}\n")
         f.write(f"# This file defines how source fields map to SAP target fields\n\n")
+        
+        # Add information about mapping process if results are available
+        if mapping_results:
+            exact_matches = mapping_results.get('exact_matches', [])
+            central_manual_matches = mapping_results.get('central_manual_matches', [])
+            
+            # Check for any overlaps between exact matches and manual mappings (1:1 override cases)
+            exact_source_fields = {match.source_field for match in exact_matches}
+            manual_source_fields = {match.source_field for match in central_manual_matches}
+            
+            if exact_source_fields or central_manual_matches:
+                f.write("# Mapping Process Summary:\n")
+                if central_manual_matches:
+                    f.write(f"# - {len(central_manual_matches)} manual mappings applied from central memory\n")
+                if exact_matches:
+                    f.write(f"# - {len(exact_matches)} exact matches found\n")
+                
+                # Check for manual mappings that may have been overridden by exact matches
+                # This would happen if there were rules for the same source field
+                overridden_manual = []
+                for manual_match in central_manual_matches:
+                    # Check if this manual mapping's target was also matched by an exact match of a different source
+                    for exact_match in exact_matches:
+                        if (exact_match.target_field == manual_match.target_field and 
+                            exact_match.source_field != manual_match.source_field):
+                            overridden_manual.append((manual_match, exact_match))
+                
+                if overridden_manual:
+                    f.write("# Note: Some manual mappings may be redundant due to exact 1:1 matches:\n")
+                    for manual_match, exact_match in overridden_manual:
+                        f.write(f"#   - Manual mapping {manual_match.source_field}→{manual_match.target_field} "
+                               f"has same target as exact match {exact_match.source_field}→{exact_match.target_field}\n")
+                f.write("#\n\n")
+        
         yaml.dump(mappings_data, f, default_flow_style=False, allow_unicode=True)
     
     print(f"Generated: {output_path}")
