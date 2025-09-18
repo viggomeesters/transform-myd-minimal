@@ -2,14 +2,17 @@
 """
 transform-myd-minimal: Generate column mapping YAML from Excel field definitions
 
-Advanced automatic field matching system for transform-myd.
+Advanced automatic field matching system with integrated YAML generation workflow.
 
-Implements comprehensive matching strategies as specified in the requirements:
+Implements comprehensive matching strategies and automated YAML generation:
 - Exact match on normalized field names and descriptions
 - Synonym matching with expandable NL/EN synonym list
 - Fuzzy matching using Levenshtein and Jaro-Winkler algorithms
+- Integrated YAML generation (fields, value_rules, object_list, column_map)
 - Configurable thresholds and top-N suggestions
 - Confidence scores: "exact", "synoniem", "fuzzy", "geen match"
+
+Version: 3.0.0 - Integrated Workflow
 """
 
 from __future__ import annotations
@@ -27,6 +30,8 @@ from typing import Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 import yaml
+
+__version__ = "3.0.0"
 
 
 @dataclass
@@ -855,7 +860,7 @@ def generate_column_map_yaml(object_name, variant, source_fields, target_fields,
     yaml_content.append("")
     yaml_content.append(f"# column_map.yaml – {variant.upper()} datamap (source → target) + descriptions")
     yaml_content.append(f"# object: {variant.upper()}")
-    yaml_content.append("# version: 2 (Advanced Matching)")
+    yaml_content.append("# version: 3 (Integrated Workflow)")
     
     # Add detailed mapping comments with advanced match information
     yaml_content.append("# mappings:")
@@ -955,7 +960,7 @@ def generate_column_map_yaml(object_name, variant, source_fields, target_fields,
 
 def main():
     # Check if this is the old format (no subcommand)
-    if len(sys.argv) > 1 and not sys.argv[1] in ['map', '-h', '--help']:
+    if len(sys.argv) > 1 and not sys.argv[1] in ['map', '-h', '--help', '--version']:
         # Old format detected, handle backward compatibility
         print("Note: Using legacy format. Consider using 'map' subcommand: python3 transform_myd_minimal.py map -object {} -variant {}".format(
             sys.argv[sys.argv.index('-object') + 1] if '-object' in sys.argv else 'OBJECT',
@@ -976,6 +981,7 @@ def main():
     
     # New format with subcommands
     parser = argparse.ArgumentParser(description='Transform MYD Minimal - Advanced Field Matching and YAML Generation')
+    parser.add_argument('--version', action='version', version=f'transform-myd-minimal {__version__}')
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
     
     # Map subcommand (default behavior)

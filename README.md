@@ -1,10 +1,16 @@
-# Transform MYD Minimal - Advanced Field Matching
+# Transform MYD Minimal - Integrated YAML Workflow
 
-CLI tool voor het genereren van column mapping YAML bestanden uit Excel field definities.
+CLI tool voor het genereren van column mapping en YAML bestanden uit Excel field definities.
 
-**Nu met geavanceerde field matching algoritmen!**
+**Nu met geïntegreerde YAML workflow en geavanceerde field matching algoritmen!**
 
 ## Features
+
+### 🔄 Integrated YAML Workflow (v3.0)
+- **Single command** genereert alle benodigde YAML bestanden
+- **Automatische generatie** van fields.yaml, value_rules.yaml, object_list.yaml
+- **Geïntegreerde workflow** zonder aparte scripts
+- **Backward compatibility** met legacy command format
 
 ### 🚀 Advanced Field Matching System
 - **Exact matching** op genormaliseerde veldnamen en beschrijvingen
@@ -205,3 +211,19 @@ python3 transform_myd_minimal.py map -object m140 -variant bnka
 - `map` - Voor directe mapping velden
 
 Het script scant automatisch de bestaande mappenstructuur en Excel-bestanden in `data/02_fields/fields_{object}_{variant}.xlsx`.
+
+## Versie Informatie
+
+**Huidige versie: 3.0.0 - Integrated Workflow**
+
+```bash
+# Bekijk versie informatie
+python3 transform_myd_minimal.py --version
+```
+
+### Versie Geschiedenis
+- **v3.0** - Geïntegreerde YAML workflow met `map` subcommand
+- **v2.0** - Advanced matching algoritmen (fuzzy, synonym)
+- **v1.0** - Basis exact matching functionaliteit
+
+Voor volledige documentatie zie [CLI_OPTIONS.md](CLI_OPTIONS.md)
