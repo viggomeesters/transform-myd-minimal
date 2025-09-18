@@ -494,15 +494,14 @@ def get_effective_rules_for_table(central_memory: CentralMappingMemory, object_n
     return effective_skip_rules, effective_manual_mappings
 
 
-def run_map_command(args):
+def run_map_command(args, config):
     """Run the map command - generates column mapping and YAML files."""
-    # Construct paths
+    # Construct paths using configuration
     base_dir = Path.cwd()
-    excel_filename = f"fields_{args.object}_{args.variant}.xlsx"
-    excel_path = base_dir / "data" / "02_fields" / excel_filename
+    excel_path = config.get_input_path(args.object, args.variant)
     
-    # Output path
-    output_dir = base_dir / "config" / args.object / args.variant
+    # Output path using configuration
+    output_dir = config.get_output_dir(args.object, args.variant)
     output_path = output_dir / "column_map.yaml"
     
     try:
@@ -523,11 +522,11 @@ def run_map_command(args):
         print(f"Found {len(source_fields)} source fields and {len(target_fields)} target fields")
         print("Initializing advanced field matching system...")
         
-        # Configure fuzzy matching
+        # Configure fuzzy matching using config values
         fuzzy_config = FuzzyConfig(
-            enabled=not args.disable_fuzzy,
-            threshold=args.fuzzy_threshold,
-            max_suggestions=args.max_suggestions
+            enabled=not config.disable_fuzzy,
+            threshold=config.fuzzy_threshold,
+            max_suggestions=config.max_suggestions
         )
         
         # Create advanced mapping with central memory support
@@ -570,8 +569,10 @@ def run_map_command(args):
                 print(f"  {match.source_field} → {match.target_field} (audit, confidence: {match.confidence_score:.2f})")
         
         # Generate YAML content with central memory data
+        excel_filename = f"fields_{args.object}_{args.variant}.xlsx"
+        excel_relative_path = f".\\{config.input_dir}\\{excel_filename}"
         yaml_content = generate_column_map_yaml(args.object, args.variant, source_fields, target_fields, 
-                                              f".\\data\\02_fields\\{excel_filename}", audit_matches, central_skip_matches, central_manual_matches)
+                                              excel_relative_path, audit_matches, central_skip_matches, central_manual_matches)
         
         # Ensure output directory exists
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -589,13 +590,13 @@ def run_map_command(args):
         print("\n=== Generating Additional YAML Files ===")
         
         # Generate object_list.yaml (updated with current structure)
-        generate_object_list_yaml(base_dir)
+        generate_object_list_yaml(base_dir, config.output_dir)
         
         # Generate fields.yaml for current table
-        generate_fields_yaml(base_dir, args.object, args.variant, df)
+        generate_fields_yaml(base_dir, args.object, args.variant, df, config.output_dir, config.input_dir)
         
         # Generate value_rules.yaml for current table
-        generate_value_rules_yaml(base_dir, args.object, args.variant, df)
+        generate_value_rules_yaml(base_dir, args.object, args.variant, df, config.output_dir, config.input_dir)
         
         print("\nAll YAML files generated successfully!")
         
@@ -624,10 +625,10 @@ def run_map_command(args):
 
 def main():
     """Main entry point for the application."""
-    args, is_legacy = setup_cli()
+    args, config, is_legacy = setup_cli()
     
     # Execute the map command
-    run_map_command(args)
+    run_map_command(args, config)
 
 
 if __name__ == "__main__":

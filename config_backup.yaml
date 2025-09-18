@@ -1,0 +1,11 @@
+# Transform MYD Minimal Configuration
+# This file contains default configuration parameters that can be overridden via CLI arguments
+
+# Fuzzy matching configuration
+fuzzy_threshold: 0.6        # Fuzzy matching threshold (0.0-1.0)
+max_suggestions: 3          # Maximum number of fuzzy match suggestions  
+disable_fuzzy: false        # Whether to disable fuzzy matching
+
+# Directory configuration
+input_dir: "data/02_fields" # Input directory for Excel files
+output_dir: "test_output"   # Output directory for generated YAML files
