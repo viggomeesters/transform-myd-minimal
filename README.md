@@ -69,6 +69,35 @@ migrations/
 - **Comments** worden bewaard in output voor transparante overdracht tussen collega's
 - **Prioriteit**: Central memory regels worden eerst toegepast, daarna automatische matching
 
+## 📦 Project Structuur
+
+De repository gebruikt een moderne src-layout voor betere code organisatie:
+
+```
+transform-myd-minimal/
+├── src/
+│   └── transform_myd_minimal/          # Python package
+│       ├── __init__.py                 # Package initialisatie
+│       ├── __main__.py                 # Module entry point
+│       ├── main.py                     # Hoofd orchestratie logica
+│       ├── cli.py                      # CLI argument parsing
+│       ├── config_loader.py            # Configuratie laden
+│       ├── fuzzy.py                    # Fuzzy matching algoritmen
+│       ├── generator.py                # YAML generatie logica
+│       └── synonym.py                  # Synonym matching
+├── transform-myd-minimal               # Wrapper script
+├── config/                             # Configuratie bestanden
+├── data/                               # Input data (Excel bestanden)
+├── migrations/                         # Nieuwe multi-file structuur
+└── README.md
+```
+
+**Voordelen van de src-layout:**
+- Schone root directory zonder Python bestanden
+- Package gebaseerde import structuur
+- Betere separatie van code en configuratie
+- Professionele Python project structuur
+
 ## Gebruik
 
 ### ✨ Multi-File Migration Structure Generation
@@ -79,7 +108,7 @@ Elke `map` opdracht genereert nu **beide** structuren:
 
 ```bash
 # Genereert zowel legacy als nieuwe structuur
-python3 transform_myd_minimal.py map -object m140 -variant bnka
+./transform-myd-minimal map -object m140 -variant bnka
 ```
 
 **Output:**
@@ -112,47 +141,47 @@ Generated 5 migration files in migrations/ directory
 
 #### M120 Profit Centers
 ```bash
-python3 transform_myd_minimal.py map -object m120 -variant cepc
+./transform-myd-minimal map -object m120 -variant cepc
 ```
 Genereert: `migrations/M120/cepc/` met alle 4 YAML bestanden
 
 #### M140 Banks  
 ```bash
-python3 transform_myd_minimal.py map -object m140 -variant bnka
+./transform-myd-minimal map -object m140 -variant bnka
 ```
 Genereert: `migrations/M140/bnka/` met alle 4 YAML bestanden
 
 ### Nieuwe format (aanbevolen)
 ```bash
-python3 transform_myd_minimal.py map -object <object_name> -variant <variant_name> [OPTIONS]
+./transform-myd-minimal map -object <object_name> -variant <variant_name> [OPTIONS]
 ```
 
 ### Legacy format (backward compatible)
 ```bash
-python3 transform_myd_minimal.py -object <object_name> -variant <variant_name> [OPTIONS]
+./transform-myd-minimal -object <object_name> -variant <variant_name> [OPTIONS]
 ```
 
 ### Basis Voorbeeld
 
 ```bash
 # Nieuwe format
-python3 transform_myd_minimal.py map -object m140 -variant bnka
+./transform-myd-minimal map -object m140 -variant bnka
 
 # Legacy format (toont waarschuwing)
-python3 transform_myd_minimal.py -object m140 -variant bnka
+./transform-myd-minimal -object m140 -variant bnka
 ```
 
 ### Geavanceerde Opties
 
 ```bash
 # Met aangepaste fuzzy threshold
-python3 transform_myd_minimal.py map -object m140 -variant bnka --fuzzy-threshold 0.8
+./transform-myd-minimal map -object m140 -variant bnka --fuzzy-threshold 0.8
 
 # Fuzzy matching uitschakelen
-python3 transform_myd_minimal.py map -object m140 -variant bnka --disable-fuzzy
+./transform-myd-minimal map -object m140 -variant bnka --disable-fuzzy
 
 # Maximum suggesties aanpassen
-python3 transform_myd_minimal.py map -object m140 -variant bnka --max-suggestions 5
+./transform-myd-minimal map -object m140 -variant bnka --max-suggestions 5
 ```
 
 ## Command Line Opties
@@ -209,10 +238,10 @@ output_dir: "config"        # Output directory for generated YAML files
 
 ```bash
 # Gebruik config.yaml defaults
-python3 transform_myd_minimal.py map -object m140 -variant bnka
+./transform-myd-minimal map -object m140 -variant bnka
 
 # Override config.yaml met CLI argumenten
-python3 transform_myd_minimal.py map -object m140 -variant bnka --fuzzy-threshold 0.8 --max-suggestions 5
+./transform-myd-minimal map -object m140 -variant bnka --fuzzy-threshold 0.8 --max-suggestions 5
 
 # Configuratie wordt automatisch geladen als config.yaml bestaat
 # Anders worden hardcoded defaults gebruikt
@@ -459,7 +488,7 @@ De YAML generatie functionaliteit is nu geïntegreerd in het hoofdscript. Bij el
 **Gebruik:**
 ```bash
 # Genereert alle YAML files automatisch
-python3 transform_myd_minimal.py map -object m140 -variant bnka
+./transform-myd-minimal map -object m140 -variant bnka
 ```
 
 **Gegenereerde bestanden:**
@@ -482,7 +511,7 @@ Het script scant automatisch de bestaande mappenstructuur en Excel-bestanden in 
 
 ```bash
 # Bekijk versie informatie
-python3 transform_myd_minimal.py --version
+./transform-myd-minimal --version
 ```
 
 ### Versie Geschiedenis
