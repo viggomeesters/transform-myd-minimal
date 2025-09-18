@@ -98,6 +98,14 @@ transform-myd-minimal/
 - Betere separatie van code en configuratie
 - Professionele Python project structuur
 
+**⚠️ Belangrijke wijziging in CLI invocatie:**
+Het script wordt nu aangeroepen via `./transform-myd-minimal` (wrapper script) in plaats van direct via Python bestanden. Dit zorgt voor een schonere interface zonder zichtbare `.py` extensies.
+
+- **Oud**: `python3 transform_myd_minimal.py map -object m140 -variant bnka`
+- **Nieuw**: `./transform-myd-minimal map -object m140 -variant bnka`
+
+De wrapper script zorgt automatisch voor de juiste Python module aanroep en path configuratie.
+
 ## Gebruik
 
 ### ✨ Multi-File Migration Structure Generation
