@@ -53,7 +53,7 @@ python3 transform_myd_minimal.py -h
 #### `-object` / `--object`
 - **Purpose**: Specifies the object name for the transformation
 - **Format**: String, typically alphanumeric (e.g., "m140", "p100")
-- **Usage**: Determines the input Excel file path: `02_fields/fields_{object}_{variant}.xlsx`
+- **Usage**: Determines the input Excel file path: `data/02_fields/fields_{object}_{variant}.xlsx`
 - **Example**: `-object m140`
 
 #### `-variant` / `--variant` 
@@ -104,12 +104,12 @@ python3 transform_myd_minimal.py -h
 ## File Path Patterns
 
 ### Input Files
-- **Excel Input**: `02_fields/fields_{object}_{variant}.xlsx`
-- **Example**: `02_fields/fields_m140_bnka.xlsx`
+- **Excel Input**: `data/02_fields/fields_{object}_{variant}.xlsx`
+- **Example**: `data/02_fields/fields_m140_bnka.xlsx`
 
 ### Output Files  
-- **YAML Output**: `config/{object}/{variant}/column_map.yaml`
-- **Example**: `config/m140/bnka/column_map.yaml`
+- **YAML Output**: `data/config/{object}/{variant}/column_map.yaml`
+- **Example**: `data/config/m140/bnka/column_map.yaml`
 
 ## Changelog
 

@@ -696,10 +696,10 @@ def main():
     # Construct paths
     base_dir = Path.cwd()
     excel_filename = f"fields_{args.object}_{args.variant}.xlsx"
-    excel_path = base_dir / "02_fields" / excel_filename
+    excel_path = base_dir / "data" / "02_fields" / excel_filename
     
     # Output path
-    output_dir = base_dir / "config" / args.object / args.variant
+    output_dir = base_dir / "data" / "config" / args.object / args.variant
     output_path = output_dir / "column_map.yaml"
     
     try:
@@ -736,7 +736,7 @@ def main():
         
         # Generate YAML content
         yaml_content = generate_column_map_yaml(args.object, args.variant, source_fields, target_fields, 
-                                              f".\\fields\\{excel_filename}")
+                                              f".\\data\\02_fields\\{excel_filename}")
         
         # Ensure output directory exists
         output_dir.mkdir(parents=True, exist_ok=True)

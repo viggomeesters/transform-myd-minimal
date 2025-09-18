@@ -102,9 +102,9 @@ Elk run toont:
 - Details van fuzzy matches met confidence scores
 
 Dit commando:
-1. Leest het bestand `02_fields/fields_{object}_{variant}.xlsx`
+1. Leest het bestand `data/02_fields/fields_{object}_{variant}.xlsx`
 2. Past geavanceerde matching algoritmen toe
-3. Genereert `config/{object}/{variant}/column_map.yaml` met uitgebreide metadata
+3. Genereert `data/config/{object}/{variant}/column_map.yaml` met uitgebreide metadata
 
 ## Vereisten
 
@@ -122,8 +122,8 @@ pip install pandas openpyxl pyyaml
 ## Bestandsstructuur
 
 Het script verwacht de volgende structuur:
-- `02_fields/fields_{object}_{variant}.xlsx` - Input Excel bestand
-- `config/{object}/{variant}/column_map.yaml` - Output YAML bestand (wordt gegenereerd)
+- `data/02_fields/fields_{object}_{variant}.xlsx` - Input Excel bestand
+- `data/config/{object}/{variant}/column_map.yaml` - Output YAML bestand (wordt gegenereerd)
 
 ## Help
 
@@ -154,3 +154,32 @@ Velden die niet als constant worden herkend krijgen `rule: derive` en vereisen b
 
 **Voorbeeld:**
 - `CUSTOMER_TOTAL` met beschrijving "Total amount for customer" → `rule: derive`
+
+## YAML Generator Script
+
+### generate_yaml_files.py
+
+Een aanvullend script dat automatisch YAML-bestanden genereert op basis van de mappenstructuur en Excel-definities:
+
+**Functionaliteit:**
+1. **object_list.yaml** - Overzicht van alle objecten en hun tables uit `data/config/{object}/{variant}`
+2. **fields.yaml** per table - Uitgebreide veldinfo (name, description, type, required, key) uit Excel-bestanden  
+3. **value_rules.yaml** per table - Automatische rules voor mandatory/operational/derived velden
+
+**Gebruik:**
+```bash
+python3 generate_yaml_files.py
+```
+
+**Gegenereerde bestanden:**
+- `data/config/object_list.yaml` - Master overzicht
+- `data/config/{object}/{variant}/fields.yaml` - Per table velddefinitiess
+- `data/config/{object}/{variant}/value_rules.yaml` - Per table value rules
+
+**Rule types:**
+- `required` - Voor mandatory velden (field_is_mandatory=True)
+- `constant` - Voor operationele velden (automatisch gedetecteerd)
+- `derive` - Voor berekende velden (automatisch gedetecteerd)  
+- `map` - Voor directe mapping velden
+
+Het script scant automatisch de bestaande mappenstructuur en Excel-bestanden in `data/02_fields/fields_{object}_{variant}.xlsx`.
