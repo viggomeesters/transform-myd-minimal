@@ -131,7 +131,7 @@ Elk run toont:
 Dit commando:
 1. Leest het bestand `data/02_fields/fields_{object}_{variant}.xlsx`
 2. Past geavanceerde matching algoritmen toe
-3. Genereert `data/config/{object}/{variant}/column_map.yaml` met uitgebreide metadata
+3. Genereert `config/{object}/{variant}/column_map.yaml` met uitgebreide metadata
 
 ## Vereisten
 
@@ -150,7 +150,7 @@ pip install pandas openpyxl pyyaml
 
 Het script verwacht de volgende structuur:
 - `data/02_fields/fields_{object}_{variant}.xlsx` - Input Excel bestand
-- `data/config/{object}/{variant}/column_map.yaml` - Output YAML bestand (wordt gegenereerd)
+- `config/{object}/{variant}/column_map.yaml` - Output YAML bestand (wordt gegenereerd)
 
 ## Help
 
@@ -187,7 +187,7 @@ Velden die niet als constant worden herkend krijgen `rule: derive` en vereisen b
 De YAML generatie functionaliteit is nu geïntegreerd in het hoofdscript. Bij elke `map` opdracht worden automatisch alle benodigde YAML-bestanden gegenereerd:
 
 **Automatisch gegenereerde bestanden:**
-1. **object_list.yaml** - Overzicht van alle objecten en hun tables uit `data/config/{object}/{variant}`
+1. **object_list.yaml** - Overzicht van alle objecten en hun tables uit `config/{object}/{variant}`
 2. **fields.yaml** per table - Uitgebreide veldinfo (name, description, type, required, key) uit Excel-bestanden  
 3. **value_rules.yaml** per table - Automatische rules voor mandatory/operational/derived velden
 4. **column_map.yaml** per table - Geavanceerde field mapping met fuzzy matching
@@ -199,10 +199,10 @@ python3 transform_myd_minimal.py map -object m140 -variant bnka
 ```
 
 **Gegenereerde bestanden:**
-- `data/config/object_list.yaml` - Master overzicht (updated bij elke run)
-- `data/config/{object}/{variant}/fields.yaml` - Per table velddefinities
-- `data/config/{object}/{variant}/value_rules.yaml` - Per table value rules
-- `data/config/{object}/{variant}/column_map.yaml` - Per table column mapping
+- `config/object_list.yaml` - Master overzicht (updated bij elke run)
+- `config/{object}/{variant}/fields.yaml` - Per table velddefinities
+- `config/{object}/{variant}/value_rules.yaml` - Per table value rules
+- `config/{object}/{variant}/column_map.yaml` - Per table column mapping
 
 **Rule types:**
 - `required` - Voor mandatory velden (field_is_mandatory=True)

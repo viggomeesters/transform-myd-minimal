@@ -556,9 +556,9 @@ def is_constant_field(field_name, field_description):
 
 
 def scan_data_structure(base_path):
-    """Scan data/config/{object}/{variant} structure to find all objects and tables."""
+    """Scan config/{object}/{variant} structure to find all objects and tables."""
     objects = {}
-    config_path = base_path / "data" / "config"
+    config_path = base_path / "config"
     
     if not config_path.exists():
         print(f"Warning: {config_path} does not exist")
@@ -596,7 +596,7 @@ def generate_object_list_yaml(base_path):
         })
     
     # Write to file
-    output_path = base_path / "data" / "config" / "object_list.yaml"
+    output_path = base_path / "config" / "object_list.yaml"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
     with open(output_path, 'w', encoding='utf-8') as f:
@@ -677,7 +677,7 @@ def generate_fields_yaml(base_path, object_name, variant, df):
     
     # Write to file
     excel_filename = f"fields_{object_name}_{variant}.xlsx"
-    output_path = base_path / "data" / "config" / object_name / variant / "fields.yaml"
+    output_path = base_path / "config" / object_name / variant / "fields.yaml"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
     with open(output_path, 'w', encoding='utf-8') as f:
@@ -733,7 +733,7 @@ def generate_value_rules_yaml(base_path, object_name, variant, df):
     
     # Write to file
     excel_filename = f"fields_{object_name}_{variant}.xlsx"
-    output_path = base_path / "data" / "config" / object_name / variant / "value_rules.yaml"
+    output_path = base_path / "config" / object_name / variant / "value_rules.yaml"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
     with open(output_path, 'w', encoding='utf-8') as f:
@@ -755,7 +755,7 @@ def run_map_command(args):
     excel_path = base_dir / "data" / "02_fields" / excel_filename
     
     # Output path
-    output_dir = base_dir / "data" / "config" / args.object / args.variant
+    output_dir = base_dir / "config" / args.object / args.variant
     output_path = output_dir / "column_map.yaml"
     
     try:
