@@ -53,10 +53,10 @@ transform-myd-minimal/
 │       ├── generator.py                # YAML generation logic
 │       └── synonym.py                  # Synonym matching logic
 ├── transform-myd-minimal               # Wrapper script for easy execution
-├── configs/                            # Configuration directory
+├── config/                             # Configuration directory
 │   ├── config.yaml                     # Application settings (if exists)
 │   └── central_mapping_memory.yaml     # Central mapping rules (if exists)
-├── config/                             # Generated output (legacy structure)
+├── output/                             # Generated output (legacy structure)
 ├── data/                               # Input Excel files
 │   └── 02_fields/                      # Expected input directory
 ├── migrations/                         # Generated output (new structure)
@@ -70,7 +70,10 @@ transform-myd-minimal/
 ### Basic Usage
 ```bash
 # Generate mapping files for an object/variant combination
-./transform-myd-minimal map -object m140 -variant bnka
+./transform-myd-minimal map --object m140 --variant bnka
+
+# Or use config defaults (if object/variant set in config/config.yaml)
+./transform-myd-minimal map
 
 # View available options
 ./transform-myd-minimal map --help
@@ -79,13 +82,13 @@ transform-myd-minimal/
 ### Advanced Options
 ```bash
 # Adjust fuzzy matching threshold
-./transform-myd-minimal map -object m140 -variant bnka --fuzzy-threshold 0.8
+./transform-myd-minimal map --object m140 --variant bnka --fuzzy-threshold 0.8
 
 # Disable fuzzy matching for faster processing
-./transform-myd-minimal map -object m140 -variant bnka --disable-fuzzy
+./transform-myd-minimal map --object m140 --variant bnka --disable-fuzzy
 
 # Increase number of suggestions shown
-./transform-myd-minimal map -object m140 -variant bnka --max-suggestions 10
+./transform-myd-minimal map --object m140 --variant bnka --max-suggestions 10
 ```
 
 ### Input Requirements
@@ -96,7 +99,7 @@ The tool expects Excel files in the format:
 
 ## Configuration
 
-### Application Settings (`configs/config.yaml`)
+### Application Settings (`config/config.yaml`)
 ```yaml
 # Fuzzy matching configuration
 fuzzy_threshold: 0.6        # Matching threshold (0.0-1.0)
@@ -108,7 +111,7 @@ input_dir: "data/02_fields" # Input directory for Excel files
 output_dir: "config"        # Output directory for generated files
 ```
 
-### Central Mapping Memory (`configs/central_mapping_memory.yaml`)
+### Central Mapping Memory (`config/central_mapping_memory.yaml`)
 Defines reusable mapping rules that apply across multiple objects/variants:
 - Global skip fields (fields to ignore)
 - Global manual mappings (explicit field mappings)
@@ -153,7 +156,7 @@ Since no formal test suite currently exists:
 
 2. **Integration testing** (if sample data available):
    ```bash
-   ./transform-myd-minimal map -object m140 -variant bnka
+   ./transform-myd-minimal map --object m140 --variant bnka
    ```
 
 3. **Output validation**:

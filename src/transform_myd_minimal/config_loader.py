@@ -28,7 +28,11 @@ class Config:
         self.max_suggestions = 3
         self.disable_fuzzy = False
         self.input_dir = "data/02_fields"
-        self.output_dir = "config"
+        self.output_dir = "output"
+        
+        # Optional default object and variant (can be set in config)
+        self.object = None
+        self.variant = None
         
         # New mapping configuration defaults
         self.mapping_from_sources = False
@@ -67,10 +71,12 @@ class Config:
         
         # Load from config file if it exists
         if config_path is None:
-            # Look in configs directory first, fallback to root for backward compatibility
-            config_path = Path.cwd() / "configs" / "config.yaml"
+            # Look in config directory first, fallback to old configs directory for backward compatibility
+            config_path = Path.cwd() / "config" / "config.yaml"
             if not config_path.exists():
-                config_path = Path.cwd() / "config.yaml"
+                config_path = Path.cwd() / "configs" / "config.yaml"
+                if not config_path.exists():
+                    config_path = Path.cwd() / "config.yaml"
         
         if config_path.exists():
             self._load_from_file(config_path)
@@ -83,6 +89,10 @@ class Config:
             
             if config_data:
                 # Update existing configuration values
+                if 'object' in config_data:
+                    self.object = str(config_data['object'])
+                if 'variant' in config_data:
+                    self.variant = str(config_data['variant'])
                 if 'fuzzy_threshold' in config_data:
                     self.fuzzy_threshold = float(config_data['fuzzy_threshold'])
                 if 'max_suggestions' in config_data:
@@ -124,6 +134,19 @@ class Config:
     
     def merge_with_cli_args(self, args) -> None:
         """Merge CLI arguments with config values. CLI args take precedence."""
+        # Handle object and variant - use config defaults if CLI not provided
+        if hasattr(args, 'object') and args.object is not None:
+            self.object = args.object
+        elif hasattr(args, 'object') and self.object is None:
+            # This should not happen due to required=True when no config default
+            raise ValueError("Object must be provided either via CLI or config.yaml")
+            
+        if hasattr(args, 'variant') and args.variant is not None:
+            self.variant = args.variant
+        elif hasattr(args, 'variant') and self.variant is None:
+            # This should not happen due to required=True when no config default
+            raise ValueError("Variant must be provided either via CLI or config.yaml")
+        
         # CLI arguments override config values if they are provided
         if hasattr(args, 'fuzzy_threshold') and args.fuzzy_threshold is not None:
             self.fuzzy_threshold = args.fuzzy_threshold

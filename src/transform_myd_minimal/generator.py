@@ -42,7 +42,7 @@ def read_excel_fields(excel_path):
     return source_fields, target_fields
 
 
-def scan_data_structure(base_path, output_dir="config"):
+def scan_data_structure(base_path, output_dir="output"):
     """Scan output_dir/{object}/{variant} structure to find all objects and tables."""
     objects = {}
     config_path = base_path / output_dir
@@ -67,7 +67,7 @@ def scan_data_structure(base_path, output_dir="config"):
     return objects
 
 
-def generate_object_list_yaml(base_path, output_dir="config"):
+def generate_object_list_yaml(base_path, output_dir="output"):
     """Generate object_list.yaml with overview of all objects and tables."""
     objects_structure = scan_data_structure(base_path, output_dir)
     
@@ -138,7 +138,7 @@ def is_derived_field(field_name, field_description):
     return any(pattern in field_text for pattern in derived_patterns)
 
 
-def generate_fields_yaml(base_path, object_name, variant, df, output_dir="config", input_dir="data/02_fields"):
+def generate_fields_yaml(base_path, object_name, variant, df, output_dir="output", input_dir="data/02_fields"):
     """Generate fields.yaml for a specific table (object/variant combination)."""
     if df is None:
         return None
@@ -177,7 +177,7 @@ def generate_fields_yaml(base_path, object_name, variant, df, output_dir="config
     return output_path
 
 
-def generate_value_rules_yaml(base_path, object_name, variant, df, output_dir="config", input_dir="data/02_fields"):
+def generate_value_rules_yaml(base_path, object_name, variant, df, output_dir="output", input_dir="data/02_fields"):
     """Generate value_rules.yaml for a specific table."""
     if df is None:
         return None

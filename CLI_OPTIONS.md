@@ -187,7 +187,7 @@ All examples in this document use the new wrapper script format.
 - **Example**: `data/02_fields/fields_m140_bnka.xlsx`
 
 ### Output Files  
-- **Global Config Files**: `config/object_list.yaml`, `config/mapping.yaml`, `config/targets.yaml`
+- **Global Config Files**: `output/object_list.yaml`, `output/mapping.yaml`, `output/targets.yaml`
 - **Migration Structure**: `migrations/{OBJECT}/{table}/fields.yaml`, `migrations/{OBJECT}/{table}/mappings.yaml`, etc.
 - **Example**: `migrations/M140/bnka/`
 
