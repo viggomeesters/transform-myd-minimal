@@ -294,14 +294,14 @@ class AdvancedFieldMatcher:
         self.fuzzy_matcher = FuzzyMatcher()
         self.synonym_matcher = SynonymMatcher()
     
-    def match_fields(self, source_fields: pd.DataFrame, target_fields: pd.DataFrame) -> List[FieldMatchResult]:
+    def match_fields(self, source_fields: pd.DataFrame, target_fields: pd.DataFrame) -> Tuple[List[FieldMatchResult], List[FieldMatchResult]]:
         """
         Match source fields to target fields using comprehensive strategies.
         
-        Returns list of FieldMatchResult objects with confidence scores and reasoning.
+        Returns tuple of (matches, audit_matches) where:
+        - matches: List of actual field mappings (exact and non-conflicting fuzzy)
+        - audit_matches: List of fuzzy matches to already exact-mapped targets (for audit)
         """
-        results = []
-        
         # Create normalized target lookup
         target_lookup = {}
         for _, target_row in target_fields.iterrows():
@@ -315,21 +315,58 @@ class AdvancedFieldMatcher:
                 'is_mandatory': target_row.get('field_is_mandatory', False)
             }
         
-        # Process each source field
+        # First pass: Find all exact matches
+        exact_mapped_targets = set()
+        results = []
+        
         for _, source_row in source_fields.iterrows():
             source_name = source_row['field_name']
             source_desc = source_row['field_description']
             
-            match_result = self._find_best_match(
-                source_name, source_desc, target_lookup
+            exact_match = self._find_exact_match(source_name, source_desc, target_lookup)
+            if exact_match:
+                results.append(exact_match)
+                exact_mapped_targets.add(exact_match.target_field)
+        
+        # Second pass: Find fuzzy/synonym matches excluding already exact-mapped targets
+        audit_matches = []
+        
+        for _, source_row in source_fields.iterrows():
+            source_name = source_row['field_name']
+            source_desc = source_row['field_description']
+            
+            # Skip if we already found an exact match for this source
+            if any(r.source_field == source_name for r in results):
+                continue
+                
+            # Find best non-exact match
+            fuzzy_match = self._find_fuzzy_match(
+                source_name, source_desc, target_lookup, exact_mapped_targets
             )
-            results.append(match_result)
+            if fuzzy_match:
+                results.append(fuzzy_match)
+            else:
+                # No match found
+                results.append(FieldMatchResult(
+                    source_field=source_name,
+                    target_field=None,
+                    confidence_score=0.0,
+                    match_type="geen match",
+                    reason="Geen geschikte match gevonden",
+                    source_description=source_desc
+                ))
+            
+            # Check for audit matches (fuzzy matches to exact-mapped targets)
+            audit_match = self._find_audit_match(
+                source_name, source_desc, target_lookup, exact_mapped_targets
+            )
+            if audit_match:
+                audit_matches.append(audit_match)
         
-        return results
+        return results, audit_matches
     
-    def _find_best_match(self, source_name: str, source_desc: str, target_lookup: Dict) -> FieldMatchResult:
-        """Find the best match for a source field using multiple strategies."""
-        
+    def _find_exact_match(self, source_name: str, source_desc: str, target_lookup: Dict) -> Optional[FieldMatchResult]:
+        """Find exact match for a source field."""
         source_norm_name = self.normalizer.normalize_field_name(source_name)
         source_norm_desc = self.normalizer.normalize_description(source_desc)
         
@@ -350,11 +387,18 @@ class AdvancedFieldMatcher:
                     source_description=source_desc,
                     target_description=target_info['description']
                 )
+        return None
+    
+    def _find_fuzzy_match(self, source_name: str, source_desc: str, target_lookup: Dict, 
+                         exact_mapped_targets: set) -> Optional[FieldMatchResult]:
+        """Find fuzzy/synonym match for a source field, excluding exact-mapped targets."""
+        source_norm_name = self.normalizer.normalize_field_name(source_name)
+        source_norm_desc = self.normalizer.normalize_description(source_desc)
         
-        # Strategy 2: Synonym matching
+        # Strategy 1: Synonym matching (excluding exact-mapped targets)
         synonym_matches = []
         for target_name, target_info in target_lookup.items():
-            if self.synonym_matcher.is_synonym_match(source_name, target_name):
+            if target_name not in exact_mapped_targets and self.synonym_matcher.is_synonym_match(source_name, target_name):
                 synonym_matches.append((target_name, target_info, 0.85))
         
         if synonym_matches:
@@ -370,11 +414,14 @@ class AdvancedFieldMatcher:
                 target_description=target_info['description']
             )
         
-        # Strategy 3: Fuzzy matching
+        # Strategy 2: Fuzzy matching (excluding exact-mapped targets)
         if self.fuzzy_config.enabled:
             fuzzy_matches = []
             
             for target_name, target_info in target_lookup.items():
+                if target_name in exact_mapped_targets:
+                    continue
+                    
                 # Fuzzy match on field names
                 name_similarity = self._calculate_fuzzy_similarity(
                     source_norm_name, target_info['normalized_name']
@@ -418,15 +465,66 @@ class AdvancedFieldMatcher:
                     algorithm=algorithm
                 )
         
-        # No match found
-        return FieldMatchResult(
-            source_field=source_name,
-            target_field=None,
-            confidence_score=0.0,
-            match_type="geen match",
-            reason="Geen geschikte match gevonden",
-            source_description=source_desc
-        )
+        return None
+    
+    def _find_audit_match(self, source_name: str, source_desc: str, target_lookup: Dict, 
+                         exact_mapped_targets: set) -> Optional[FieldMatchResult]:
+        """Find fuzzy matches to exact-mapped targets for audit purposes."""
+        source_norm_name = self.normalizer.normalize_field_name(source_name)
+        source_norm_desc = self.normalizer.normalize_description(source_desc)
+        
+        # Only check fuzzy matching for exact-mapped targets
+        if self.fuzzy_config.enabled:
+            fuzzy_matches = []
+            
+            for target_name, target_info in target_lookup.items():
+                if target_name not in exact_mapped_targets:
+                    continue
+                    
+                # Fuzzy match on field names
+                name_similarity = self._calculate_fuzzy_similarity(
+                    source_norm_name, target_info['normalized_name']
+                )
+                
+                # Fuzzy match on descriptions
+                desc_similarity = self._calculate_fuzzy_similarity(
+                    source_norm_desc, target_info['normalized_desc']
+                )
+                
+                # Combined similarity (weighted average)
+                combined_similarity = (name_similarity * 0.7) + (desc_similarity * 0.3)
+                
+                if combined_similarity >= self.fuzzy_config.threshold:
+                    fuzzy_matches.append((
+                        target_name, target_info, combined_similarity, 
+                        name_similarity, desc_similarity
+                    ))
+            
+            if fuzzy_matches:
+                # Sort by similarity and take the best match
+                fuzzy_matches.sort(key=lambda x: x[2], reverse=True)
+                best_match = fuzzy_matches[0]
+                target_name, target_info, combined_sim, name_sim, desc_sim = best_match
+                
+                # Determine which algorithm contributed most
+                algorithm = "combined"
+                if name_sim > desc_sim:
+                    algorithm = "name_fuzzy"
+                else:
+                    algorithm = "description_fuzzy"
+                
+                return FieldMatchResult(
+                    source_field=source_name,
+                    target_field=target_name,
+                    confidence_score=combined_sim,
+                    match_type="audit_fuzzy",
+                    reason=f"Fuzzy match to exact-mapped target (audit only, similarity: {combined_sim:.2f})",
+                    source_description=source_desc,
+                    target_description=target_info['description'],
+                    algorithm=algorithm
+                )
+        
+        return None
     
     def _calculate_fuzzy_similarity(self, str1: str, str2: str) -> float:
         """Calculate combined fuzzy similarity using configured algorithms."""
@@ -478,8 +576,8 @@ def create_advanced_column_mapping(source_fields, target_fields, fuzzy_config=No
     # Initialize the advanced matcher
     matcher = AdvancedFieldMatcher(fuzzy_config)
     
-    # Get match results
-    match_results = matcher.match_fields(source_fields, target_fields)
+    # Get match results and audit matches
+    match_results, audit_matches = matcher.match_fields(source_fields, target_fields)
     
     # Create mapping lines based on results
     mapping_lines = []
@@ -505,12 +603,12 @@ def create_advanced_column_mapping(source_fields, target_fields, fuzzy_config=No
         if target_name not in mapped_targets:
             mapping_lines.append(f"<NOT_IN_SOURCE_{target_name}>: {target_name}")
     
-    return mapping_lines, exact_matches, fuzzy_matches, unmapped_sources
+    return mapping_lines, exact_matches, fuzzy_matches, unmapped_sources, audit_matches
 
 
 def create_column_mapping(source_fields, target_fields):
     """Legacy column mapping function - maintained for backward compatibility."""
-    mapping_lines, _, _, _ = create_advanced_column_mapping(source_fields, target_fields)
+    mapping_lines, _, _, _, _ = create_advanced_column_mapping(source_fields, target_fields)
     return mapping_lines
 
 
@@ -556,9 +654,9 @@ def is_constant_field(field_name, field_description):
 
 
 def scan_data_structure(base_path):
-    """Scan data/config/{object}/{variant} structure to find all objects and tables."""
+    """Scan config/{object}/{variant} structure to find all objects and tables."""
     objects = {}
-    config_path = base_path / "data" / "config"
+    config_path = base_path / "config"
     
     if not config_path.exists():
         print(f"Warning: {config_path} does not exist")
@@ -596,7 +694,7 @@ def generate_object_list_yaml(base_path):
         })
     
     # Write to file
-    output_path = base_path / "data" / "config" / "object_list.yaml"
+    output_path = base_path / "config" / "object_list.yaml"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
     with open(output_path, 'w', encoding='utf-8') as f:
@@ -677,7 +775,7 @@ def generate_fields_yaml(base_path, object_name, variant, df):
     
     # Write to file
     excel_filename = f"fields_{object_name}_{variant}.xlsx"
-    output_path = base_path / "data" / "config" / object_name / variant / "fields.yaml"
+    output_path = base_path / "config" / object_name / variant / "fields.yaml"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
     with open(output_path, 'w', encoding='utf-8') as f:
@@ -733,7 +831,7 @@ def generate_value_rules_yaml(base_path, object_name, variant, df):
     
     # Write to file
     excel_filename = f"fields_{object_name}_{variant}.xlsx"
-    output_path = base_path / "data" / "config" / object_name / variant / "value_rules.yaml"
+    output_path = base_path / "config" / object_name / variant / "value_rules.yaml"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
     with open(output_path, 'w', encoding='utf-8') as f:
@@ -755,7 +853,7 @@ def run_map_command(args):
     excel_path = base_dir / "data" / "02_fields" / excel_filename
     
     # Output path
-    output_dir = base_dir / "data" / "config" / args.object / args.variant
+    output_dir = base_dir / "config" / args.object / args.variant
     output_path = output_dir / "column_map.yaml"
     
     try:
@@ -774,7 +872,7 @@ def run_map_command(args):
         )
         
         # Create advanced mapping to get statistics
-        mapping_lines, exact_matches, fuzzy_matches, unmapped_sources = create_advanced_column_mapping(
+        mapping_lines, exact_matches, fuzzy_matches, unmapped_sources, audit_matches = create_advanced_column_mapping(
             source_fields, target_fields, fuzzy_config
         )
         
@@ -783,6 +881,7 @@ def run_map_command(args):
         print(f"Exact matches: {len(exact_matches)}")
         print(f"Fuzzy/Synonym matches: {len(fuzzy_matches)}")
         print(f"Unmapped sources: {len(unmapped_sources)}")
+        print(f"Audit matches (fuzzy to exact-mapped targets): {len(audit_matches)}")
         print(f"Mapping coverage: {((len(exact_matches) + len(fuzzy_matches)) / len(source_fields) * 100):.1f}%")
         
         if fuzzy_matches:
@@ -790,9 +889,14 @@ def run_map_command(args):
             for match in fuzzy_matches:
                 print(f"  {match.source_field} → {match.target_field} ({match.match_type}, confidence: {match.confidence_score:.2f})")
         
+        if audit_matches:
+            print("\nAudit matches found (fuzzy matches to exact-mapped targets):")
+            for match in audit_matches:
+                print(f"  {match.source_field} → {match.target_field} (audit, confidence: {match.confidence_score:.2f})")
+        
         # Generate YAML content
         yaml_content = generate_column_map_yaml(args.object, args.variant, source_fields, target_fields, 
-                                              f".\\data\\02_fields\\{excel_filename}")
+                                              f".\\data\\02_fields\\{excel_filename}", audit_matches)
         
         # Ensure output directory exists
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -825,7 +929,7 @@ def run_map_command(args):
         sys.exit(1)
 
 
-def generate_column_map_yaml(object_name, variant, source_fields, target_fields, excel_source_path):
+def generate_column_map_yaml(object_name, variant, source_fields, target_fields, excel_source_path, external_audit_matches=None):
     """Generate the complete column_map.yaml content with advanced matching."""
     
     # Generate timestamp
@@ -839,9 +943,13 @@ def generate_column_map_yaml(object_name, variant, source_fields, target_fields,
         jaro_winkler_weight=0.5
     )
     
-    mapping_lines, exact_matches, fuzzy_matches, unmapped_sources = create_advanced_column_mapping(
+    mapping_lines, exact_matches, fuzzy_matches, unmapped_sources, audit_matches = create_advanced_column_mapping(
         source_fields, target_fields, fuzzy_config
     )
+    
+    # Use external audit matches if provided (from run_map_command)
+    if external_audit_matches is not None:
+        audit_matches = external_audit_matches
     
     # Generate the YAML content
     yaml_content = []
@@ -895,6 +1003,21 @@ def generate_column_map_yaml(object_name, variant, source_fields, target_fields,
             f"#    reason: \"{result.reason}\"",
             "#"
         ])
+    
+    # Process audit matches (fuzzy matches to exact-mapped targets)
+    if audit_matches:
+        yaml_content.append("#")
+        yaml_content.append("# Audit matches (fuzzy matches to already exact-mapped targets):")
+        for result in audit_matches:
+            yaml_content.extend([
+                f"# AUDIT: {result.source_field} -> {result.target_field}",
+                f"#   source_description: \"{result.source_description}\"",
+                f"#   target_description: \"{result.target_description}\"",
+                f"#   confidence: {result.confidence_score:.2f}",
+                f"#   algorithm: {result.algorithm or 'N/A'}",
+                f"#   reason: \"{result.reason}\"",
+                "#"
+            ])
     
     # Add derived targets section with smart logic
     yaml_content.append("#derived_targets:")

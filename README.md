@@ -92,12 +92,13 @@ Het script genereert nu:
 ```
 === Advanced Matching Results ===
 Exact matches: 11
-Fuzzy/Synonym matches: 1
-Unmapped sources: 25
-Mapping coverage: 32.4%
+Fuzzy/Synonym matches: 0
+Unmapped sources: 26
+Audit matches (fuzzy to exact-mapped targets): 1
+Mapping coverage: 29.7%
 
-Fuzzy/Synonym matches found:
-  IBAN_RULE → BANKL (fuzzy, confidence: 0.60)
+Audit matches found (fuzzy matches to exact-mapped targets):
+  IBAN_RULE → BANKL (audit, confidence: 0.60)
 ```
 
 ## Algoritme Details
@@ -121,17 +122,36 @@ Fuzzy/Synonym matches found:
 - Gecombineerde score: 70% veldnaam + 30% beschrijving
 - Instelbare threshold (default: 0.6)
 
+### 🚫 Duplicate Target Prevention
+Het script implementeert een geavanceerde twee-fase matching strategie om te voorkomen dat een target veld (bijv. BANKL) meerdere keren wordt toegewezen:
+
+**Fase 1: Exact Matching**
+- Eerst worden alle exacte matches geïdentificeerd
+- Deze target velden worden gemarkeerd als "bezet"
+
+**Fase 2: Fuzzy Matching**
+- Fuzzy matching wordt alleen uitgevoerd voor nog niet toegewezen target velden
+- Dit voorkomt dat BANKL zowel exact als fuzzy gemapt wordt
+
+**Audit Logging**
+- Fuzzy matches naar reeds exact-gemapte targets worden alsnog geregistreerd als audit commentaren
+- Deze verschijnen in de YAML output als `# AUDIT: source -> target` 
+- Voorbeeld: Als IBAN_RULE fuzzy zou matchen met BANKL (die al exact gemapt is), wordt dit gelogd voor auditdoeleinden
+- Audit matches tellen niet mee voor coverage percentage
+
 ### 📊 Matching Statistics
 Elk run toont:
 - Totaal aantal source/target velden
 - Aantal exact/fuzzy/unmapped matches
-- Mapping coverage percentage
+- Aantal audit matches (fuzzy matches naar exact-gemapte targets)
+- Mapping coverage percentage (exclusief audit matches)
 - Details van fuzzy matches met confidence scores
+- Details van audit matches voor transparency
 
 Dit commando:
 1. Leest het bestand `data/02_fields/fields_{object}_{variant}.xlsx`
 2. Past geavanceerde matching algoritmen toe
-3. Genereert `data/config/{object}/{variant}/column_map.yaml` met uitgebreide metadata
+3. Genereert `config/{object}/{variant}/column_map.yaml` met uitgebreide metadata
 
 ## Vereisten
 
@@ -150,7 +170,7 @@ pip install pandas openpyxl pyyaml
 
 Het script verwacht de volgende structuur:
 - `data/02_fields/fields_{object}_{variant}.xlsx` - Input Excel bestand
-- `data/config/{object}/{variant}/column_map.yaml` - Output YAML bestand (wordt gegenereerd)
+- `config/{object}/{variant}/column_map.yaml` - Output YAML bestand (wordt gegenereerd)
 
 ## Help
 
@@ -187,7 +207,7 @@ Velden die niet als constant worden herkend krijgen `rule: derive` en vereisen b
 De YAML generatie functionaliteit is nu geïntegreerd in het hoofdscript. Bij elke `map` opdracht worden automatisch alle benodigde YAML-bestanden gegenereerd:
 
 **Automatisch gegenereerde bestanden:**
-1. **object_list.yaml** - Overzicht van alle objecten en hun tables uit `data/config/{object}/{variant}`
+1. **object_list.yaml** - Overzicht van alle objecten en hun tables uit `config/{object}/{variant}`
 2. **fields.yaml** per table - Uitgebreide veldinfo (name, description, type, required, key) uit Excel-bestanden  
 3. **value_rules.yaml** per table - Automatische rules voor mandatory/operational/derived velden
 4. **column_map.yaml** per table - Geavanceerde field mapping met fuzzy matching
@@ -199,10 +219,10 @@ python3 transform_myd_minimal.py map -object m140 -variant bnka
 ```
 
 **Gegenereerde bestanden:**
-- `data/config/object_list.yaml` - Master overzicht (updated bij elke run)
-- `data/config/{object}/{variant}/fields.yaml` - Per table velddefinities
-- `data/config/{object}/{variant}/value_rules.yaml` - Per table value rules
-- `data/config/{object}/{variant}/column_map.yaml` - Per table column mapping
+- `config/object_list.yaml` - Master overzicht (updated bij elke run)
+- `config/{object}/{variant}/fields.yaml` - Per table velddefinities
+- `config/{object}/{variant}/value_rules.yaml` - Per table value rules
+- `config/{object}/{variant}/column_map.yaml` - Per table column mapping
 
 **Rule types:**
 - `required` - Voor mandatory velden (field_is_mandatory=True)

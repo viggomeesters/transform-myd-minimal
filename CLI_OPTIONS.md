@@ -124,11 +124,11 @@ python3 transform_myd_minimal.py --version
 - **Example**: `data/02_fields/fields_m140_bnka.xlsx`
 
 ### Output Files  
-- **Column Mapping**: `data/config/{object}/{variant}/column_map.yaml`
-- **Field Definitions**: `data/config/{object}/{variant}/fields.yaml`  
-- **Value Rules**: `data/config/{object}/{variant}/value_rules.yaml`
-- **Object Overview**: `data/config/object_list.yaml`
-- **Example**: `data/config/m140/bnka/`
+- **Column Mapping**: `config/{object}/{variant}/column_map.yaml`
+- **Field Definitions**: `config/{object}/{variant}/fields.yaml`  
+- **Value Rules**: `config/{object}/{variant}/value_rules.yaml`
+- **Object Overview**: `config/object_list.yaml`
+- **Example**: `config/m140/bnka/`
 
 ## Changelog
 
