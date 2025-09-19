@@ -187,17 +187,21 @@ def generate_targets_yaml(target_fields: List[Dict[str, Any]], output_path: Path
     
     for target in target_fields:
         target_entry = {
+            'sap_field': target['sap_field'],  # sap_field first for readability
             'internal_id': target['internal_id'],
             'transformer_id': target['transformer_id'],
             'sap_table': target['sap_table'],
-            'sap_field': target['sap_field'],
             'description': target.get('description', ''),
             'group': target.get('group_name', ''),
             'importance': target.get('importance', ''),
             'type': target.get('type', ''),
-            'length': target.get('length', ''),
-            'decimal': target.get('decimal', '')
+            'length': target.get('length', '')
         }
+        # Only add decimal if it's not null/empty to avoid "decimal: null"
+        decimal_value = target.get('decimal', '')
+        if decimal_value:
+            target_entry['decimal'] = decimal_value
+            
         targets_data['targets'].append(target_entry)
     
     # Ensure output directory exists
