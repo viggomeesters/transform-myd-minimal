@@ -10,6 +10,7 @@ Contains the entrypoint and orchestration of the different modules including:
 """
 
 import sys
+from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
@@ -537,10 +538,10 @@ def run_index_source_command(args):
         
         # Process each header
         for header in headers:
-            source_data['source_fields'].append({
-                'field_name': header,
-                'field_description': header  # Use header as description if no separate description column
-            })
+            field_entry = {'field_name': header}
+            # Only add field_description if it differs from field_name (i.e., when there's a separate description column)
+            # Currently using header as description, so we skip adding field_description to avoid duplication
+            source_data['source_fields'].append(field_entry)
         
         # Create output directory structure
         output_dir = Path(f"migrations/{args.object}/{args.variant}")
@@ -613,18 +614,22 @@ def run_index_target_command(args):
         
         # Process each filtered field
         for field in filtered_fields:
-            target_entry = {
-                'internal_id': field.get('internal_id', ''),
-                'transformer_id': field.get('transformer_id', ''),
-                'sap_table': field.get('sap_table', ''),
-                'sap_field': field.get('sap_field', ''),
-                'description': field.get('description', ''),
-                'group': field.get('group_name', ''),
-                'importance': field.get('importance', ''),
-                'type': field.get('type', ''),
-                'length': field.get('length', ''),
-                'decimal': field.get('decimal', '')
-            }
+            target_entry = {}
+            # Add fields in desired order
+            target_entry['sap_field'] = field.get('sap_field', '')  # sap_field first for readability
+            target_entry['internal_id'] = field.get('internal_id', '')
+            target_entry['transformer_id'] = field.get('transformer_id', '')
+            target_entry['sap_table'] = field.get('sap_table', '')
+            target_entry['description'] = field.get('description', '')
+            target_entry['group'] = field.get('group_name', '')
+            target_entry['importance'] = field.get('importance', '')
+            target_entry['type'] = field.get('type', '')
+            target_entry['length'] = field.get('length', '')
+            # Only add decimal if it's not null/empty to avoid "decimal: null"
+            decimal_value = field.get('decimal', '')
+            if decimal_value:
+                target_entry['decimal'] = decimal_value
+            
             target_data['target_fields'].append(target_entry)
         
         # Create output directory structure
@@ -731,7 +736,7 @@ def run_map_command(args, config):
         target_fields_list = []
         for field in target_data.get('target_fields', []):
             target_fields_list.append({
-                'field_name': field.get('transformer_id', ''),
+                'field_name': field.get('sap_field', ''),  # Map to sap_field instead of transformer_id
                 'field_description': field.get('description', ''),
                 'field_is_key': False,  # Default values for compatibility
                 'field_is_mandatory': False
