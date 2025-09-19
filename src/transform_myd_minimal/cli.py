@@ -28,7 +28,7 @@ def setup_cli():
     config = load_config()
     
     # Check if this is the old format (no subcommand)
-    if len(sys.argv) > 1 and not sys.argv[1] in ['map', '-h', '--help', '--version']:
+    if len(sys.argv) > 1 and not sys.argv[1] in ['map', 'index_source', 'index_target', '-h', '--help', '--version']:
         # Old format detected, handle backward compatibility
         logger.info("Note: Using legacy format. Consider using 'map' subcommand: python3 transform_myd_minimal.py map --object {} --variant {}".format(
             sys.argv[sys.argv.index('-object') + 1] if '-object' in sys.argv else 'OBJECT',
@@ -87,6 +87,16 @@ def setup_cli():
     map_parser.add_argument('--target-xml', type=str, help='Path to target XML file (overrides config)')
     map_parser.add_argument('--target-xml-worksheet', type=str, help='Worksheet name in target XML (overrides config)')
     
+    # Index source subcommand
+    index_source_parser = subparsers.add_parser('index_source', help='Parse and index source fields from XLSX file')
+    index_source_parser.add_argument('--object', required=True, help='Object name (e.g., m140)')
+    index_source_parser.add_argument('--variant', required=True, help='Variant name (e.g., bnka)')
+    
+    # Index target subcommand  
+    index_target_parser = subparsers.add_parser('index_target', help='Parse and index target fields from XML file')
+    index_target_parser.add_argument('--object', required=True, help='Object name (e.g., m140)')
+    index_target_parser.add_argument('--variant', required=True, help='Variant name (e.g., bnka)')
+    
     # Parse arguments
     args = parser.parse_args()
     
@@ -96,13 +106,18 @@ def setup_cli():
         sys.exit(1)
     
     # Validate command
-    if args.command != 'map':
+    if args.command not in ['map', 'index_source', 'index_target']:
         parser.print_help()
         sys.exit(1)
     
     config.merge_with_cli_args(args)
     
-    # Validate that we have object and variant after merging
+    # For index_source and index_target commands, we need object and variant
+    if args.command in ['index_source', 'index_target']:
+        # These commands always require object and variant from CLI args
+        return args, config, False
+    
+    # Validate that we have object and variant after merging (for map command)
     if not config.object:
         logger.error("Object must be provided either via --object argument or config.yaml")
         sys.exit(1)

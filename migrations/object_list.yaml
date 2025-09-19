@@ -1,0 +1,9 @@
+# Global object/variant list for transform-myd-minimal
+# Updated at: 2025-09-19 09:56:44
+
+objects:
+- added_at: '2025-09-19 09:56:44'
+  key: m140_bnka
+  object: m140
+  path: migrations/m140/bnka/
+  variant: bnka
