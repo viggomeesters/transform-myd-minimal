@@ -1,8 +1,93 @@
-# Transform MYD Minimal - Multi-File YAML Migration Workflow
+# Transform MYD Minimal - Step-by-Step Object+Variant Pipeline
 
-CLI tool voor het genereren van column mapping en YAML bestanden uit Excel field definities met een nieuwe, verbeterde multi-file structuur.
+CLI tool voor het genereren van column mapping en YAML bestanden met een stapsgewijze Object+Variant pipeline. Alle input en output wordt per **object** en **variant** geadministreerd, zonder globale output-bestanden.
 
-**Nu met geïntegreerde YAML workflow, geavanceerde field matching algoritmen, nieuwe multi-file migration structuur EN directe mapping generatie vanuit bronbestanden!**
+## 🆕 NEW: Step-by-Step Workflow (v4.0)
+
+Deze nieuwe workflow zorgt ervoor dat elke stap een aparte CLI-command is en alle output variant-specifiek wordt opgeslagen.
+
+### Workflow Stappen
+
+#### 1. index_source - Indexeer bronvelden
+
+**Command:**  
+```bash
+./transform-myd-minimal index_source --object {object} --variant {variant}
+```
+
+**Werking:**  
+- Zoekt naar het bestand: `data/03_raw/index_source_{object}_{variant}.xlsx`
+- Parseert de headers uit deze XLSX
+- Zet de velden om naar een YAML-structuur (`index_source.yaml`)
+- Maakt (indien nodig) de folder: `migrations/{object}/{variant}/`
+- Schrijft het resultaat naar: `migrations/{object}/{variant}/index_source.yaml`
+- Voegt het object/variant toe aan de globale lijst: `migrations/object_list.yaml`
+
+#### 2. index_target - Indexeer doelvelden
+
+**Command:**  
+```bash
+./transform-myd-minimal index_target --object {object} --variant {variant}
+```
+
+**Werking:**  
+- Zoekt naar het bestand: `data/03_raw/index_target_{object}_{variant}.xml`
+- Parseert XML en filtert target fields behorend bij deze variant
+- Bijvoorbeeld: Zoek velden die beginnen met `S_{variant}` zoals `S_BNKA` als variant=`bnka`
+- Zet de target fields om naar YAML (`index_target.yaml`)
+- Schrijft het resultaat naar: `migrations/{object}/{variant}/index_target.yaml`
+
+#### 3. map - Genereer mapping
+
+**Command:**  
+```bash
+./transform-myd-minimal map --object {object} --variant {variant}
+```
+
+**Werking:**  
+- Zoekt in `migrations/{object}/{variant}/` naar `index_source.yaml` en `index_target.yaml`
+- Maakt een match tussen source en target fields (met confidence score en audit/logging)
+- Schrijft het resultaat naar: `migrations/{object}/{variant}/mapping.yaml`
+
+### 📁 Nieuwe Directorystructuur
+
+```
+data/03_raw/
+  index_source_m140_bnka.xlsx    # Source headers
+  index_target_m140_bnka.xml     # Target field definitions
+migrations/
+  object_list.yaml               # Global object/variant registry
+  m140/
+    bnka/
+      index_source.yaml          # Indexed source fields
+      index_target.yaml          # Indexed target fields  
+      mapping.yaml               # Generated mappings
+```
+
+### 🚀 Quick Start Example
+
+```bash
+# 1. Indexeer source velden
+./transform-myd-minimal index_source --object m140 --variant bnka
+
+# 2. Indexeer target velden
+./transform-myd-minimal index_target --object m140 --variant bnka
+
+# 3. Genereer mapping
+./transform-myd-minimal map --object m140 --variant bnka
+```
+
+### ✅ Voordelen Nieuwe Workflow
+
+- **Stapsgewijze controle**: Elke stap kan afzonderlijk uitgevoerd worden
+- **Variant-specifieke output**: Geen globale bestanden meer
+- **Heldere input/output paden**: Duidelijk waar data vandaan komt en naartoe gaat
+- **Auditeerbaar**: Elke stap logt wat gedaan wordt
+- **Uitbreidbaar**: Nieuwe stappen kunnen eenvoudig toegevoegd worden
+
+---
+
+## Legacy Multi-File YAML Migration Workflow (v3.x)
 
 ## 🆕 Source-Based Mapping Generation (v3.1)
 

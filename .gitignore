@@ -44,6 +44,9 @@ data/05_rejected/
 data/06_transformed/
 data/07_transformed_validation/
 
+# Legacy output directory - deprecated
+output/
+
 # Distribution / packaging
 build/
 dist/

@@ -1,5 +1,81 @@
 # Transform MYD Minimal - CLI Options Overview
 
+## NEW: Step-by-Step Object+Variant Pipeline (v4.0)
+
+### Available Commands
+
+| Command | Description | Purpose |
+|---------|-------------|---------|
+| `index_source` | Parse and index source fields from XLSX file | Step 1: Process source headers |
+| `index_target` | Parse and index target fields from XML file | Step 2: Process target field definitions |
+| `map` | Generate column mapping from indexed files | Step 3: Create source-to-target mappings |
+
+### Command-Specific Options
+
+#### index_source
+```bash
+./transform-myd-minimal index_source --object OBJECT --variant VARIANT
+```
+- `--object`: Object name (e.g., m140) **[Required]**
+- `--variant`: Variant name (e.g., bnka) **[Required]**
+
+#### index_target  
+```bash
+./transform-myd-minimal index_target --object OBJECT --variant VARIANT
+```
+- `--object`: Object name (e.g., m140) **[Required]**
+- `--variant`: Variant name (e.g., bnka) **[Required]**
+
+#### map (Updated for v4.0)
+```bash
+./transform-myd-minimal map --object OBJECT --variant VARIANT [OPTIONS]
+```
+- `--object`: Object name (e.g., m140) **[Required]**
+- `--variant`: Variant name (e.g., bnka) **[Required]**
+- `--fuzzy-threshold`: Fuzzy matching threshold (0.0-1.0, default: 0.6)
+- `--max-suggestions`: Maximum fuzzy match suggestions (default: 3)
+- `--disable-fuzzy`: Disable fuzzy matching completely
+
+### File Path Patterns (v4.0)
+
+#### Input Files
+- **Source XLSX**: `data/03_raw/index_source_{object}_{variant}.xlsx`
+- **Target XML**: `data/03_raw/index_target_{object}_{variant}.xml`
+
+#### Output Files
+- **Object List**: `migrations/object_list.yaml` (global registry)
+- **Per Object/Variant**: `migrations/{object}/{variant}/`
+  - `index_source.yaml` - Indexed source fields
+  - `index_target.yaml` - Indexed target fields
+  - `mapping.yaml` - Generated mappings
+
+### Usage Examples (v4.0)
+
+#### Complete Workflow
+```bash
+# Step 1: Index source fields
+./transform-myd-minimal index_source --object m140 --variant bnka
+
+# Step 2: Index target fields  
+./transform-myd-minimal index_target --object m140 --variant bnka
+
+# Step 3: Generate mappings
+./transform-myd-minimal map --object m140 --variant bnka
+```
+
+#### Advanced Mapping Options
+```bash
+# With custom fuzzy threshold
+./transform-myd-minimal map --object m140 --variant bnka --fuzzy-threshold 0.8
+
+# Disable fuzzy matching
+./transform-myd-minimal map --object m140 --variant bnka --disable-fuzzy
+```
+
+---
+
+## Legacy CLI Options Reference (v3.x)
+
 ## Complete CLI Options Reference
 
 | Option | Type | Required | Default | Description | Version Added |
