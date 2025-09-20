@@ -799,6 +799,7 @@ def run_index_source_command(args):
                     "source_file": f"data/01_source/index_source_{args.object}_{args.variant}.xlsx",
                     "generated_at": datetime.now().isoformat(),
                     "sheet": sheet_name,
+                    "source_fields_count": len(source_fields),
                 },
                 "source_fields": source_fields,
             }
