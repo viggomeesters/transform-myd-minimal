@@ -148,9 +148,55 @@ def setup_cli():
     map_parser.add_argument(
         "--quiet", action="store_true", help="No stdout output; still writes file unless --no-log-file"
     )
+    
+    # Fuzzy matching options for map command
+    map_parser.add_argument(
+        "--fuzzy-threshold", 
+        type=float, 
+        default=config.fuzzy_threshold,
+        help=f"Fuzzy matching threshold (0.0-1.0, default: {config.fuzzy_threshold})"
+    )
+    map_parser.add_argument(
+        "--max-suggestions", 
+        type=int, 
+        default=config.max_suggestions,
+        help=f"Maximum fuzzy match suggestions (default: {config.max_suggestions})"
+    )
+    map_parser.add_argument(
+        "--disable-fuzzy", 
+        action="store_true", 
+        default=config.disable_fuzzy,
+        help="Disable fuzzy matching completely"
+    )
+    
+    # Source-based mapping options for map command
+    map_parser.add_argument(
+        "--source-headers-xlsx", 
+        type=str, 
+        help="Path to source headers XLSX file"
+    )
+    map_parser.add_argument(
+        "--source-headers-sheet", 
+        type=str, 
+        help="Sheet name in source XLSX"
+    )
+    map_parser.add_argument(
+        "--source-headers-row", 
+        type=int, 
+        help="Header row number in source XLSX"
+    )
+    map_parser.add_argument(
+        "--target-xml", 
+        type=str, 
+        help="Path to target XML file"
+    )
+    map_parser.add_argument(
+        "--target-xml-worksheet", 
+        type=str, 
+        help="Worksheet name in target XML"
+    )
 
-    # Parse arguments
-    args = parser.parse_args()
+    # Index source subcommand
     index_source_parser = subparsers.add_parser(
         "index_source", help="Parse and index source fields from XLSX file"
     )

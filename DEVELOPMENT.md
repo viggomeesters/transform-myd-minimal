@@ -32,7 +32,7 @@ pip install -e ".[dev]"
 ./transform-myd-minimal map --help
 
 # Or run via Python module
-python -m src.transform_myd_minimal --help
+python -m transform_myd_minimal --help
 ```
 
 ## Project Structure Overview
@@ -108,7 +108,7 @@ disable_fuzzy: false        # Whether to disable fuzzy matching
 
 # Directory configuration  
 input_dir: "data/02_fields" # Input directory for Excel files
-output_dir: "config"        # Output directory for generated files
+output_dir: "output"        # Output directory for generated files
 ```
 
 ### Central Mapping Memory (`config/central_mapping_memory.yaml`)

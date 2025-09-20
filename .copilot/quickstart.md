@@ -79,7 +79,7 @@ def get_synonyms(self) -> Dict[str, List[str]]:
 ```
 
 ### 3. Adjusting Fuzzy Matching
-Edit configuration in `configs/config.yaml`:
+Edit configuration in `config/config.yaml`:
 ```yaml
 fuzzy_threshold: 0.7  # Increase for stricter matching
 max_suggestions: 5    # Show more potential matches

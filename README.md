@@ -16,8 +16,6 @@ source .venv/bin/activate
 
 # verify installation
 transform-myd-minimal --help
-pre-commit run --all-files
-pytest -q
 ```
 
 ## 🆕 NEW: Step-by-Step Workflow (v4.0)
@@ -34,7 +32,7 @@ Deze nieuwe workflow zorgt ervoor dat elke stap een aparte CLI-command is en all
 ```
 
 **Werking:**  
-- Zoekt naar het bestand: `data/03_raw/index_source_{object}_{variant}.xlsx`
+- Zoekt naar het bestand: `data/02_fields/fields_{object}_{variant}.xlsx`
 - Parseert de headers uit deze XLSX
 - Zet de velden om naar een YAML-structuur (`index_source.yaml`)
 - Maakt (indien nodig) de folder: `migrations/{object}/{variant}/`
@@ -49,7 +47,7 @@ Deze nieuwe workflow zorgt ervoor dat elke stap een aparte CLI-command is en all
 ```
 
 **Werking:**  
-- Zoekt naar het bestand: `data/03_raw/index_target_{object}_{variant}.xml`
+- Zoekt naar het bestand: `data/02_target/index_target_{object}_{variant}.xml`
 - Parseert XML en filtert target fields behorend bij deze variant
 - Bijvoorbeeld: Zoek velden die beginnen met `S_{variant}` zoals `S_BNKA` als variant=`bnka`
 - Zet de target fields om naar YAML (`index_target.yaml`)
@@ -70,9 +68,11 @@ Deze nieuwe workflow zorgt ervoor dat elke stap een aparte CLI-command is en all
 ### 📁 Nieuwe Directorystructuur
 
 ```
-data/03_raw/
-  index_source_m140_bnka.xlsx    # Source headers
-  index_target_m140_bnka.xml     # Target field definitions
+data/
+  02_fields/                     # Source Excel files
+    fields_m140_bnka.xlsx        # Source headers 
+  02_target/                     # Target XML files
+    index_target_m140_bnka.xml   # Target field definitions
 migrations/
   object_list.yaml               # Global object/variant registry
   m140/
@@ -256,7 +256,7 @@ migrations/
 - `rule: derive` voor velden die business logica vereisen
 
 ### 📋 Central Mapping Memory System
-- **Centraal geheugenbestand** (`configs/central_mapping_memory.yaml`) voor herbruikbare mapping regels
+- **Centraal geheugenbestand** (`config/central_mapping_memory.yaml`) voor herbruikbare mapping regels
 - **Skip rules** - velden uitsluiten van mapping met auditeerbare comments
 - **Manual mappings** - handmatige veld-naar-veld mappings met business context
 - **Global + table-specific overrides** - flexibele regel hiërarchie
@@ -280,7 +280,7 @@ transform-myd-minimal/
 │       ├── generator.py                # YAML generatie logica
 │       └── synonym.py                  # Synonym matching
 ├── transform-myd-minimal               # Wrapper script
-├── configs/                            # Centrale configuratie bestanden
+├── config/                              # Centrale configuratie bestanden
 │   ├── config.yaml                     # Applicatie configuratie
 │   └── central_mapping_memory.yaml     # Centrale mapping regels
 ├── config/                             # Globale output bestanden (voor source-based mapping)
@@ -439,7 +439,7 @@ output_dir: "output"        # Output directory for generated YAML files
 2. **config/config.yaml** - Middel prioriteit  
 3. **Hardcoded defaults** - Laagste prioriteit
 
-**Opmerking**: Voor backward compatibility ondersteunt het systeem ook config bestanden in de oude `configs/` directory en de project root. Het zoekt eerst in `config/`, dan `configs/` en valt terug naar de root directory.
+**Opmerking**: Het systeem zoekt naar configuratiebestanden in de `config/` directory.
 
 ### Voorbeelden
 
@@ -614,13 +614,13 @@ Velden die niet als constant worden herkend krijgen `rule: derive` en vereisen b
 
 ## Central Mapping Memory System
 
-Het central mapping memory systeem maakt gebruik van een centraal configuratiebestand (`configs/central_mapping_memory.yaml`) voor herbruikbare mapping regels.
+Het central mapping memory systeem maakt gebruik van een centraal configuratiebestand (`config/central_mapping_memory.yaml`) voor herbruikbare mapping regels.
 
-**Opmerking**: Voor backward compatibility ondersteunt het systeem ook het bestand in de project root. Het zoekt eerst in `configs/` en valt terug naar de root directory.
+**Opmerking**: Het systeem zoekt naar configuratiebestanden in de `config/` directory.
 
 ### 📋 Configuratie Structuur
 
-Het `configs/central_mapping_memory.yaml` bestand ondersteunt:
+Het `config/central_mapping_memory.yaml` bestand ondersteunt:
 
 1. **Global skip fields** - Skip regels die op alle tabellen van toepassing zijn
 2. **Global manual mappings** - Handmatige mappings die op alle tabellen van toepassing zijn  

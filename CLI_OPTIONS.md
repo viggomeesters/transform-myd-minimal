@@ -39,8 +39,8 @@
 ### File Path Patterns (v4.0)
 
 #### Input Files
-- **Source XLSX**: `data/03_raw/index_source_{object}_{variant}.xlsx`
-- **Target XML**: `data/03_raw/index_target_{object}_{variant}.xml`
+- **Source XLSX**: `data/02_fields/fields_{object}_{variant}.xlsx`
+- **Target XML**: `data/02_target/index_target_{object}_{variant}.xml`
 
 #### Output Files
 - **Object List**: `migrations/object_list.yaml` (global registry)

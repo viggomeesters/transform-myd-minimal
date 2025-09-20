@@ -27,7 +27,7 @@ transform-myd-minimal/
 │       ├── generator.py                # YAML generation logic
 │       └── synonym.py                  # Synonym matching
 ├── transform-myd-minimal               # Wrapper script
-├── configs/                            # Configuration files
+├── config/                             # Configuration files
 ├── config/                             # Generated output (legacy)
 ├── data/                               # Input Excel files
 ├── migrations/                         # New multi-file structure
@@ -45,7 +45,7 @@ transform-myd-minimal/
    - Provides audit logging for transparency
 
 2. **Configuration System** (`config_loader.py`):
-   - Loads settings from `configs/config.yaml`
+   - Loads settings from `config/config.yaml`
    - Merges CLI arguments with config values
    - Manages input/output directory paths
 
@@ -79,8 +79,8 @@ transform-myd-minimal/
 ```
 
 ### Configuration
-- Primary config: `configs/config.yaml`
-- Central mapping rules: `configs/central_mapping_memory.yaml`
+- Primary config: `config/config.yaml`
+- Central mapping rules: `config/central_mapping_memory.yaml`
 - Input files: `data/02_fields/fields_{object}_{variant}.xlsx`
 
 ## Dependencies

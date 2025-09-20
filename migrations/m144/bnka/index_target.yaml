@@ -2,7 +2,7 @@ metadata:
   object: m144
   variant: bnka
   target_file: data/02_target/index_target_m144_bnka.xml
-  generated_at: '2025-09-20T11:37:06.563095'
+  generated_at: '2025-09-20T10:47:46.218794'
   structure: S_BNKA
   target_fields_count: 12
 target_fields:
