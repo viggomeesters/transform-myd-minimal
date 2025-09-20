@@ -4,7 +4,7 @@
 
 ### Code Organization
 - **Primary package**: `src/transform_myd_minimal/` - all core functionality
-- **Entry point**: Can be run via `./transform-myd-minimal` wrapper or `python -m src.transform_myd_minimal`
+- **Entry point**: Can be run via `./transform-myd-minimal` wrapper or `python -m transform_myd_minimal`
 - **Module structure**: Each module has a specific responsibility (CLI, matching, generation, etc.)
 
 ### Dependencies Management

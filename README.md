@@ -614,13 +614,13 @@ Velden die niet als constant worden herkend krijgen `rule: derive` en vereisen b
 
 ## Central Mapping Memory System
 
-Het central mapping memory systeem maakt gebruik van een centraal configuratiebestand (`configs/central_mapping_memory.yaml`) voor herbruikbare mapping regels.
+Het central mapping memory systeem maakt gebruik van een centraal configuratiebestand (`config/central_mapping_memory.yaml`) voor herbruikbare mapping regels.
 
-**Opmerking**: Voor backward compatibility ondersteunt het systeem ook het bestand in de project root. Het zoekt eerst in `configs/` en valt terug naar de root directory.
+**Opmerking**: Het systeem zoekt naar configuratiebestanden in de `config/` directory.
 
 ### 📋 Configuratie Structuur
 
-Het `configs/central_mapping_memory.yaml` bestand ondersteunt:
+Het `config/central_mapping_memory.yaml` bestand ondersteunt:
 
 1. **Global skip fields** - Skip regels die op alle tabellen van toepassing zijn
 2. **Global manual mappings** - Handmatige mappings die op alle tabellen van toepassing zijn  
