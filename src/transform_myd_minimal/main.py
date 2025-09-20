@@ -1223,7 +1223,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             if norm(header) == t_name:
                 best_match = header
                 best_confidence = 1.00
-                best_rationale = "exact"
+                best_rationale = "Exact field name match"
                 break
         
         # 2. SYNONYM MATCH: if no exact match and synonyms available
@@ -1235,7 +1235,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
                     if norm(header) in [norm(variant) for variant in synonym_variants]:
                         best_match = header
                         best_confidence = 0.95
-                        best_rationale = "synonym"
+                        best_rationale = "Matched via synonym definition"
                         break
         
         # 3. FUZZY MATCH: against t_name and t_desc
@@ -1267,14 +1267,14 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
                     if score > best_confidence or (score == best_confidence and is_better_match(header, best_match, t_name)):
                         best_match = header
                         best_confidence = score
-                        best_rationale = f"fuzzy:{score:.2f}"
+                        best_rationale = f"Fuzzy match with {score:.0%} confidence"
                     candidates.append((header, score))
                 elif 0.80 <= score < 0.85 and required:
                     # Only map if target is mandatory
                     if score > best_confidence or (score == best_confidence and is_better_match(header, best_match, t_name)):
                         best_match = header
                         best_confidence = score
-                        best_rationale = f"fuzzy:{score:.2f}"
+                        best_rationale = f"Fuzzy match with {score:.0%} confidence (mandatory field)"
                     candidates.append((header, score))
         
         # Handle tiebreakers (tie when delta score <= 0.02)
@@ -1283,7 +1283,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             # Tie detected - add to audit
             to_audit.append({
                 "target_table": t_table,
-                "target_field": t_name,
+                "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
                 "source_header": best_match,
                 "confidence": best_confidence,
                 "reason": "tie_break"
@@ -1291,12 +1291,15 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
         
         # Create mapping entry
         status = "auto" if best_match else "unmapped"
+        # Set appropriate rationale for unmapped fields
+        if not best_match:
+            best_rationale = "Added without source match, to comply with SAP template"
+        
         mapping = {
             "target_table": t_table,
-            "target_field": t_name,
+            "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
             "source_header": best_match,
             "required": required,
-            "transforms": [],
             "confidence": round(best_confidence, 2),
             "status": status,
             "rationale": best_rationale
@@ -1318,17 +1321,17 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             if 0.80 <= best_confidence < 0.90:
                 to_audit.append({
                     "target_table": t_table,
-                    "target_field": t_name,
+                    "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
                     "source_header": best_match,
                     "confidence": best_confidence,
                     "reason": "low_confidence_fuzzy"
                 })
             
             # Synonym based
-            if best_rationale == "synonym":
+            if best_rationale == "Matched via synonym definition":
                 to_audit.append({
                     "target_table": t_table,
-                    "target_field": t_name,
+                    "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
                     "source_header": best_match,
                     "confidence": best_confidence,
                     "reason": "synonym_based"
@@ -1338,7 +1341,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             if required:
                 to_audit.append({
                     "target_table": t_table,
-                    "target_field": t_name,
+                    "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
                     "source_header": None,
                     "confidence": 0.00,
                     "reason": "required_unmapped"
@@ -1347,7 +1350,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             # Add to unmapped targets
             unmapped_target_fields.append({
                 "target_table": t_table,
-                "target_field": t_name,
+                "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
                 "required": required
             })
     
@@ -1486,6 +1489,20 @@ def run_map_command(args, config):
             source_fields, target_fields, synonyms, args.object, args.variant
         )
 
+        # Calculate metrics for metadata
+        mapped_count = len([m for m in mapping_result["mappings"] if m["status"] == "auto"])
+        unmapped_count = len(mapping_result["unmapped_target_fields"])
+        to_audit_count = len(mapping_result["to_audit"])
+        unused_sources_count = len(mapping_result["unmapped_source_fields"])
+        unused_targets_count = 0  # As specified in the requirement
+        
+        # Add metrics to metadata
+        mapping_result["metadata"]["mapped_count"] = mapped_count
+        mapping_result["metadata"]["unmapped_count"] = unmapped_count
+        mapping_result["metadata"]["to_audit"] = to_audit_count
+        mapping_result["metadata"]["unused_sources"] = unused_sources_count
+        mapping_result["metadata"]["unused_targets"] = unused_targets_count
+
         # Create output structure with exact key ordering
         output_data = {
             "metadata": mapping_result["metadata"],
@@ -1495,16 +1512,24 @@ def run_map_command(args, config):
             "unmapped_target_fields": mapping_result["unmapped_target_fields"]
         }
 
-        # Write mapping.yaml with exact format
+        # Write mapping.yaml with exact format and blank line between sections
         mapping_file.parent.mkdir(parents=True, exist_ok=True)
         with open(mapping_file, "w", encoding="utf-8") as f:
-            yaml.safe_dump(output_data, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
+            # Write metadata section
+            yaml.safe_dump({"metadata": output_data["metadata"]}, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
+            
+            # Add blank line between metadata and mappings
+            f.write("\n")
+            
+            # Write remaining sections
+            remaining_data = {
+                "mappings": output_data["mappings"],
+                "to_audit": output_data["to_audit"],
+                "unmapped_source_fields": output_data["unmapped_source_fields"],
+                "unmapped_target_fields": output_data["unmapped_target_fields"]
+            }
+            yaml.safe_dump(remaining_data, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
 
-        # Calculate metrics for logging
-        mapped_count = len([m for m in mapping_result["mappings"] if m["status"] == "auto"])
-        unmapped_count = len(mapping_result["unmapped_target_fields"])
-        to_audit_count = len(mapping_result["to_audit"])
-        unused_sources_count = len(mapping_result["unmapped_source_fields"])
         duration_ms = int((time.time() - start_time) * 1000)
 
         # JSONL summary logging

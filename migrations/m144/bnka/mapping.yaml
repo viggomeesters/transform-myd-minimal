@@ -1,106 +1,100 @@
 metadata:
   object: m144
   variant: bnka
-  generated_at: '2025-09-20T10:26:34.776413'
+  generated_at: '2025-09-20T11:13:54.021966'
   source_index: migrations/m144/bnka/index_source.yaml
   target_index: migrations/m144/bnka/index_target.yaml
+  mapped_count: 11
+  unmapped_count: 1
+  to_audit: 0
+  unused_sources: 26
+  unused_targets: 0
+
 mappings:
 - target_table: bnka
-  target_field: banks
+  target_field: BANKS
   source_header: BANKS
   required: true
-  transforms: []
   confidence: 1.0
   status: auto
-  rationale: exact
+  rationale: Exact field name match
 - target_table: bnka
-  target_field: bankl
+  target_field: BANKL
   source_header: BANKL
   required: true
-  transforms: []
   confidence: 1.0
   status: auto
-  rationale: exact
+  rationale: Exact field name match
 - target_table: bnka
-  target_field: banka
+  target_field: BANKA
   source_header: BANKA
   required: true
-  transforms: []
   confidence: 1.0
   status: auto
-  rationale: exact
+  rationale: Exact field name match
 - target_table: bnka
-  target_field: provz
+  target_field: PROVZ
   source_header: PROVZ
   required: false
-  transforms: []
   confidence: 1.0
   status: auto
-  rationale: exact
+  rationale: Exact field name match
 - target_table: bnka
-  target_field: stras
+  target_field: STRAS
   source_header: STRAS
   required: false
-  transforms: []
   confidence: 1.0
   status: auto
-  rationale: exact
+  rationale: Exact field name match
 - target_table: bnka
-  target_field: ort01
+  target_field: ORT01
   source_header: ORT01
   required: false
-  transforms: []
   confidence: 1.0
   status: auto
-  rationale: exact
+  rationale: Exact field name match
 - target_table: bnka
-  target_field: brnch
+  target_field: BRNCH
   source_header: BRNCH
   required: false
-  transforms: []
   confidence: 1.0
   status: auto
-  rationale: exact
+  rationale: Exact field name match
 - target_table: bnka
-  target_field: swift
+  target_field: SWIFT
   source_header: SWIFT
   required: false
-  transforms: []
   confidence: 1.0
   status: auto
-  rationale: exact
+  rationale: Exact field name match
 - target_table: bnka
-  target_field: xpgro
+  target_field: XPGRO
   source_header: XPGRO
   required: false
-  transforms: []
   confidence: 1.0
   status: auto
-  rationale: exact
+  rationale: Exact field name match
 - target_table: bnka
-  target_field: bnklz
+  target_field: BNKLZ
   source_header: BNKLZ
   required: false
-  transforms: []
   confidence: 1.0
   status: auto
-  rationale: exact
+  rationale: Exact field name match
 - target_table: bnka
-  target_field: bgrup
+  target_field: BGRUP
   source_header: BGRUP
   required: false
-  transforms: []
   confidence: 1.0
   status: auto
-  rationale: exact
+  rationale: Exact field name match
 - target_table: bnka
-  target_field: isnotoverwrite
+  target_field: ISNOTOVERWRITE
   source_header: null
   required: false
-  transforms: []
   confidence: 0.0
   status: unmapped
-  rationale: none
+  rationale: Added without source match, to comply with SAP template
 to_audit: []
 unmapped_source_fields:
 - MANDT
@@ -131,5 +125,5 @@ unmapped_source_fields:
 - RCCODE
 unmapped_target_fields:
 - target_table: bnka
-  target_field: isnotoverwrite
+  target_field: ISNOTOVERWRITE
   required: false

@@ -1,50 +1,52 @@
 metadata:
   object: m143
   variant: bnka
-  generated_at: '2025-09-20T10:26:35.149727'
+  generated_at: '2025-09-20T11:14:35.333729'
   source_index: migrations/m143/bnka/index_source.yaml
   target_index: migrations/m143/bnka/index_target.yaml
+  mapped_count: 3
+  unmapped_count: 1
+  to_audit: 2
+  unused_sources: 1
+  unused_targets: 0
+
 mappings:
 - target_table: bnka
-  target_field: banks
+  target_field: BANKS
   source_header: Bank Country/Region Key
   required: true
-  transforms: []
   confidence: 0.93
   status: auto
-  rationale: fuzzy:0.93
+  rationale: Fuzzy match with 93% confidence
 - target_table: bnka
-  target_field: bankl
+  target_field: BANKL
   source_header: Bank Key
   required: true
-  transforms: []
   confidence: 0.95
   status: auto
-  rationale: synonym
+  rationale: Matched via synonym definition
 - target_table: bnka
-  target_field: banka
+  target_field: BANKA
   source_header: Bank Name
   required: false
-  transforms: []
   confidence: 0.95
   status: auto
-  rationale: synonym
+  rationale: Matched via synonym definition
 - target_table: bnka
-  target_field: ort01
+  target_field: ORT01
   source_header: null
   required: false
-  transforms: []
   confidence: 0.0
   status: unmapped
-  rationale: none
+  rationale: Added without source match, to comply with SAP template
 to_audit:
 - target_table: bnka
-  target_field: bankl
+  target_field: BANKL
   source_header: Bank Key
   confidence: 0.95
   reason: synonym_based
 - target_table: bnka
-  target_field: banka
+  target_field: BANKA
   source_header: Bank Name
   confidence: 0.95
   reason: synonym_based
@@ -52,5 +54,5 @@ unmapped_source_fields:
 - Currency
 unmapped_target_fields:
 - target_table: bnka
-  target_field: ort01
+  target_field: ORT01
   required: false
