@@ -128,53 +128,29 @@ def setup_cli():
     if not variant_required:
         variant_help += f" (default from config: {config.variant})"
 
-    map_parser.add_argument("--object", required=object_required, help=object_help)
-    map_parser.add_argument("--variant", required=variant_required, help=variant_help)
+    map_parser.add_argument("-o", "--object", required=object_required, help=object_help)
+    map_parser.add_argument("-v", "--variant", required=variant_required, help=variant_help)
     map_parser.add_argument(
-        "--fuzzy-threshold",
-        type=float,
-        default=config.fuzzy_threshold,
-        help=f"Fuzzy matching threshold (0.0-1.0, default: {config.fuzzy_threshold})",
+        "--root", default=".", help="Root directory (default: .)"
     )
     map_parser.add_argument(
-        "--max-suggestions",
-        type=int,
-        default=config.max_suggestions,
-        help=f"Maximum fuzzy match suggestions (default: {config.max_suggestions})",
+        "--force", action="store_true", help="Overwrite existing outputs"
     )
     map_parser.add_argument(
-        "--disable-fuzzy",
-        action="store_true",
-        default=config.disable_fuzzy,
-        help="Disable fuzzy matching",
-    )
-
-    # New optional flags for source-based mapping
-    map_parser.add_argument(
-        "--source-headers-xlsx",
-        type=str,
-        help="Path to source headers XLSX file (overrides config)",
+        "--json", action="store_true", help="Force JSONL output to stdout"
     )
     map_parser.add_argument(
-        "--source-headers-sheet",
-        type=str,
-        help="Sheet name in source XLSX (overrides config)",
+        "--no-preview", action="store_true", help="Suppress preview table in human mode"
     )
     map_parser.add_argument(
-        "--source-headers-row",
-        type=int,
-        help="Header row number in source XLSX (overrides config)",
+        "--no-log-file", action="store_true", help="Do not write log file"
     )
     map_parser.add_argument(
-        "--target-xml", type=str, help="Path to target XML file (overrides config)"
-    )
-    map_parser.add_argument(
-        "--target-xml-worksheet",
-        type=str,
-        help="Worksheet name in target XML (overrides config)",
+        "--quiet", action="store_true", help="No stdout output; still writes file unless --no-log-file"
     )
 
-    # Index source subcommand
+    # Parse arguments
+    args = parser.parse_args()
     index_source_parser = subparsers.add_parser(
         "index_source", help="Parse and index source fields from XLSX file"
     )

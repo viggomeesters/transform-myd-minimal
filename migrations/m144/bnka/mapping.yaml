@@ -1,0 +1,135 @@
+metadata:
+  object: m144
+  variant: bnka
+  generated_at: '2025-09-20T10:26:34.776413'
+  source_index: migrations/m144/bnka/index_source.yaml
+  target_index: migrations/m144/bnka/index_target.yaml
+mappings:
+- target_table: bnka
+  target_field: banks
+  source_header: BANKS
+  required: true
+  transforms: []
+  confidence: 1.0
+  status: auto
+  rationale: exact
+- target_table: bnka
+  target_field: bankl
+  source_header: BANKL
+  required: true
+  transforms: []
+  confidence: 1.0
+  status: auto
+  rationale: exact
+- target_table: bnka
+  target_field: banka
+  source_header: BANKA
+  required: true
+  transforms: []
+  confidence: 1.0
+  status: auto
+  rationale: exact
+- target_table: bnka
+  target_field: provz
+  source_header: PROVZ
+  required: false
+  transforms: []
+  confidence: 1.0
+  status: auto
+  rationale: exact
+- target_table: bnka
+  target_field: stras
+  source_header: STRAS
+  required: false
+  transforms: []
+  confidence: 1.0
+  status: auto
+  rationale: exact
+- target_table: bnka
+  target_field: ort01
+  source_header: ORT01
+  required: false
+  transforms: []
+  confidence: 1.0
+  status: auto
+  rationale: exact
+- target_table: bnka
+  target_field: brnch
+  source_header: BRNCH
+  required: false
+  transforms: []
+  confidence: 1.0
+  status: auto
+  rationale: exact
+- target_table: bnka
+  target_field: swift
+  source_header: SWIFT
+  required: false
+  transforms: []
+  confidence: 1.0
+  status: auto
+  rationale: exact
+- target_table: bnka
+  target_field: xpgro
+  source_header: XPGRO
+  required: false
+  transforms: []
+  confidence: 1.0
+  status: auto
+  rationale: exact
+- target_table: bnka
+  target_field: bnklz
+  source_header: BNKLZ
+  required: false
+  transforms: []
+  confidence: 1.0
+  status: auto
+  rationale: exact
+- target_table: bnka
+  target_field: bgrup
+  source_header: BGRUP
+  required: false
+  transforms: []
+  confidence: 1.0
+  status: auto
+  rationale: exact
+- target_table: bnka
+  target_field: isnotoverwrite
+  source_header: null
+  required: false
+  transforms: []
+  confidence: 0.0
+  status: unmapped
+  rationale: none
+to_audit: []
+unmapped_source_fields:
+- MANDT
+- ERDAT
+- ERNAM
+- LOEVM
+- PSKTO
+- ADRNR
+- CHKME
+- VERS
+- IBAN_RULE
+- SDD_B2B
+- SDD_COR1
+- SDD_RTRANS
+- ZNOCHECK
+- ZACC_LEN
+- ZRES1
+- ZRES2
+- ZRES3
+- ZRES4
+- ZRES5
+- ZRES6
+- ZRES7
+- ZRES8
+- ZRES9
+- ZRES10
+- BICKY
+- RCCODE
+unmapped_target_fields:
+- target_table: bnka
+  target_field: isnotoverwrite
+  required: false

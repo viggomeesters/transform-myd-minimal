@@ -2,6 +2,16 @@
 # This file contains global and table-specific field mapping rules that take precedence
 # over automatic mapping algorithms. Comments are preserved for auditability.
 
+# Synonyms for field matching (TARGET_TOKEN: [list of source header variants])
+synonyms:
+  BANKL:
+    - "Bank Key"
+    - "Bank Number"
+    - "Bank ID"
+  BANKA:
+    - "Bank Name"
+    - "Bank Title"
+
 # Global skip fields - apply to all tables unless overridden
 global_skip_fields:
   - source_field: "TEMP_FIELD"
