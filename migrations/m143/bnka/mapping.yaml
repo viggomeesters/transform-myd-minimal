@@ -1,7 +1,7 @@
 metadata:
   object: m143
   variant: bnka
-  generated_at: '2025-09-20T10:23:30.652456'
+  generated_at: '2025-09-20T10:26:35.149727'
   source_index: migrations/m143/bnka/index_source.yaml
   target_index: migrations/m143/bnka/index_target.yaml
 mappings:
@@ -15,20 +15,20 @@ mappings:
   rationale: fuzzy:0.93
 - target_table: bnka
   target_field: bankl
-  source_header: Bank Name
+  source_header: Bank Key
   required: true
   transforms: []
-  confidence: 0.92
+  confidence: 0.95
   status: auto
-  rationale: fuzzy:0.92
+  rationale: synonym
 - target_table: bnka
   target_field: banka
   source_header: Bank Name
   required: false
   transforms: []
-  confidence: 1.0
+  confidence: 0.95
   status: auto
-  rationale: fuzzy:1.00
+  rationale: synonym
 - target_table: bnka
   target_field: ort01
   source_header: null
@@ -39,12 +39,16 @@ mappings:
   rationale: none
 to_audit:
 - target_table: bnka
+  target_field: bankl
+  source_header: Bank Key
+  confidence: 0.95
+  reason: synonym_based
+- target_table: bnka
   target_field: banka
   source_header: Bank Name
-  confidence: 1.0
-  reason: reused_source
+  confidence: 0.95
+  reason: synonym_based
 unmapped_source_fields:
-- Bank Key
 - Currency
 unmapped_target_fields:
 - target_table: bnka
