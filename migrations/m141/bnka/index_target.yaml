@@ -2,8 +2,9 @@ metadata:
   object: m141
   variant: bnka
   target_file: data/02_target/index_target_m141_bnka.xml
-  generated_at: '2025-09-20T09:04:12.720645'
+  generated_at: '2025-09-20T09:22:48.458701'
   structure: S_BNKA
+  target_fields_count: 12
 target_fields:
 - sap_field: banks
   field_description: Bank Country/Region Key

@@ -1095,7 +1095,8 @@ def run_index_target_command(args):
                 "variant": args.variant,
                 "target_file": f"data/02_target/index_target_{args.object}_{args.variant}.xml",
                 "generated_at": datetime.now().isoformat(),
-                "structure": f"S_{args.variant.upper()}"
+                "structure": f"S_{args.variant.upper()}",
+                "target_fields_count": len(target_fields)
             },
             "target_fields": target_fields
         }
