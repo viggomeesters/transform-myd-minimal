@@ -23,6 +23,12 @@ from pandas.api.types import infer_dtype
 
 from .cli import setup_cli
 from .fuzzy import FuzzyConfig, FieldNormalizer, FuzzyMatcher
+
+# Configure YAML to maintain dictionary order
+def represent_ordereddict(dumper, data):
+    return dumper.represent_mapping('tag:yaml.org,2002:map', data.items())
+
+yaml.add_representer(OrderedDict, represent_ordereddict)
 from .synonym import SynonymMatcher
 from .generator import (
     read_excel_fields, generate_object_list_yaml, generate_fields_yaml, 
@@ -581,22 +587,22 @@ def analyze_column_data(file_path: Path, sheet_name: str, header_row: int, heade
                         dtype = "empty"
                         example = ""
                     
-                    field_data.append({
-                        'field_name': header,
-                        'field_description': None,
-                        'dtype': dtype,
-                        'nullable': bool(has_nulls),
-                        'example': example
-                    })
+                    field_data.append(OrderedDict([
+                        ('field_name', header),
+                        ('field_description', None),
+                        ('example', example),
+                        ('dtype', dtype),
+                        ('nullable', bool(has_nulls))
+                    ]))
                 else:
                     # Column index beyond available data
-                    field_data.append({
-                        'field_name': header,
-                        'field_description': None,
-                        'dtype': "empty",
-                        'nullable': True,
-                        'example': ""
-                    })
+                    field_data.append(OrderedDict([
+                        ('field_name', header),
+                        ('field_description', None),
+                        ('example', ""),
+                        ('dtype', "empty"),
+                        ('nullable', True)
+                    ]))
             
             col_idx += 1
         
