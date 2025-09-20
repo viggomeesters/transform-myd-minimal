@@ -714,10 +714,6 @@ def analyze_column_data(
         raise ValueError(f"Error analyzing column data: {e}")
 
 
-def log_jsonl(data: Dict):
-    """Log data as JSONL to stdout."""
-    print(json.dumps(data, ensure_ascii=False))
-
 
 def run_index_source_command(args):
     """Run the index_source command - parse headers from XLSX and create index_source.yaml."""

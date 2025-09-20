@@ -95,6 +95,32 @@ migrations/
 ./transform-myd-minimal map --object m140 --variant bnka
 ```
 
+### 📋 Enhanced Logging
+
+**Logging is on by default** for `index_source` and `index_target` commands with rich formatting and automatic file logging.
+
+**Default behavior:**
+- Interactive terminal → Human summary + preview table
+- Piped/redirected → JSONL lines
+- Automatic log files: `data/09_logging/<step>_<object>_<variant>_<YYYYMMDD_HHmm>.jsonl`
+
+**Examples:**
+```bash
+# Default (human format in terminal, JSONL when piped)
+./transform-myd-minimal index_source --object m140 --variant bnka
+
+# Force JSONL output
+./transform-myd-minimal index_source --object m140 --variant bnka --json
+
+# Quiet mode (no stdout, but still writes log file)
+./transform-myd-minimal index_source --object m140 --variant bnka --quiet
+
+# No log file
+./transform-myd-minimal index_source --object m140 --variant bnka --no-log-file
+```
+
+See [LOGGING.md](LOGGING.md) for complete documentation.
+
 ### ✅ Voordelen Nieuwe Workflow
 
 - **Stapsgewijze controle**: Elke stap kan afzonderlijk uitgevoerd worden
