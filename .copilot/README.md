@@ -79,8 +79,8 @@ transform-myd-minimal/
 ```
 
 ### Configuration
-- Primary config: `configs/config.yaml`
-- Central mapping rules: `configs/central_mapping_memory.yaml`
+- Primary config: `config/config.yaml`
+- Central mapping rules: `config/central_mapping_memory.yaml`
 - Input files: `data/02_fields/fields_{object}_{variant}.xlsx`
 
 ## Dependencies

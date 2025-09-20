@@ -148,6 +148,26 @@ def setup_cli():
     map_parser.add_argument(
         "--quiet", action="store_true", help="No stdout output; still writes file unless --no-log-file"
     )
+    
+    # Fuzzy matching options for map command
+    map_parser.add_argument(
+        "--fuzzy-threshold", 
+        type=float, 
+        default=config.fuzzy_threshold,
+        help=f"Fuzzy matching threshold (0.0-1.0, default: {config.fuzzy_threshold})"
+    )
+    map_parser.add_argument(
+        "--max-suggestions", 
+        type=int, 
+        default=config.max_suggestions,
+        help=f"Maximum fuzzy match suggestions (default: {config.max_suggestions})"
+    )
+    map_parser.add_argument(
+        "--disable-fuzzy", 
+        action="store_true", 
+        default=config.disable_fuzzy,
+        help="Disable fuzzy matching completely"
+    )
 
     # Index source subcommand
     index_source_parser = subparsers.add_parser(

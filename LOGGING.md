@@ -33,32 +33,32 @@ Use these flags to control logging behavior:
 
 1. **Default operation** (automatic format based on TTY):
    ```bash
-   python -m transform_myd_minimal index_source --object m143 --variant bnka
+   ./transform-myd-minimal index_source --object m143 --variant bnka
    ```
 
 2. **Force JSONL output**:
    ```bash
-   python -m transform_myd_minimal index_source --object m143 --variant bnka --json
+   ./transform-myd-minimal index_source --object m143 --variant bnka --json
    ```
 
 3. **Quiet mode** (no stdout, but still writes log file):
    ```bash
-   python -m transform_myd_minimal index_source --object m143 --variant bnka --quiet
+   ./transform-myd-minimal index_source --object m143 --variant bnka --quiet
    ```
 
 4. **No log file**:
    ```bash
-   python -m transform_myd_minimal index_source --object m143 --variant bnka --no-log-file
+   ./transform-myd-minimal index_source --object m143 --variant bnka --no-log-file
    ```
 
 5. **Custom log file**:
    ```bash
-   python -m transform_myd_minimal index_source --object m143 --variant bnka --log-file my_custom.jsonl
+   ./transform-myd-minimal index_source --object m143 --variant bnka --log-file my_custom.jsonl
    ```
 
 6. **Human format without preview table**:
    ```bash
-   python -m transform_myd_minimal index_source --object m143 --variant bnka --no-preview
+   ./transform-myd-minimal index_source --object m143 --variant bnka --no-preview
    ```
 
 ### JSONL Event Format
@@ -67,7 +67,7 @@ Events are logged in JSONL format with the following structure:
 
 **index_source**:
 ```json
-{"step":"index_source","object":"m143","variant":"bnka","input_file":"data/01_source/index_source_m143_bnka.xlsx","output_file":"migrations/m143/bnka/index_source.yaml","total_columns":4,"duration_ms":420,"warnings":[]}
+{"step":"index_source","object":"m143","variant":"bnka","input_file":"data/02_fields/fields_m143_bnka.xlsx","output_file":"migrations/m143/bnka/index_source.yaml","total_columns":4,"duration_ms":420,"warnings":[]}
 ```
 
 **index_target**:
@@ -80,7 +80,7 @@ Events are logged in JSONL format with the following structure:
 **index_source** example:
 ```
 ✓ index_source  m143/bnka  columns=37
-  in:  data/01_source/m143_bnka.xlsx
+  in:  data/02_fields/fields_m143_bnka.xlsx
   out: migrations/m143/bnka/index_source.yaml
   time: 420ms
   warnings: 0

@@ -26,8 +26,8 @@ pip install pandas openpyxl pyyaml
 ```
 
 ### Key Configuration Files
-- `configs/config.yaml` - Application settings (fuzzy thresholds, paths)
-- `configs/central_mapping_memory.yaml` - Reusable mapping rules
+- `config/config.yaml` - Application settings (fuzzy thresholds, paths)
+- `config/central_mapping_memory.yaml` - Reusable mapping rules
 - Input format: `data/02_fields/fields_{object}_{variant}.xlsx`
 
 ### Code Patterns to Follow
@@ -94,7 +94,7 @@ print(f"Coverage: {coverage:.1f}%")
 - Input: `fields_{object}_{variant}.xlsx`
 - Legacy output: `config/{object}/{variant}/`
 - New output: `migrations/{OBJECT}/{variant}/`
-- Config files: `configs/` directory
+- Config files: `config/` directory
 
 ### Business Logic Understanding
 - **Exact matching**: 100% confidence, normalized comparison
