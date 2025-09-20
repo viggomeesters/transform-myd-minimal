@@ -227,6 +227,11 @@ class EnhancedLogger:
     def log_error(self, error_event: Dict[str, Any]) -> None:
         """Log an error event."""
         error_event["duration_ms"] = self.get_duration_ms()
+        
+        # Normalize paths in error event
+        if "path" in error_event:
+            error_event["path"] = self.normalize_path(Path(error_event["path"]))
+        
         self.write_jsonl_to_file(error_event)
         
         if self.stdout_format != "none":
