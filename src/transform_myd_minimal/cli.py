@@ -190,6 +190,25 @@ def setup_cli():
     index_source_parser.add_argument(
         "--force", action="store_true", help="Overwrite existing outputs"
     )
+    # Logging flags
+    index_source_parser.add_argument(
+        "--json", action="store_true", help="Force JSONL output to stdout"
+    )
+    index_source_parser.add_argument(
+        "--format", choices=["human", "jsonl"], help="Output format (overrides TTY detection)"
+    )
+    index_source_parser.add_argument(
+        "--log-file", type=str, help="Override log file path"
+    )
+    index_source_parser.add_argument(
+        "--no-log-file", action="store_true", help="Do not write log file"
+    )
+    index_source_parser.add_argument(
+        "--no-preview", action="store_true", help="Suppress preview table in human mode"
+    )
+    index_source_parser.add_argument(
+        "--quiet", action="store_true", help="No stdout output; still writes file unless --no-log-file"
+    )
 
     # Index target subcommand
     index_target_parser = subparsers.add_parser(
@@ -206,6 +225,25 @@ def setup_cli():
     )
     index_target_parser.add_argument(
         "--force", action="store_true", help="Overwrite existing outputs"
+    )
+    # Logging flags
+    index_target_parser.add_argument(
+        "--json", action="store_true", help="Force JSONL output to stdout"
+    )
+    index_target_parser.add_argument(
+        "--format", choices=["human", "jsonl"], help="Output format (overrides TTY detection)"
+    )
+    index_target_parser.add_argument(
+        "--log-file", type=str, help="Override log file path"
+    )
+    index_target_parser.add_argument(
+        "--no-log-file", action="store_true", help="Do not write log file"
+    )
+    index_target_parser.add_argument(
+        "--no-preview", action="store_true", help="Suppress preview table in human mode"
+    )
+    index_target_parser.add_argument(
+        "--quiet", action="store_true", help="No stdout output; still writes file unless --no-log-file"
     )
 
     # Parse arguments

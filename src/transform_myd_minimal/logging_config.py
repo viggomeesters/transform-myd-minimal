@@ -19,7 +19,7 @@ def setup_logging(
 
     Args:
         level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-               If None, will use environment variable LOG_LEVEL or default to INFO
+               If None, defaults to INFO
         format_detailed: If True, use detailed format with timestamps and module names
 
     Returns:
@@ -31,9 +31,9 @@ def setup_logging(
     # Clear any existing handlers to avoid duplication
     logger.handlers.clear()
 
-    # Determine logging level
+    # Determine logging level - removed environment variable dependency
     if level is None:
-        level = os.getenv("LOG_LEVEL", "INFO")
+        level = "INFO"
 
     # Set the logging level
     numeric_level = getattr(logging, level.upper(), logging.INFO)
@@ -43,8 +43,8 @@ def setup_logging(
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(numeric_level)
 
-    # Create formatter
-    if format_detailed or os.getenv("LOG_FORMAT", "").lower() == "detailed":
+    # Create formatter - removed environment variable dependency
+    if format_detailed:
         formatter = logging.Formatter(
             "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         )
