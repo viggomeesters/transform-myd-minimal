@@ -156,14 +156,21 @@ def get_python_executable(python_version: str = None) -> str:
         raise RuntimeError(f"Python {python_version} not found")
 
     # Default python
-    for cmd in ["python3", "python"]:
+    if platform.system() == "Windows":
         try:
-            sh([cmd, "--version"], check=True)
-            return cmd
+            sh(["python", "--version"], check=True)
+            return "python"
         except (subprocess.CalledProcessError, FileNotFoundError):
-            continue
-
-    raise RuntimeError("No Python interpreter found")
+            pass
+        raise RuntimeError("No Python interpreter found on Windows")
+    else:
+        for cmd in ["python3", "python"]:
+            try:
+                sh([cmd, "--version"], check=True)
+                return cmd
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                continue
+        raise RuntimeError("No Python interpreter found")
 
 
 def check_existing_venv(venv_path: Path) -> bool:
