@@ -2,6 +2,24 @@
 
 CLI tool voor het genereren van column mapping en YAML bestanden met een stapsgewijze Object+Variant pipeline. Alle input en output wordt per **object** en **variant** geadministreerd, zonder globale output-bestanden.
 
+## Quick start
+
+```bash
+# one-time setup
+python dev_bootstrap.py
+
+# activate environment
+# Windows PowerShell
+.\.venv\Scripts\Activate.ps1
+# macOS/Linux
+source .venv/bin/activate
+
+# verify installation
+transform-myd-minimal --help
+pre-commit run --all-files
+pytest -q
+```
+
 ## 🆕 NEW: Step-by-Step Workflow (v4.0)
 
 Deze nieuwe workflow zorgt ervoor dat elke stap een aparte CLI-command is en alle output variant-specifiek wordt opgeslagen.
