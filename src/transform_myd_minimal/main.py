@@ -1143,252 +1143,437 @@ def update_object_list(object_name: str, variant: str, root_path: Path = None):
             yaml.dump(object_list_data, f, default_flow_style=False, allow_unicode=True)
 
 
+def process_f03_mapping(source_fields, target_fields, synonyms, object_name, variant):
+    """
+    Process mapping according to F03 specification.
+    
+    Args:
+        source_fields: List of source field dicts with field_name, dtype, nullable, example
+        target_fields: List of target field dicts with exact 10 keys in F02 order
+        synonyms: Dict of synonym mappings from central_mapping_memory.yaml
+        object_name: Object name for transformer_id generation
+        variant: Variant name for transformer_id generation
+    
+    Returns:
+        Dict with metadata, mappings, to_audit, unmapped_source_fields, unmapped_target_fields
+    """
+    from datetime import datetime
+    from .fuzzy import FieldNormalizer, FuzzyMatcher
+    
+    # Helper function for tiebreakers (as per spec: longest common substring, then shortest source header)
+    def is_better_match(candidate, current_best, target_name):
+        if not current_best:
+            return True
+        # Longest common substring
+        def longest_common_substring(s1, s2):
+            if not s1 or not s2:
+                return 0
+            max_len = 0
+            for i in range(len(s1)):
+                for j in range(i + 1, len(s1) + 1):
+                    substr = s1[i:j]
+                    if substr in s2:
+                        max_len = max(max_len, len(substr))
+            return max_len
+        
+        candidate_lcs = longest_common_substring(candidate.lower(), target_name.lower())
+        current_lcs = longest_common_substring(current_best.lower(), target_name.lower())
+        
+        if candidate_lcs > current_lcs:
+            return True
+        elif candidate_lcs == current_lcs:
+            # Tie in LCS, use shortest header
+            return len(candidate) < len(current_best)
+        return False
+    def norm(s):
+        if not s:
+            return ""
+        # lower → non-alphanumeric to space → collapse spaces → strip
+        import re
+        lowered = s.lower()
+        spaces = re.sub(r'[^a-zA-Z0-9]', ' ', lowered)
+        collapsed = re.sub(r'\s+', ' ', spaces)
+        return collapsed.strip()
+    
+    # Extract verbatim and normalized headers
+    verbatim_headers = [field.get("field_name", "") for field in source_fields]
+    norm_headers = [norm(header) for header in verbatim_headers]
+    
+    # Create fuzzy matcher components
+    normalizer = FieldNormalizer()
+    fuzzy_matcher = FuzzyMatcher()
+    
+    # Initialize result structures
+    mappings = []
+    to_audit = []
+    unmapped_source_fields = []
+    unmapped_target_fields = []
+    used_sources = set()
+    reused_sources = {}  # Track sources used multiple times
+    
+    # Process each target field (target-centric approach)
+    for target in target_fields:
+        t_name = target.get("sap_field", "").lower()
+        t_desc = (target.get("field_description") or "").lower()
+        t_table = target.get("sap_table", "").lower()
+        required = bool(target.get("mandatory", False))
+        
+        best_match = None
+        best_confidence = 0.0
+        best_rationale = "none"
+        candidates = []  # For tie-break detection
+        
+        # 1. EXACT MATCH: norm(header) == t_name
+        for i, header in enumerate(verbatim_headers):
+            if norm(header) == t_name:
+                best_match = header
+                best_confidence = 1.00
+                best_rationale = "exact"
+                break
+        
+        # 2. SYNONYM MATCH: if no exact match and synonyms available
+        if not best_match and synonyms:
+            t_name_upper = t_name.upper()
+            if t_name_upper in synonyms:
+                synonym_variants = synonyms[t_name_upper]
+                for i, header in enumerate(verbatim_headers):
+                    if norm(header) in [norm(variant) for variant in synonym_variants]:
+                        best_match = header
+                        best_confidence = 0.95
+                        best_rationale = "synonym"
+                        break
+        
+        # 3. FUZZY MATCH: against t_name and t_desc
+        if not best_match:
+            for i, header in enumerate(verbatim_headers):
+                norm_header = normalizer.normalize_field_name(header)
+                
+                # Try against target field name
+                name_score = 0.0
+                if t_name:
+                    norm_target_name = normalizer.normalize_field_name(t_name)
+                    lev_sim = fuzzy_matcher.levenshtein_similarity(norm_header, norm_target_name)
+                    jw_sim = fuzzy_matcher.jaro_winkler_similarity(norm_header, norm_target_name) 
+                    name_score = max(lev_sim, jw_sim)
+                
+                # Try against target description
+                desc_score = 0.0
+                if t_desc:
+                    norm_target_desc = normalizer.normalize_field_name(t_desc)
+                    lev_sim = fuzzy_matcher.levenshtein_similarity(norm_header, norm_target_desc)
+                    jw_sim = fuzzy_matcher.jaro_winkler_similarity(norm_header, norm_target_desc)
+                    desc_score = max(lev_sim, jw_sim)
+                
+                # Take the maximum score from name and description matching
+                score = max(name_score, desc_score)
+                
+                # Apply thresholds per spec
+                if score >= 0.85:
+                    if score > best_confidence or (score == best_confidence and is_better_match(header, best_match, t_name)):
+                        best_match = header
+                        best_confidence = score
+                        best_rationale = f"fuzzy:{score:.2f}"
+                    candidates.append((header, score))
+                elif 0.80 <= score < 0.85 and required:
+                    # Only map if target is mandatory
+                    if score > best_confidence or (score == best_confidence and is_better_match(header, best_match, t_name)):
+                        best_match = header
+                        best_confidence = score
+                        best_rationale = f"fuzzy:{score:.2f}"
+                    candidates.append((header, score))
+        
+        # Handle tiebreakers (tie when delta score <= 0.02)
+        candidates.sort(key=lambda x: x[1], reverse=True)
+        if len(candidates) > 1 and abs(candidates[0][1] - candidates[1][1]) <= 0.02:
+            # Tie detected - add to audit
+            to_audit.append({
+                "target_table": t_table,
+                "target_field": t_name,
+                "source_header": best_match,
+                "confidence": best_confidence,
+                "reason": "tie_break"
+            })
+        
+        # Create mapping entry
+        status = "auto" if best_match else "unmapped"
+        mapping = {
+            "target_table": t_table,
+            "target_field": t_name,
+            "source_header": best_match,
+            "required": required,
+            "transforms": [],
+            "confidence": round(best_confidence, 2),
+            "status": status,
+            "rationale": best_rationale
+        }
+        mappings.append(mapping)
+        
+        # Track source usage for reuse detection
+        if best_match:
+            if best_match in used_sources:
+                if best_match not in reused_sources:
+                    reused_sources[best_match] = []
+                reused_sources[best_match].append(mapping)
+            else:
+                used_sources.add(best_match)
+        
+        # Add to audit based on conditions
+        if best_match:
+            # Low confidence fuzzy
+            if 0.80 <= best_confidence < 0.90:
+                to_audit.append({
+                    "target_table": t_table,
+                    "target_field": t_name,
+                    "source_header": best_match,
+                    "confidence": best_confidence,
+                    "reason": "low_confidence_fuzzy"
+                })
+            
+            # Synonym based
+            if best_rationale == "synonym":
+                to_audit.append({
+                    "target_table": t_table,
+                    "target_field": t_name,
+                    "source_header": best_match,
+                    "confidence": best_confidence,
+                    "reason": "synonym_based"
+                })
+        else:
+            # Required unmapped
+            if required:
+                to_audit.append({
+                    "target_table": t_table,
+                    "target_field": t_name,
+                    "source_header": None,
+                    "confidence": 0.00,
+                    "reason": "required_unmapped"
+                })
+            
+            # Add to unmapped targets
+            unmapped_target_fields.append({
+                "target_table": t_table,
+                "target_field": t_name,
+                "required": required
+            })
+    
+    # Handle reused sources audit
+    for source_header, mappings_list in reused_sources.items():
+        for mapping in mappings_list:
+            to_audit.append({
+                "target_table": mapping["target_table"],
+                "target_field": mapping["target_field"],
+                "source_header": source_header,
+                "confidence": mapping["confidence"],
+                "reason": "reused_source"
+            })
+    
+    # Find unmapped source fields
+    unmapped_source_fields = [header for header in verbatim_headers if header not in used_sources]
+    
+    # Create metadata
+    metadata = {
+        "object": object_name,
+        "variant": variant,
+        "generated_at": datetime.now().isoformat(),
+        "source_index": f"migrations/{object_name}/{variant}/index_source.yaml",
+        "target_index": f"migrations/{object_name}/{variant}/index_target.yaml"
+    }
+    
+    return {
+        "metadata": metadata,
+        "mappings": mappings,
+        "to_audit": to_audit,
+        "unmapped_source_fields": unmapped_source_fields,
+        "unmapped_target_fields": unmapped_target_fields
+    }
+
+
 def run_map_command(args, config):
     """Run the map command - generates mapping from indexed source and target YAML files."""
+    import json
+    import time
+    from collections import OrderedDict
+    
+    start_time = time.time()
     logger.info(f"=== Map Command: {args.object}/{args.variant} ===")
 
-    # Check for indexed source and target files
-    migrations_dir = Path(f"migrations/{args.object}/{args.variant}")
+    # Set up paths using root directory
+    root_path = Path(args.root)
+    migrations_dir = root_path / "migrations" / args.object / args.variant
     source_index_file = migrations_dir / "index_source.yaml"
     target_index_file = migrations_dir / "index_target.yaml"
+    mapping_file = migrations_dir / "mapping.yaml"
+    
+    # Central mapping memory (optional)
+    central_mapping_file = root_path / "config" / "central_mapping_memory.yaml"
+    if not central_mapping_file.exists():
+        central_mapping_file = root_path / "central_mapping_memory.yaml"
 
+    # Check for required files with proper exit codes
     if not source_index_file.exists():
-        logger.error(f"Source index file not found: {source_index_file}")
-        logger.info(
-            f"Please run: ./transform-myd-minimal index_source --object {args.object} --variant {args.variant}"
-        )
-        sys.exit(1)
+        error_data = {
+            "error": "missing_index_source",
+            "object": args.object,
+            "variant": args.variant,
+            "expected_path": str(source_index_file)
+        }
+        if args.json or not sys.stdout.isatty():
+            print(json.dumps(error_data))
+        else:
+            logger.error(f"Source index file not found: {source_index_file}")
+        sys.exit(2)
 
     if not target_index_file.exists():
-        logger.error(f"Target index file not found: {target_index_file}")
-        logger.info(
-            f"Please run: ./transform-myd-minimal index_target --object {args.object} --variant {args.variant}"
-        )
-        sys.exit(1)
+        error_data = {
+            "error": "missing_index_target",
+            "object": args.object,
+            "variant": args.variant,
+            "expected_path": str(target_index_file)
+        }
+        if args.json or not sys.stdout.isatty():
+            print(json.dumps(error_data))
+        else:
+            logger.error(f"Target index file not found: {target_index_file}")
+        sys.exit(3)
 
-    logger.info(f"Reading source index from: {source_index_file}")
-    logger.info(f"Reading target index from: {target_index_file}")
+    # Check if output exists and enforce --force policy
+    if mapping_file.exists() and not args.force:
+        error_data = {
+            "error": "would_overwrite",
+            "object": args.object,
+            "variant": args.variant,
+            "existing_file": str(mapping_file),
+            "message": "Use --force to overwrite existing mapping.yaml"
+        }
+        if args.json or not sys.stdout.isatty():
+            print(json.dumps(error_data))
+        else:
+            logger.error(f"Output file exists: {mapping_file}. Use --force to overwrite.")
+        sys.exit(5)
 
     try:
-        # Load source fields from index_source.yaml
+        # Load source fields
         with open(source_index_file, "r", encoding="utf-8") as f:
             source_data = yaml.safe_load(f)
-
-        # Load target fields from index_target.yaml
+        
+        # Load target fields  
         with open(target_index_file, "r", encoding="utf-8") as f:
             target_data = yaml.safe_load(f)
 
-        # Convert to DataFrames for compatibility with existing matching logic
-        source_fields_list = []
-        for field in source_data.get("source_fields", []):
-            source_fields_list.append(
-                {
-                    "field_name": field.get("field_name", ""),
-                    "field_description": field.get("field_description", ""),
-                }
-            )
-
-        target_fields_list = []
-        for field in target_data.get("target_fields", []):
-            target_fields_list.append(
-                {
-                    "field_name": field.get(
-                        "sap_field", ""
-                    ),  # Map to sap_field instead of transformer_id
-                    "field_description": field.get("description", ""),
-                    "field_is_key": False,  # Default values for compatibility
-                    "field_is_mandatory": False,
-                }
-            )
-
-        # Convert to DataFrames
-        source_fields = pd.DataFrame(source_fields_list)
-        target_fields = pd.DataFrame(target_fields_list)
-
-        logger.info(
-            f"Found {len(source_fields)} source fields and {len(target_fields)} target fields"
-        )
-
-        # Load central mapping memory
-        base_dir = Path.cwd()
-        logger.info("Loading central mapping memory...")
-        central_memory = load_central_mapping_memory(base_dir)
-        if central_memory:
-            logger.info("Central mapping memory loaded successfully")
-            skip_rules, manual_mappings = get_effective_rules_for_table(
-                central_memory, args.object, args.variant
-            )
-            logger.info(
-                f"Found {len(skip_rules)} skip rules and {len(manual_mappings)} manual mappings for {args.object}_{args.variant}"
-            )
-        else:
-            logger.info("No central mapping memory found or failed to load")
-
-        # Configure fuzzy matching using config values
-        fuzzy_config = FuzzyConfig(
-            enabled=not config.disable_fuzzy,
-            threshold=config.fuzzy_threshold,
-            max_suggestions=config.max_suggestions,
-        )
-
-        # Create advanced mapping with central memory support
-        mapping_result = create_advanced_column_mapping(
-            source_fields,
-            target_fields,
-            fuzzy_config,
-            central_memory,
-            args.object,
-            args.variant,
-        )
-        (
-            mapping_lines,
-            exact_matches,
-            fuzzy_matches,
-            unmapped_sources,
-            audit_matches,
-            central_skip_matches,
-            central_manual_matches,
-        ) = mapping_result
-
-        # Print matching statistics
-        logger.info("")
-        logger.info("=== Advanced Matching Results ===")
-        if central_skip_matches:
-            logger.info(
-                f"Central memory skip rules applied: {len(central_skip_matches)}"
-            )
-        if central_manual_matches:
-            logger.info(
-                f"Central memory manual mappings applied: {len(central_manual_matches)}"
-            )
-        logger.info(f"Exact matches: {len(exact_matches)}")
-        logger.info(f"Fuzzy/Synonym matches: {len(fuzzy_matches)}")
-        logger.info(f"Unmapped sources: {len(unmapped_sources)}")
-        logger.info(
-            f"Audit matches (fuzzy to exact-mapped targets): {len(audit_matches)}"
-        )
-        logger.info(
-            f"Mapping coverage: {((len(exact_matches) + len(fuzzy_matches)) / len(source_fields) * 100):.1f}%"
-        )
-
-        # Show detailed results
-        if central_skip_matches:
-            logger.info("")
-            logger.info("Central memory skip rules applied:")
-            for match in central_skip_matches:
-                logger.info(f"  SKIP: {match.source_field} - {match.reason}")
-
-        if central_manual_matches:
-            logger.info("")
-            logger.info("Central memory manual mappings applied:")
-            for match in central_manual_matches:
-                logger.info(
-                    f"  MANUAL: {match.source_field} → {match.target_field} - {match.reason}"
-                )
-
-        if fuzzy_matches:
-            logger.info("")
-            logger.info("Fuzzy/Synonym matches found:")
-            for match in fuzzy_matches:
-                logger.info(
-                    f"  {match.source_field} → {match.target_field} ({match.match_type}, confidence: {match.confidence_score:.2f})"
-                )
-
-        if audit_matches:
-            logger.info("")
-            logger.info("Audit matches found (fuzzy matches to exact-mapped targets):")
-            for match in audit_matches:
-                logger.info(
-                    f"  {match.source_field} → {match.target_field} (audit, confidence: {match.confidence_score:.2f})"
-                )
-
-        # Generate mapping.yaml
-        mapping_data = {
-            "metadata": {
-                "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        source_fields = source_data.get("source_fields", [])
+        target_fields = target_data.get("target_fields", [])
+        
+        if not target_fields:
+            error_data = {
+                "error": "no_targets",
                 "object": args.object,
                 "variant": args.variant,
-                "source_index": str(source_index_file),
-                "target_index": str(target_index_file),
-                "total_mappings": len(exact_matches)
-                + len(fuzzy_matches)
-                + len(central_manual_matches),
-                "coverage_percentage": (
-                    (
-                        (
-                            len(exact_matches)
-                            + len(fuzzy_matches)
-                            + len(central_manual_matches)
-                        )
-                        / len(source_fields)
-                        * 100
-                    )
-                    if source_fields.shape[0] > 0
-                    else 0
-                ),
-                "generator": "transform-myd-minimal map",
-            },
-            "mappings": [],
-            "unmapped_sources": [],
-            "audit_matches": [],
+                "message": "No target fields found in index_target.yaml"
+            }
+            if args.json or not sys.stdout.isatty():
+                print(json.dumps(error_data))
+            else:
+                logger.error("No target fields found in index_target.yaml")
+            sys.exit(4)
+
+        # Load central mapping memory (synonyms) if available
+        synonyms = {}
+        if central_mapping_file.exists():
+            try:
+                with open(central_mapping_file, "r", encoding="utf-8") as f:
+                    central_data = yaml.safe_load(f)
+                    synonyms = central_data.get("synonyms", {})
+            except Exception:
+                pass  # Continue without synonyms if file is corrupted
+
+        # Process mapping according to F03 specification
+        mapping_result = process_f03_mapping(
+            source_fields, target_fields, synonyms, args.object, args.variant
+        )
+
+        # Create output structure with exact key ordering
+        output_data = {
+            "metadata": mapping_result["metadata"],
+            "mappings": mapping_result["mappings"],
+            "to_audit": mapping_result["to_audit"],
+            "unmapped_source_fields": mapping_result["unmapped_source_fields"],
+            "unmapped_target_fields": mapping_result["unmapped_target_fields"]
         }
 
-        # Add all mappings
-        all_matches = central_manual_matches + exact_matches + fuzzy_matches
-        for match in all_matches:
-            if match.target_field:
-                mapping_entry = {
-                    "source_field": match.source_field,
-                    "target_field": match.target_field,
-                    "confidence_score": match.confidence_score,
-                    "match_type": match.match_type,
-                    "reason": match.reason,
-                    "source_description": match.source_description,
-                    "target_description": match.target_description,
-                }
-                if match.algorithm:
-                    mapping_entry["algorithm"] = match.algorithm
-                mapping_data["mappings"].append(mapping_entry)
+        # Write mapping.yaml with exact format
+        mapping_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(mapping_file, "w", encoding="utf-8") as f:
+            yaml.safe_dump(output_data, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
 
-        # Add unmapped sources
-        for unmapped in unmapped_sources:
-            mapping_data["unmapped_sources"].append(
-                {
-                    "source_field": unmapped.source_field,
-                    "reason": unmapped.reason,
-                    "source_description": unmapped.source_description,
-                }
-            )
+        # Calculate metrics for logging
+        mapped_count = len([m for m in mapping_result["mappings"] if m["status"] == "auto"])
+        unmapped_count = len(mapping_result["unmapped_target_fields"])
+        to_audit_count = len(mapping_result["to_audit"])
+        unused_sources_count = len(mapping_result["unmapped_source_fields"])
+        duration_ms = int((time.time() - start_time) * 1000)
 
-        # Add audit matches
-        for audit in audit_matches:
-            mapping_data["audit_matches"].append(
-                {
-                    "source_field": audit.source_field,
-                    "target_field": audit.target_field,
-                    "confidence_score": audit.confidence_score,
-                    "reason": audit.reason,
-                    "algorithm": audit.algorithm,
-                }
-            )
+        # JSONL summary logging
+        summary_data = {
+            "step": "map",
+            "object": args.object,
+            "variant": args.variant,
+            "source_index": str(source_index_file).replace("\\", "/"),
+            "target_index": str(target_index_file).replace("\\", "/"),
+            "output_file": str(mapping_file).replace("\\", "/"),
+            "mapped": mapped_count,
+            "unmapped": unmapped_count,
+            "to_audit": to_audit_count,
+            "unused_sources": unused_sources_count,
+            "duration_ms": duration_ms,
+            "warnings": []
+        }
 
-        # Write mapping.yaml
-        output_file = migrations_dir / "mapping.yaml"
-        with open(output_file, "w", encoding="utf-8") as f:
-            f.write(
-                "# Source-to-target field mappings generated by transform-myd-minimal\n"
-            )
-            f.write(f"# Generated at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-            f.write(
-                f"# Coverage: {mapping_data['metadata']['coverage_percentage']:.1f}%\n\n"
-            )
-            yaml.dump(mapping_data, f, default_flow_style=False, allow_unicode=True)
+        # Add ruleset_sources to metadata if central mapping file exists
+        if central_mapping_file.exists():
+            output_data["metadata"]["ruleset_sources"] = str(central_mapping_file).replace("\\", "/")
+            summary_data["ruleset_sources"] = str(central_mapping_file).replace("\\", "/")
 
-        logger.info(f"Generated mapping.yaml: {output_file}")
+        # Log JSONL summary and audit records
+        if not args.quiet:
+            if args.json or not sys.stdout.isatty():
+                print(json.dumps(summary_data))
+                # Log audit records for each target
+                for mapping in mapping_result["mappings"]:
+                    audit_data = {
+                        "step": "map",
+                        "target": f"S_{args.variant.upper()}.{mapping['target_field']}",
+                        "decision": {
+                            "source": mapping["source_header"],
+                            "confidence": mapping["confidence"],
+                            "status": mapping["status"],
+                            "reason": mapping["rationale"]
+                        },
+                        "candidates": []  # Could add top-3 candidates here if we track them
+                    }
+                    print(json.dumps(audit_data))
+            else:
+                # Human preview format
+                if not args.no_preview:
+                    print("\n=== Mapping Preview (first 12) ===")
+                    print(f"{'target_field':<20} | {'source_header':<25} | {'confidence':<10} | {'status':<10}")
+                    print("-" * 75)
+                    for i, mapping in enumerate(mapping_result["mappings"][:12]):
+                        source_header = mapping["source_header"] or "null"
+                        print(f"{mapping['target_field']:<20} | {source_header:<25} | {mapping['confidence']:<10.2f} | {mapping['status']:<10}")
+                    if len(mapping_result["mappings"]) > 12:
+                        print(f"... and {len(mapping_result['mappings']) - 12} more")
+                
+                print(f"\nmapped {mapped_count} • unmapped {unmapped_count} • to-audit {to_audit_count} • unused sources {unused_sources_count}")
+
+        logger.info(f"Generated mapping.yaml: {mapping_file}")
         logger.info("✓ Map command completed successfully!")
 
     except Exception as e:
-        logger.error(f"Error creating mapping: {e}")
+        error_data = {"error": "exception", "message": str(e)}
+        if args.json or not sys.stdout.isatty():
+            print(json.dumps(error_data))
+        else:
+            logger.error(f"Error creating mapping: {e}")
         sys.exit(1)
 
 

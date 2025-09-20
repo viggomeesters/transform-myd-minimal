@@ -1,0 +1,52 @@
+metadata:
+  object: m143
+  variant: bnka
+  generated_at: '2025-09-20T10:23:30.652456'
+  source_index: migrations/m143/bnka/index_source.yaml
+  target_index: migrations/m143/bnka/index_target.yaml
+mappings:
+- target_table: bnka
+  target_field: banks
+  source_header: Bank Country/Region Key
+  required: true
+  transforms: []
+  confidence: 0.93
+  status: auto
+  rationale: fuzzy:0.93
+- target_table: bnka
+  target_field: bankl
+  source_header: Bank Name
+  required: true
+  transforms: []
+  confidence: 0.92
+  status: auto
+  rationale: fuzzy:0.92
+- target_table: bnka
+  target_field: banka
+  source_header: Bank Name
+  required: false
+  transforms: []
+  confidence: 1.0
+  status: auto
+  rationale: fuzzy:1.00
+- target_table: bnka
+  target_field: ort01
+  source_header: null
+  required: false
+  transforms: []
+  confidence: 0.0
+  status: unmapped
+  rationale: none
+to_audit:
+- target_table: bnka
+  target_field: banka
+  source_header: Bank Name
+  confidence: 1.0
+  reason: reused_source
+unmapped_source_fields:
+- Bank Key
+- Currency
+unmapped_target_fields:
+- target_table: bnka
+  target_field: ort01
+  required: false
