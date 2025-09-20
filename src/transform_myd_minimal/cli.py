@@ -91,6 +91,8 @@ def setup_cli():
     index_source_parser = subparsers.add_parser('index_source', help='Parse and index source fields from XLSX file')
     index_source_parser.add_argument('--object', required=True, help='Object name (e.g., m140)')
     index_source_parser.add_argument('--variant', required=True, help='Variant name (e.g., bnka)')
+    index_source_parser.add_argument('--root', default='.', help='Root directory (default: .)')
+    index_source_parser.add_argument('--force', action='store_true', help='Overwrite existing outputs')
     
     # Index target subcommand  
     index_target_parser = subparsers.add_parser('index_target', help='Parse and index target fields from XML file')

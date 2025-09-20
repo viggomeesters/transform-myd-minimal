@@ -10,6 +10,7 @@ Contains the entrypoint and orchestration of the different modules including:
 """
 
 import sys
+import json
 from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
@@ -18,6 +19,7 @@ from datetime import datetime
 
 import pandas as pd
 import yaml
+from pandas.api.types import infer_dtype
 
 from .cli import setup_cli
 from .fuzzy import FuzzyConfig, FieldNormalizer, FuzzyMatcher
@@ -503,66 +505,223 @@ def get_effective_rules_for_table(central_memory: CentralMappingMemory, object_n
     return effective_skip_rules, effective_manual_mappings
 
 
+def find_first_non_empty_worksheet(file_path: Path) -> str:
+    """Find the first non-empty worksheet in an Excel file."""
+    try:
+        excel_file = pd.ExcelFile(file_path)
+        for sheet_name in excel_file.sheet_names:
+            # Read just a few rows to check if sheet has data
+            df = pd.read_excel(file_path, sheet_name=sheet_name, nrows=10)
+            if not df.empty and not df.dropna(how='all').empty:
+                return sheet_name
+        raise ValueError("No non-empty worksheets found")
+    except Exception as e:
+        raise ValueError(f"Error reading Excel file: {e}")
+
+
+def find_header_row(file_path: Path, sheet_name: str) -> Tuple[int, List[str]]:
+    """Find the first row with ≥1 non-empty cell and return headers."""
+    try:
+        # Read the entire sheet to find header row
+        df_full = pd.read_excel(file_path, sheet_name=sheet_name, header=None)
+        
+        for row_idx in range(len(df_full)):
+            row_data = df_full.iloc[row_idx]
+            # Check if row has at least one non-empty cell
+            non_empty_cells = row_data.dropna()
+            if len(non_empty_cells) >= 1:
+                # This is our header row
+                headers = []
+                for cell in row_data:
+                    if pd.isna(cell):
+                        headers.append("")
+                    else:
+                        # Trim surrounding whitespace
+                        headers.append(str(cell).strip())
+                return row_idx, headers
+        
+        raise ValueError("No header row found with ≥1 non-empty cell")
+    except Exception as e:
+        raise ValueError(f"Error finding header row: {e}")
+
+
+def analyze_column_data(file_path: Path, sheet_name: str, header_row: int, headers: List[str]) -> List[Dict]:
+    """Analyze column data to infer types, nullable status, and examples."""
+    try:
+        # Read the full sheet to get access to all columns
+        df_full = pd.read_excel(file_path, sheet_name=sheet_name, header=None)
+        
+        # Get the header row to understand column positions
+        header_data = df_full.iloc[header_row] if header_row < len(df_full) else pd.Series()
+        
+        # Get data rows (everything after header row)
+        data_rows = df_full.iloc[header_row + 1:] if header_row + 1 < len(df_full) else pd.DataFrame()
+        
+        field_data = []
+        col_idx = 0
+        
+        for header in headers:
+            if header.strip():  # Only process non-empty headers
+                # Find the column index for this header in the original data
+                if col_idx < len(data_rows.columns):
+                    column_data = data_rows.iloc[:, col_idx]
+                    
+                    # Check for nulls
+                    has_nulls = column_data.isna().any()
+                    
+                    # Get non-null values for type inference
+                    non_null_values = column_data.dropna()
+                    
+                    # Infer data type
+                    if len(non_null_values) > 0:
+                        dtype = infer_dtype(non_null_values, skipna=True)
+                        # Get first non-null value as example
+                        example = str(non_null_values.iloc[0]) if len(non_null_values) > 0 else ""
+                    else:
+                        dtype = "empty"
+                        example = ""
+                    
+                    field_data.append({
+                        'field_name': header,
+                        'field_description': None,
+                        'dtype': dtype,
+                        'nullable': bool(has_nulls),
+                        'example': example
+                    })
+                else:
+                    # Column index beyond available data
+                    field_data.append({
+                        'field_name': header,
+                        'field_description': None,
+                        'dtype': "empty",
+                        'nullable': True,
+                        'example': ""
+                    })
+            
+            col_idx += 1
+        
+        return field_data
+    except Exception as e:
+        raise ValueError(f"Error analyzing column data: {e}")
+
+
+def log_jsonl(data: Dict):
+    """Log data as JSONL to stdout."""
+    print(json.dumps(data, ensure_ascii=False))
+
+
 def run_index_source_command(args):
     """Run the index_source command - parse headers from XLSX and create index_source.yaml."""
-    logger.info(f"=== Index Source Command: {args.object}/{args.variant} ===")
+    warnings = []
     
-    # Construct input file path
-    input_file = Path(f"data/03_raw/index_source_{args.object}_{args.variant}.xlsx")
-    
-    if not input_file.exists():
-        logger.error(f"Input file not found: {input_file}")
-        sys.exit(1)
-    
-    logger.info(f"Reading source headers from: {input_file}")
-    
-    # Read Excel file and parse headers
     try:
-        df = pd.read_excel(input_file, header=0)
-        headers = df.columns.tolist()
+        # Construct input file path
+        root_path = Path(args.root) if hasattr(args, 'root') else Path('.')
+        input_file = root_path / "data" / "01_source" / f"{args.object}_{args.variant}.xlsx"
         
-        logger.info(f"Found {len(headers)} source headers")
+        # Check if input file exists
+        if not input_file.exists():
+            error_data = {
+                "error": "missing_input",
+                "path": str(input_file)
+            }
+            log_jsonl(error_data)
+            sys.exit(2)
         
-        # Create YAML structure
-        source_data = {
-            'metadata': {
-                'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                'source_file': str(input_file),
-                'object': args.object,
-                'variant': args.variant,
-                'total_fields': len(headers),
-                'generator': 'transform-myd-minimal index_source'
-            },
-            'source_fields': []
-        }
+        # Find first non-empty worksheet
+        try:
+            sheet_name = find_first_non_empty_worksheet(input_file)
+        except ValueError as e:
+            error_data = {
+                "error": "no_headers"
+            }
+            log_jsonl(error_data)
+            sys.exit(3)
         
-        # Process each header
-        for header in headers:
-            field_entry = {'field_name': header}
-            # Only add field_description if it differs from field_name (i.e., when there's a separate description column)
-            # Currently using header as description, so we skip adding field_description to avoid duplication
-            source_data['source_fields'].append(field_entry)
+        # Find header row
+        try:
+            header_row_idx, headers = find_header_row(input_file, sheet_name)
+        except ValueError as e:
+            error_data = {
+                "error": "no_headers"
+            }
+            log_jsonl(error_data)
+            sys.exit(3)
+        
+        # Filter out empty headers and warn about them
+        processed_headers = []
+        for i, header in enumerate(headers):
+            if header.strip():
+                processed_headers.append(header)
+            elif header == "":
+                warnings.append(f"Empty header found at column {i+1}")
+        
+        if not processed_headers:
+            error_data = {
+                "error": "no_headers"
+            }
+            log_jsonl(error_data)
+            sys.exit(3)
+        
+        # Analyze column data
+        try:
+            source_fields = analyze_column_data(input_file, sheet_name, header_row_idx, processed_headers)
+        except ValueError as e:
+            error_data = {
+                "error": "exception",
+                "message": str(e)
+            }
+            log_jsonl(error_data)
+            sys.exit(1)
         
         # Create output directory structure
-        output_dir = Path(f"migrations/{args.object}/{args.variant}")
-        output_dir.mkdir(parents=True, exist_ok=True)
+        migrations_dir = root_path / "migrations" / args.object / args.variant
+        migrations_dir.mkdir(parents=True, exist_ok=True)
         
-        # Write index_source.yaml
-        output_file = output_dir / "index_source.yaml"
-        with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(f"# Source fields index generated by transform-myd-minimal\n")
-            f.write(f"# Generated at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
-            yaml.dump(source_data, f, default_flow_style=False, allow_unicode=True)
+        # Check if output already exists and force flag
+        output_file = migrations_dir / "index_source.yaml"
+        force = getattr(args, 'force', False)
         
-        logger.info(f"Generated index_source.yaml: {output_file}")
+        if output_file.exists() and not force:
+            warnings.append(f"Output file exists and --force not specified: {output_file}")
+        else:
+            # Create YAML structure with correct schema
+            source_data = {
+                'metadata': {
+                    'object': args.object,
+                    'variant': args.variant,
+                    'source_file': f"data/01_source/{args.object}_{args.variant}.xlsx",
+                    'generated_at': datetime.now().isoformat(),
+                    'sheet': sheet_name
+                },
+                'source_fields': source_fields
+            }
+            
+            # Write index_source.yaml
+            with open(output_file, 'w', encoding='utf-8') as f:
+                yaml.dump(source_data, f, default_flow_style=False, allow_unicode=True)
         
         # Update global object list
-        update_object_list(args.object, args.variant)
+        update_object_list(args.object, args.variant, root_path)
         
-        logger.info("✓ Index source command completed successfully!")
+        # Log summary
+        summary_data = {
+            "step": "index_source",
+            "object": args.object,
+            "variant": args.variant,
+            "input_file": str(input_file),
+            "output_file": str(output_file),
+            "total_columns": len(source_fields),
+            "warnings": warnings
+        }
+        log_jsonl(summary_data)
         
     except Exception as e:
-        logger.error(f"Error processing source file: {e}")
+        error_data = {
+            "error": "exception",
+            "message": str(e)
+        }
+        log_jsonl(error_data)
         sys.exit(1)
 
 
@@ -652,46 +811,42 @@ def run_index_target_command(args):
         sys.exit(1)
 
 
-def update_object_list(object_name: str, variant: str):
+def update_object_list(object_name: str, variant: str, root_path: Path = None):
     """Update or create the global object_list.yaml file."""
-    object_list_file = Path("migrations/object_list.yaml")
+    if root_path is None:
+        root_path = Path('.')
+    
+    object_list_file = root_path / "migrations" / "object_list.yaml"
     
     # Load existing data if file exists
-    object_list_data = {'objects': []}
+    object_list_data = {'entries': []}
     if object_list_file.exists():
         try:
             with open(object_list_file, 'r', encoding='utf-8') as f:
                 existing_data = yaml.safe_load(f)
-                if existing_data and 'objects' in existing_data:
+                if existing_data and 'entries' in existing_data:
                     object_list_data = existing_data
         except Exception:
             pass  # Use default structure if file is corrupted
     
-    # Create object/variant entry
-    entry_key = f"{object_name}_{variant}"
-    
     # Check if this object/variant combination already exists
-    existing_entries = [obj.get('key', '') for obj in object_list_data['objects']]
-    if entry_key not in existing_entries:
+    existing_entries = []
+    for entry in object_list_data['entries']:
+        if entry.get('object') == object_name and entry.get('variant') == variant:
+            existing_entries.append(entry)
+    
+    if not existing_entries:
         new_entry = {
-            'key': entry_key,
             'object': object_name,
             'variant': variant,
-            'path': f"migrations/{object_name}/{variant}/",
-            'added_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            'added_at': datetime.now().isoformat()
         }
-        object_list_data['objects'].append(new_entry)
+        object_list_data['entries'].append(new_entry)
         
         # Write updated object list
         object_list_file.parent.mkdir(parents=True, exist_ok=True)
         with open(object_list_file, 'w', encoding='utf-8') as f:
-            f.write(f"# Global object/variant list for transform-myd-minimal\n")
-            f.write(f"# Updated at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
             yaml.dump(object_list_data, f, default_flow_style=False, allow_unicode=True)
-        
-        logger.info(f"Added {entry_key} to global object list: {object_list_file}")
-    else:
-        logger.info(f"Object/variant {entry_key} already exists in object list")
 
 
 def run_map_command(args, config):
