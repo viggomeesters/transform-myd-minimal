@@ -149,8 +149,7 @@ def setup_cli():
         "--quiet", action="store_true", help="No stdout output; still writes file unless --no-log-file"
     )
 
-    # Parse arguments
-    args = parser.parse_args()
+    # Index source subcommand
     index_source_parser = subparsers.add_parser(
         "index_source", help="Parse and index source fields from XLSX file"
     )
