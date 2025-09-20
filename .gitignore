@@ -10,6 +10,7 @@ __pycache__/
 venv/
 env/
 ENV/
+test_env/
 
 # IDE files
 .vscode/
