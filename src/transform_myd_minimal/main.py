@@ -617,7 +617,7 @@ def run_index_source_command(args):
     try:
         # Construct input file path
         root_path = Path(args.root) if hasattr(args, 'root') else Path('.')
-        input_file = root_path / "data" / "01_source" / f"{args.object}_{args.variant}.xlsx"
+        input_file = root_path / "data" / "01_source" / f"index_source_{args.object}_{args.variant}.xlsx"
         
         # Check if input file exists
         if not input_file.exists():
@@ -690,7 +690,7 @@ def run_index_source_command(args):
                 'metadata': {
                     'object': args.object,
                     'variant': args.variant,
-                    'source_file': f"data/01_source/{args.object}_{args.variant}.xlsx",
+                    'source_file': f"data/01_source/index_source_{args.object}_{args.variant}.xlsx",
                     'generated_at': datetime.now().isoformat(),
                     'sheet': sheet_name
                 },
