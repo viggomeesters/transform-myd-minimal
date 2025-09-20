@@ -1,0 +1,28 @@
+metadata:
+  generated_at: '2025-09-20T09:38:28.942433'
+  object: test
+  sheet: Sheet1
+  source_fields_count: 4
+  source_file: data/01_source/index_source_test_data.xlsx
+  variant: data
+source_fields:
+- field_name: field1
+  field_description: null
+  example: value1
+  dtype: string
+  nullable: false
+- field_name: field2
+  field_description: null
+  example: value3
+  dtype: string
+  nullable: false
+- field_name: field3
+  field_description: null
+  example: value5
+  dtype: string
+  nullable: false
+- field_name: field4
+  field_description: null
+  example: value7
+  dtype: string
+  nullable: false
