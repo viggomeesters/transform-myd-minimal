@@ -721,11 +721,16 @@ def log_jsonl(data: Dict):
 
 def run_index_source_command(args):
     """Run the index_source command - parse headers from XLSX and create index_source.yaml."""
+    from .enhanced_logging import EnhancedLogger
+    
     warnings = []
+    root_path = Path(args.root) if hasattr(args, "root") else Path(".")
+    
+    # Initialize enhanced logger
+    logger = EnhancedLogger(args, "index_source", args.object, args.variant, root_path)
 
     try:
         # Construct input file path
-        root_path = Path(args.root) if hasattr(args, "root") else Path(".")
         input_file = (
             root_path
             / "data"
@@ -736,7 +741,7 @@ def run_index_source_command(args):
         # Check if input file exists
         if not input_file.exists():
             error_data = {"error": "missing_input", "path": str(input_file)}
-            log_jsonl(error_data)
+            logger.log_error(error_data)
             sys.exit(2)
 
         # Find first non-empty worksheet
@@ -744,7 +749,7 @@ def run_index_source_command(args):
             sheet_name = find_first_non_empty_worksheet(input_file)
         except ValueError:
             error_data = {"error": "no_headers"}
-            log_jsonl(error_data)
+            logger.log_error(error_data)
             sys.exit(3)
 
         # Find header row
@@ -752,7 +757,7 @@ def run_index_source_command(args):
             header_row_idx, headers = find_header_row(input_file, sheet_name)
         except ValueError:
             error_data = {"error": "no_headers"}
-            log_jsonl(error_data)
+            logger.log_error(error_data)
             sys.exit(3)
 
         # Filter out empty headers and warn about them
@@ -765,7 +770,7 @@ def run_index_source_command(args):
 
         if not processed_headers:
             error_data = {"error": "no_headers"}
-            log_jsonl(error_data)
+            logger.log_error(error_data)
             sys.exit(3)
 
         # Analyze column data
@@ -775,7 +780,7 @@ def run_index_source_command(args):
             )
         except ValueError as e:
             error_data = {"error": "exception", "message": str(e)}
-            log_jsonl(error_data)
+            logger.log_error(error_data)
             sys.exit(1)
 
         # Create output directory structure
@@ -811,6 +816,16 @@ def run_index_source_command(args):
         # Update global object list
         update_object_list(args.object, args.variant, root_path)
 
+        # Prepare preview data for human output (first 8 headers)
+        preview_data = []
+        for i, field in enumerate(source_fields[:8]):
+            preview_data.append({
+                "field_name": field.get("field_name", ""),
+                "dtype": field.get("dtype", ""),
+                "nullable": field.get("nullable", True),
+                "example": field.get("example", "")
+            })
+
         # Log summary
         summary_data = {
             "step": "index_source",
@@ -821,11 +836,11 @@ def run_index_source_command(args):
             "total_columns": len(source_fields),
             "warnings": warnings,
         }
-        log_jsonl(summary_data)
+        logger.log_event(summary_data, preview_data)
 
     except Exception as e:
         error_data = {"error": "exception", "message": str(e)}
-        log_jsonl(error_data)
+        logger.log_error(error_data)
         sys.exit(1)
 
 
@@ -1024,11 +1039,15 @@ def _parse_spreadsheetml_target_fields(xml_path: Path, variant: str) -> List[Dic
 
 def run_index_target_command(args):
     """Run the index_target command - parse XML and filter target fields by variant."""
+    from .enhanced_logging import EnhancedLogger
     import xml.etree.ElementTree as ET
     from datetime import datetime
     from pathlib import Path
     
     root_path = Path(args.root).resolve()
+    
+    # Initialize enhanced logger
+    logger = EnhancedLogger(args, "index_target", args.object, args.variant, root_path)
     
     # Construct input file path - check both .xml and fallback formats
     input_file = root_path / f"data/02_target/index_target_{args.object}_{args.variant}.xml"
@@ -1044,7 +1063,7 @@ def run_index_target_command(args):
             input_file = yaml_file
         else:
             error_data = {"error": "missing_input", "path": str(input_file)}
-            log_jsonl(error_data)
+            logger.log_error(error_data)
             sys.exit(2)
     
     # Create output directory structure
@@ -1056,7 +1075,7 @@ def run_index_target_command(args):
     # Check overwrite policy
     if output_file.exists() and not args.force:
         error_data = {"error": "would_overwrite", "path": str(output_file)}
-        log_jsonl(error_data)
+        logger.log_error(error_data)
         sys.exit(5)
     
     try:
@@ -1065,12 +1084,12 @@ def run_index_target_command(args):
         else:
             # Handle JSON/YAML fallback (simplified for now)
             error_data = {"error": "unsupported_format", "path": str(input_file)}
-            log_jsonl(error_data)
+            logger.log_error(error_data)
             sys.exit(1)
         
         if not target_fields:
             error_data = {"error": "no_fields", "structure": f"S_{args.variant.upper()}"}
-            log_jsonl(error_data)
+            logger.log_error(error_data)
             sys.exit(4)
         
         # Create output YAML structure with exact metadata schema
@@ -1085,9 +1104,23 @@ def run_index_target_command(args):
             "target_fields": target_fields
         }
         
-        # Write YAML with preserved order
+        # Write YAML with preserved order (using yaml.safe_dump as specified)
         with open(output_file, "w", encoding="utf-8") as f:
             yaml.safe_dump(target_data, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
+        
+        # Prepare preview data for human output (first 8 fields)
+        preview_data = []
+        for field in target_fields[:8]:
+            preview_data.append({
+                "sap_field": field.get("sap_field", ""),
+                "field_description": field.get("field_description", ""),
+                "mandatory": field.get("mandatory", False),
+                "data_type": field.get("data_type", ""),
+                "length": field.get("length", ""),
+                "decimal": field.get("decimal", ""),
+                "field_group": field.get("field_group", ""),
+                "key": field.get("key", False)
+            })
         
         # Log summary
         summary_data = {
@@ -1100,16 +1133,11 @@ def run_index_target_command(args):
             "total_fields": len(target_fields),
             "warnings": []
         }
-        log_jsonl(summary_data)
-        
-        # Log first row example if exists
-        if target_fields:
-            example_data = {"step": "index_target", "example_row": target_fields[0]}
-            log_jsonl(example_data)
+        logger.log_event(summary_data, preview_data)
     
     except Exception as e:
         error_data = {"error": "exception", "message": str(e)}
-        log_jsonl(error_data)
+        logger.log_error(error_data)
         sys.exit(1)
 
 

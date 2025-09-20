@@ -1,192 +1,28 @@
 metadata:
-  generated_at: '2025-09-20T09:33:17.713366'
+  generated_at: '2025-09-20T09:22:01.635925'
   object: m143
   sheet: Sheet1
+  source_fields_count: 4
   source_file: data/01_source/index_source_m143_bnka.xlsx
   variant: bnka
 source_fields:
-- dtype: string
-  example: '280'
+- field_name: Bank Country/Region Key
   field_description: null
-  field_name: MANDT
+  example: NL
+  dtype: string
   nullable: false
-- dtype: string
-  example: AE
+- field_name: Bank Key
   field_description: null
-  field_name: BANKS
-  nullable: true
-- dtype: string
-  example: IBTFAEAS
-  field_description: null
-  field_name: BANKL
-  nullable: true
-- dtype: string
-  example: '20150714'
-  field_description: null
-  field_name: ERDAT
+  example: '123456'
+  dtype: string
   nullable: false
-- dtype: string
-  example: VGOUW
+- field_name: Bank Name
   field_description: null
-  field_name: ERNAM
+  example: Test Bank NL
+  dtype: string
   nullable: false
-- dtype: string
-  example: Investbank
+- field_name: Currency
   field_description: null
-  field_name: BANKA
+  example: EUR
+  dtype: string
   nullable: false
-- dtype: string
-  example: ANT
-  field_description: null
-  field_name: PROVZ
-  nullable: true
-- dtype: string
-  example: HOECHTLGASSE 6
-  field_description: null
-  field_name: STRAS
-  nullable: true
-- dtype: string
-  example: Sharjah
-  field_description: null
-  field_name: ORT01
-  nullable: true
-- dtype: string
-  example: IBTFAEAS
-  field_description: null
-  field_name: SWIFT
-  nullable: true
-- dtype: empty
-  example: ''
-  field_description: null
-  field_name: BGRUP
-  nullable: true
-- dtype: empty
-  example: ''
-  field_description: null
-  field_name: XPGRO
-  nullable: true
-- dtype: empty
-  example: ''
-  field_description: null
-  field_name: LOEVM
-  nullable: true
-- dtype: string
-  example: '14000'
-  field_description: null
-  field_name: BNKLZ
-  nullable: true
-- dtype: empty
-  example: ''
-  field_description: null
-  field_name: PSKTO
-  nullable: true
-- dtype: empty
-  example: ''
-  field_description: null
-  field_name: ADRNR
-  nullable: true
-- dtype: string
-  example: Dilkusha C/A
-  field_description: null
-  field_name: BRNCH
-  nullable: true
-- dtype: empty
-  example: ''
-  field_description: null
-  field_name: CHKME
-  nullable: true
-- dtype: empty
-  example: ''
-  field_description: null
-  field_name: VERS
-  nullable: true
-- dtype: empty
-  example: ''
-  field_description: null
-  field_name: IBAN_RULE
-  nullable: true
-- dtype: string
-  example: '0'
-  field_description: null
-  field_name: SDD_B2B
-  nullable: false
-- dtype: string
-  example: '0'
-  field_description: null
-  field_name: SDD_COR1
-  nullable: false
-- dtype: string
-  example: '0'
-  field_description: null
-  field_name: SDD_RTRANS
-  nullable: false
-- dtype: empty
-  example: ''
-  field_description: null
-  field_name: ZNOCHECK
-  nullable: true
-- dtype: empty
-  example: ''
-  field_description: null
-  field_name: ZACC_LEN
-  nullable: true
-- dtype: string
-  example: '000'
-  field_description: null
-  field_name: ZRES1
-  nullable: false
-- dtype: string
-  example: '000'
-  field_description: null
-  field_name: ZRES2
-  nullable: false
-- dtype: string
-  example: '000'
-  field_description: null
-  field_name: ZRES3
-  nullable: false
-- dtype: string
-  example: '000'
-  field_description: null
-  field_name: ZRES4
-  nullable: false
-- dtype: string
-  example: '000'
-  field_description: null
-  field_name: ZRES5
-  nullable: false
-- dtype: string
-  example: '000'
-  field_description: null
-  field_name: ZRES6
-  nullable: false
-- dtype: string
-  example: '000'
-  field_description: null
-  field_name: ZRES7
-  nullable: false
-- dtype: string
-  example: '000'
-  field_description: null
-  field_name: ZRES8
-  nullable: false
-- dtype: string
-  example: '000'
-  field_description: null
-  field_name: ZRES9
-  nullable: false
-- dtype: string
-  example: '000'
-  field_description: null
-  field_name: ZRES10
-  nullable: false
-- dtype: empty
-  example: ''
-  field_description: null
-  field_name: BICKY
-  nullable: true
-- dtype: empty
-  example: ''
-  field_description: null
-  field_name: RCCODE
-  nullable: true

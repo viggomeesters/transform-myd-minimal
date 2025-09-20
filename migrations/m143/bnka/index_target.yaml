@@ -1,0 +1,47 @@
+metadata:
+  object: m143
+  variant: bnka
+  target_file: data/02_target/index_target_m143_bnka.xml
+  generated_at: '2025-09-20T09:21:45.745261'
+  structure: S_BNKA
+target_fields:
+- sap_field: banks
+  field_description: Bank Country Key
+  sap_table: bnka
+  mandatory: true
+  field_group: key
+  key: true
+  sheet_name: BNKA
+  data_type: CHAR
+  length: 3
+  decimal: 0
+- sap_field: bankl
+  field_description: Bank Number
+  sap_table: bnka
+  mandatory: true
+  field_group: key
+  key: true
+  sheet_name: BNKA
+  data_type: CHAR
+  length: 15
+  decimal: 0
+- sap_field: banka
+  field_description: Bank Name
+  sap_table: bnka
+  mandatory: false
+  field_group: data
+  key: false
+  sheet_name: BNKA
+  data_type: CHAR
+  length: 60
+  decimal: 0
+- sap_field: ort01
+  field_description: City
+  sap_table: bnka
+  mandatory: false
+  field_group: data
+  key: false
+  sheet_name: BNKA
+  data_type: CHAR
+  length: 35
+  decimal: 0
