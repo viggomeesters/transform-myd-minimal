@@ -1,7 +1,8 @@
 metadata:
-  generated_at: '2025-09-20T09:48:48.024495'
+  generated_at: '2025-09-20T11:36:04.230345'
   object: m144
   sheet: Sheet1
+  source_fields_count: 37
   source_file: data/01_source/index_source_m144_bnka.xlsx
   variant: bnka
 source_fields:
