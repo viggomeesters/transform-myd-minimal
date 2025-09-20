@@ -35,7 +35,6 @@ config/mapping.yaml
 config/*/column_map.yaml
 config/*/fields.yaml
 config/*/value_rules.yaml
-migrations/*/
 
 # Data files
 data/03_raw/
