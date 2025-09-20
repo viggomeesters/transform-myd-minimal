@@ -168,6 +168,33 @@ def setup_cli():
         default=config.disable_fuzzy,
         help="Disable fuzzy matching completely"
     )
+    
+    # Source-based mapping options for map command
+    map_parser.add_argument(
+        "--source-headers-xlsx", 
+        type=str, 
+        help="Path to source headers XLSX file"
+    )
+    map_parser.add_argument(
+        "--source-headers-sheet", 
+        type=str, 
+        help="Sheet name in source XLSX"
+    )
+    map_parser.add_argument(
+        "--source-headers-row", 
+        type=int, 
+        help="Header row number in source XLSX"
+    )
+    map_parser.add_argument(
+        "--target-xml", 
+        type=str, 
+        help="Path to target XML file"
+    )
+    map_parser.add_argument(
+        "--target-xml-worksheet", 
+        type=str, 
+        help="Worksheet name in target XML"
+    )
 
     # Index source subcommand
     index_source_parser = subparsers.add_parser(

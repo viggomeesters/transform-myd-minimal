@@ -680,7 +680,7 @@ def analyze_column_data(
 
 
 
-def run_index_source_command(args):
+def run_index_source_command(args, config):
     """Run the index_source command - parse headers from XLSX and create index_source.yaml."""
     from .enhanced_logging import EnhancedLogger
     
@@ -691,13 +691,8 @@ def run_index_source_command(args):
     logger = EnhancedLogger(args, "index_source", args.object, args.variant, root_path)
 
     try:
-        # Construct input file path
-        input_file = (
-            root_path
-            / "data"
-            / "01_source"
-            / f"index_source_{args.object}_{args.variant}.xlsx"
-        )
+        # Use configured input path
+        input_file = config.get_input_path(args.object, args.variant)
 
         # Check if input file exists
         if not input_file.exists():
@@ -763,7 +758,7 @@ def run_index_source_command(args):
                 "metadata": {
                     "object": args.object,
                     "variant": args.variant,
-                    "source_file": f"data/01_source/index_source_{args.object}_{args.variant}.xlsx",
+                    "source_file": str(input_file.relative_to(root_path)),
                     "generated_at": datetime.now().isoformat(),
                     "sheet": sheet_name,
                     "source_fields_count": len(source_fields),
@@ -1000,7 +995,7 @@ def _parse_spreadsheetml_target_fields(xml_path: Path, variant: str) -> List[Dic
     return target_fields
 
 
-def run_index_target_command(args):
+def run_index_target_command(args, config):
     """Run the index_target command - parse XML and filter target fields by variant."""
     from .enhanced_logging import EnhancedLogger
     import xml.etree.ElementTree as ET
@@ -1588,9 +1583,9 @@ def main():
 
     # Execute the appropriate command
     if args.command == "index_source":
-        run_index_source_command(args)
+        run_index_source_command(args, config)
     elif args.command == "index_target":
-        run_index_target_command(args)
+        run_index_target_command(args, config)
     elif args.command == "map":
         run_map_command(args, config)
     else:
