@@ -14,7 +14,7 @@ import json
 from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 from datetime import datetime
 
 import pandas as pd
@@ -828,95 +828,287 @@ def run_index_source_command(args):
         sys.exit(1)
 
 
+def _parse_spreadsheetml_target_fields(xml_path: Path, variant: str) -> List[Dict[str, Any]]:
+    """
+    Parse SpreadsheetML XML file according to F02 specification.
+    
+    Returns list of target field dictionaries with exact key ordering:
+    ["sap_field","field_description","sap_table","mandatory","field_group","key","sheet_name","data_type","length","decimal"]
+    """
+    import xml.etree.ElementTree as ET
+    
+    # Parse XML
+    tree = ET.parse(xml_path)
+    root = tree.getroot()
+    
+    # Define namespace
+    ns = {"ss": "urn:schemas-microsoft-com:office:spreadsheet"}
+    
+    # Find the "Field List" worksheet
+    worksheet = None
+    for ws in root.findall(".//ss:Worksheet", ns):
+        name = ws.get(f'{{{ns["ss"]}}}Name', "")
+        if name == "Field List":
+            worksheet = ws
+            break
+    
+    if worksheet is None:
+        raise ValueError("Worksheet 'Field List' not found")
+    
+    # Get worksheet name for fallback
+    worksheet_name = worksheet.get(f'{{{ns["ss"]}}}Name', "")
+    
+    # Get all rows
+    rows = worksheet.findall(".//ss:Row", ns)
+    
+    # Parse rows with ss:Index and ss:MergeDown support
+    parsed_rows = []
+    carry = {}  # For vertical propagation (ss:MergeDown)
+    
+    for row_idx, row in enumerate(rows):
+        col = 1  # 1-based column pointer
+        row_data = [None] * 15  # Pre-allocate for up to 15 columns
+        
+        # Apply carry-over values from previous rows
+        for carry_col, carry_info in list(carry.items()):
+            if carry_info["remaining"] > 0:
+                row_data[carry_col - 1] = carry_info["value"]  # Convert to 0-based
+                carry_info["remaining"] -= 1
+                if carry_info["remaining"] == 0:
+                    del carry[carry_col]
+        
+        # Process cells in this row
+        for cell in row.findall("ss:Cell", ns):
+            # Handle ss:Index (sparse cells)
+            index_attr = cell.get(f'{{{ns["ss"]}}}Index')
+            if index_attr:
+                col = int(index_attr)
+            
+            # Extract cell value
+            data_elem = cell.find("ss:Data", ns)
+            cell_value = data_elem.text if data_elem is not None else None
+            
+            # Trim and convert empty to None
+            if cell_value:
+                cell_value = cell_value.strip()
+                if not cell_value:
+                    cell_value = None
+            
+            # Place value at current column (convert to 0-based)
+            if col <= len(row_data):
+                if col - 1 < len(row_data):
+                    row_data[col - 1] = cell_value
+            
+            # Handle ss:MergeDown
+            merge_down_attr = cell.get(f'{{{ns["ss"]}}}MergeDown')
+            if merge_down_attr and cell_value is not None:
+                merge_count = int(merge_down_attr)
+                carry[col] = {"value": cell_value, "remaining": merge_count}
+            
+            col += 1
+        
+        parsed_rows.append(row_data)
+    
+    # Find header row - look for "Sheet Name" in any column
+    header_row_idx = None
+    for i, row_data in enumerate(parsed_rows):
+        for cell in row_data:
+            if cell and "Sheet Name" in str(cell):
+                header_row_idx = i
+                break
+        if header_row_idx is not None:
+            break
+    
+    if header_row_idx is None:
+        raise ValueError("Header row with 'Sheet Name' not found")
+    
+    # Process data rows
+    target_fields = []
+    structure_pattern = f"S_{variant.upper()}"
+    
+    for row_data in parsed_rows[header_row_idx + 1:]:
+        # Skip empty rows
+        if not any(cell for cell in row_data if cell and str(cell).strip()):
+            continue
+            
+        # Map columns according to specification:
+        # Note: XML has ss:Index="2" for first column, so offset by 1
+        # 2 "Sheet Name" → sheet_name
+        # 3 "Group Name" → field_group  
+        # 4 "Field Description" → field_description
+        # 5 "Importance" → mandatory (to bool)
+        # 6 "Type" → data_type
+        # 7 "Length" → length (int|null)
+        # 8 "Decimal" → decimal (int|null)
+        # 9 "SAP Structure" → sap_table (strip "S_")
+        # 10 "SAP Field" → sap_field
+        
+        sheet_name = row_data[1] if len(row_data) > 1 else None  # Column 2 -> index 1
+        field_group_raw = row_data[2] if len(row_data) > 2 else None  # Column 3 -> index 2
+        field_description = row_data[3] if len(row_data) > 3 else None  # Column 4 -> index 3
+        importance_raw = row_data[4] if len(row_data) > 4 else None  # Column 5 -> index 4
+        data_type = row_data[5] if len(row_data) > 5 else None  # Column 6 -> index 5
+        length_raw = row_data[6] if len(row_data) > 6 else None  # Column 7 -> index 6
+        decimal_raw = row_data[7] if len(row_data) > 7 else None  # Column 8 -> index 7
+        sap_table_raw = row_data[8] if len(row_data) > 8 else None  # Column 9 -> index 8
+        sap_field_raw = row_data[9] if len(row_data) > 9 else None  # Column 10 -> index 9
+        
+        # Apply sheet_name fallback
+        if not sheet_name:
+            sheet_name = worksheet_name
+            
+        # Filter: only rows where column 8 starts with "S_" and matches variant
+        if not sap_table_raw or not str(sap_table_raw).startswith("S_"):
+            continue
+            
+        # Check if matches variant (case-insensitive)
+        sap_table_clean = str(sap_table_raw)[2:].lower()  # Remove "S_" and lowercase
+        if sap_table_clean != variant.lower():
+            continue
+        
+        # Normalize fields
+        # field_group: lower(); if equals "key" then key=true else false
+        field_group = field_group_raw.lower() if field_group_raw else ""
+        key = (field_group == "key")
+        
+        # mandatory: true if contains "mandatory" or in {"X","x","true","1"}
+        mandatory = False
+        if importance_raw:
+            importance_str = str(importance_raw).lower()
+            mandatory = ("mandatory" in importance_str or 
+                        importance_str in {"x", "true", "1"})
+        
+        # length, decimal: parse int; invalid → None
+        length = None
+        if length_raw:
+            try:
+                length = int(str(length_raw).strip())
+            except (ValueError, AttributeError):
+                length = None
+                
+        decimal = None
+        if decimal_raw:
+            try:
+                decimal = int(str(decimal_raw).strip())
+            except (ValueError, AttributeError):
+                decimal = None
+        
+        # sap_table: strip prefix "S_"/"s_", then lower
+        sap_table = sap_table_raw[2:].lower() if sap_table_raw else ""
+        
+        # sap_field: lower
+        sap_field = sap_field_raw.lower() if sap_field_raw else ""
+        
+        # Skip rows without required sap_field
+        if not sap_field:
+            continue
+        
+        # Build row dict with EXACT key ordering
+        row_dict = {}
+        row_dict["sap_field"] = sap_field
+        row_dict["field_description"] = field_description
+        row_dict["sap_table"] = sap_table  
+        row_dict["mandatory"] = mandatory
+        row_dict["field_group"] = field_group
+        row_dict["key"] = key
+        row_dict["sheet_name"] = sheet_name
+        row_dict["data_type"] = data_type
+        row_dict["length"] = length
+        row_dict["decimal"] = decimal
+        
+        target_fields.append(row_dict)
+    
+    return target_fields
+
+
 def run_index_target_command(args):
     """Run the index_target command - parse XML and filter target fields by variant."""
-    logger.info(f"=== Index Target Command: {args.object}/{args.variant} ===")
-
-    # Construct input file path
-    input_file = Path(f"data/03_raw/index_target_{args.object}_{args.variant}.xml")
-
+    import xml.etree.ElementTree as ET
+    from datetime import datetime
+    from pathlib import Path
+    
+    root_path = Path(args.root).resolve()
+    
+    # Construct input file path - check both .xml and fallback formats
+    input_file = root_path / f"data/02_target/index_target_{args.object}_{args.variant}.xml"
+    
+    # Check for fallback files if XML doesn't exist
     if not input_file.exists():
-        logger.error(f"Input file not found: {input_file}")
-        sys.exit(1)
-
-    logger.info(f"Reading target fields from: {input_file}")
-
+        json_file = root_path / f"data/02_target/index_target_{args.object}_{args.variant}.json"
+        yaml_file = root_path / f"data/02_target/index_target_{args.object}_{args.variant}.yaml"
+        
+        if json_file.exists():
+            input_file = json_file
+        elif yaml_file.exists():
+            input_file = yaml_file
+        else:
+            error_data = {"error": "missing_input", "path": str(input_file)}
+            log_jsonl(error_data)
+            sys.exit(2)
+    
+    # Create output directory structure
+    output_dir = root_path / f"migrations/{args.object}/{args.variant}"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    output_file = output_dir / "index_target.yaml"
+    
+    # Check overwrite policy
+    if output_file.exists() and not args.force:
+        error_data = {"error": "would_overwrite", "path": str(output_file)}
+        log_jsonl(error_data)
+        sys.exit(5)
+    
     try:
-        # Use existing parsers to read XML
-        from .parsers import SpreadsheetMLParser
-
-        # Parse the XML file
-        xml_parser = SpreadsheetMLParser(input_file)
-        target_fields = xml_parser.parse_target_fields()
-
-        # Filter fields that match the variant pattern (S_{variant})
-        variant_pattern = f"S_{args.variant.upper()}"
-        filtered_fields = []
-
-        for field in target_fields:
-            transformer_id = field.get("transformer_id", "")
-            if transformer_id.startswith(variant_pattern):
-                filtered_fields.append(field)
-
-        logger.info(
-            f"Found {len(filtered_fields)} target fields matching variant pattern '{variant_pattern}'"
-        )
-
-        # Create YAML structure
+        if input_file.suffix == '.xml':
+            target_fields = _parse_spreadsheetml_target_fields(input_file, args.variant)
+        else:
+            # Handle JSON/YAML fallback (simplified for now)
+            error_data = {"error": "unsupported_format", "path": str(input_file)}
+            log_jsonl(error_data)
+            sys.exit(1)
+        
+        if not target_fields:
+            error_data = {"error": "no_fields", "structure": f"S_{args.variant.upper()}"}
+            log_jsonl(error_data)
+            sys.exit(4)
+        
+        # Create output YAML structure with exact metadata schema
         target_data = {
             "metadata": {
-                "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "source_file": str(input_file),
                 "object": args.object,
                 "variant": args.variant,
-                "variant_pattern": variant_pattern,
-                "total_fields": len(filtered_fields),
-                "generator": "transform-myd-minimal index_target",
+                "target_file": f"data/02_target/index_target_{args.object}_{args.variant}.xml",
+                "generated_at": datetime.now().isoformat(),
+                "structure": f"S_{args.variant.upper()}"
             },
-            "target_fields": [],
+            "target_fields": target_fields
         }
-
-        # Process each filtered field
-        for field in filtered_fields:
-            target_entry = {}
-            # Add fields in desired order
-            target_entry["sap_field"] = field.get(
-                "sap_field", ""
-            )  # sap_field first for readability
-            target_entry["internal_id"] = field.get("internal_id", "")
-            target_entry["transformer_id"] = field.get("transformer_id", "")
-            target_entry["sap_table"] = field.get("sap_table", "")
-            target_entry["description"] = field.get("description", "")
-            target_entry["group"] = field.get("group_name", "")
-            target_entry["importance"] = field.get("importance", "")
-            target_entry["type"] = field.get("type", "")
-            target_entry["length"] = field.get("length", "")
-            # Only add decimal if it's not null/empty to avoid "decimal: null"
-            decimal_value = field.get("decimal", "")
-            if decimal_value:
-                target_entry["decimal"] = decimal_value
-
-            target_data["target_fields"].append(target_entry)
-
-        # Create output directory structure
-        output_dir = Path(f"migrations/{args.object}/{args.variant}")
-        output_dir.mkdir(parents=True, exist_ok=True)
-
-        # Write index_target.yaml
-        output_file = output_dir / "index_target.yaml"
+        
+        # Write YAML with preserved order
         with open(output_file, "w", encoding="utf-8") as f:
-            f.write("# Target fields index generated by transform-myd-minimal\n")
-            f.write(
-                f"# Generated at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
-            )
-            yaml.dump(target_data, f, default_flow_style=False, allow_unicode=True)
-
-        logger.info(f"Generated index_target.yaml: {output_file}")
-
-        logger.info("✓ Index target command completed successfully!")
-
+            yaml.safe_dump(target_data, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
+        
+        # Log summary
+        summary_data = {
+            "step": "index_target",
+            "object": args.object,
+            "variant": args.variant,
+            "input_file": str(input_file),
+            "output_file": str(output_file),
+            "structure": f"S_{args.variant.upper()}",
+            "total_fields": len(target_fields),
+            "warnings": []
+        }
+        log_jsonl(summary_data)
+        
+        # Log first row example if exists
+        if target_fields:
+            example_data = {"step": "index_target", "example_row": target_fields[0]}
+            log_jsonl(example_data)
+    
     except Exception as e:
-        logger.error(f"Error processing target file: {e}")
+        error_data = {"error": "exception", "message": str(e)}
+        log_jsonl(error_data)
         sys.exit(1)
 
 
