@@ -1051,9 +1051,9 @@ def run_index_target_command(args):
             sys.exit(1)
         
         if not target_fields:
-            error_data = {"error": "no_fields", "structure": f"S_{args.variant.upper()}"}
+            error_data = {"error": "structure_not_found", "variant": args.variant}
             logger.log_error(error_data)
-            sys.exit(4)
+            sys.exit(3)
         
         # Create output YAML structure with exact metadata schema
         target_data = {

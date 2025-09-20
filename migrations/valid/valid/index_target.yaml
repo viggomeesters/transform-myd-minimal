@@ -1,0 +1,28 @@
+metadata:
+  object: valid
+  variant: valid
+  target_file: data/02_target/index_target_valid_valid.xml
+  generated_at: '2025-09-20T09:59:47.244823'
+  structure: S_VALID
+  target_fields_count: 2
+target_fields:
+- sap_field: test_field_1
+  field_description: Test Field 1
+  sap_table: valid
+  mandatory: true
+  field_group: main
+  key: false
+  sheet_name: TestSheet
+  data_type: CHAR
+  length: 10
+  decimal: 0
+- sap_field: test_field_2
+  field_description: Test Field 2
+  sap_table: valid
+  mandatory: true
+  field_group: key
+  key: true
+  sheet_name: TestSheet
+  data_type: NUMC
+  length: 5
+  decimal: 0

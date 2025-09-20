@@ -234,5 +234,31 @@ class EnhancedLogger:
                 jsonl_line = json.dumps(error_event, ensure_ascii=False, separators=(",", ":"))
                 print(jsonl_line)
             else:
-                # Human format error
-                self.console.print(f"[red]✗[/red] Error: {error_event.get('message', 'Unknown error')}")
+                # Human format error - display structured error message
+                error_type = error_event.get('error', 'unknown')
+                error_msg = self._format_error_message(error_event)
+                self.console.print(f"[red]✗[/red] Error: {error_msg}")
+    
+    def _format_error_message(self, error_event: Dict[str, Any]) -> str:
+        """Format error message for human-readable output."""
+        error_type = error_event.get('error', 'unknown')
+        
+        if error_type == 'missing_input':
+            path = error_event.get('path', 'unknown')
+            return f"Input file not found: {path}"
+        elif error_type == 'no_headers':
+            return "No valid headers found in the input file"
+        elif error_type == 'structure_not_found':
+            variant = error_event.get('variant', 'unknown')
+            return f"Structure S_{variant.upper()} not found in target file"
+        elif error_type == 'exception':
+            message = error_event.get('message', 'Unknown exception')
+            return f"Unexpected error: {message}"
+        elif error_type == 'would_overwrite':
+            path = error_event.get('path', 'unknown')
+            return f"Output file exists and --force not specified: {path}"
+        elif error_type == 'unsupported_format':
+            path = error_event.get('path', 'unknown')
+            return f"Unsupported file format: {path}"
+        else:
+            return error_event.get('message', f"Unknown error type: {error_type}")

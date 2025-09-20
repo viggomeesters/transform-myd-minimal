@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:Worksheet ss:Name="Field List">
+        <ss:Table>
+            <ss:Row>
+                <ss:Cell ss:Index="2"><ss:Data ss:Type="String">Sheet Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Group Name</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Field Description</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Importance</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Type</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Length</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Decimal</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">SAP Structure</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">SAP Field</ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row>
+                <ss:Cell ss:Index="2"><ss:Data ss:Type="String">TestSheet</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">main</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Test Field 1</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">mandatory</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">CHAR</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">10</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">0</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">S_VALID</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">test_field_1</ss:Data></ss:Cell>
+            </ss:Row>
+            <ss:Row>
+                <ss:Cell ss:Index="2"><ss:Data ss:Type="String">TestSheet</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">key</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">Test Field 2</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">mandatory</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">NUMC</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">5</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">0</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">S_VALID</ss:Data></ss:Cell>
+                <ss:Cell><ss:Data ss:Type="String">test_field_2</ss:Data></ss:Cell>
+            </ss:Row>
+        </ss:Table>
+    </ss:Worksheet>
+</Workbook>
