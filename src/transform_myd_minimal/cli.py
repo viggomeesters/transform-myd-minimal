@@ -201,6 +201,12 @@ def setup_cli():
     index_target_parser.add_argument(
         "--variant", required=True, help="Variant name (e.g., bnka)"
     )
+    index_target_parser.add_argument(
+        "--root", default=".", help="Root directory (default: .)"
+    )
+    index_target_parser.add_argument(
+        "--force", action="store_true", help="Overwrite existing outputs"
+    )
 
     # Parse arguments
     args = parser.parse_args()
