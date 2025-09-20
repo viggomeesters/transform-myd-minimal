@@ -604,10 +604,15 @@ def find_first_non_empty_worksheet(file_path: Path) -> str:
     try:
         excel_file = pd.ExcelFile(file_path)
         for sheet_name in excel_file.sheet_names:
-            # Read just a few rows to check if sheet has data
-            df = pd.read_excel(file_path, sheet_name=sheet_name, nrows=10)
-            if not df.empty and not df.dropna(how="all").empty:
-                return sheet_name
+            # Read with no header row and as text to properly detect headers
+            df = pd.read_excel(file_path, sheet_name=sheet_name, header=None, dtype=str, engine="openpyxl")
+            if not df.empty:
+                # Check if any row has non-empty content
+                def is_nonempty_row(r):
+                    return any((str(x).strip() != "") for x in r.tolist() if x is not None)
+                
+                if any(is_nonempty_row(row) for _, row in df.iterrows()):
+                    return sheet_name
         raise ValueError("No non-empty worksheets found")
     except Exception as e:
         raise ValueError(f"Error reading Excel file: {e}")
@@ -616,26 +621,20 @@ def find_first_non_empty_worksheet(file_path: Path) -> str:
 def find_header_row(file_path: Path, sheet_name: str) -> Tuple[int, List[str]]:
     """Find the first row with ≥1 non-empty cell and return headers."""
     try:
-        # Read the entire sheet to find header row
-        df_full = pd.read_excel(file_path, sheet_name=sheet_name, header=None)
-
-        for row_idx in range(len(df_full)):
-            row_data = df_full.iloc[row_idx]
-            # Check if row has at least one non-empty cell
-            non_empty_cells = row_data.dropna()
-            if len(non_empty_cells) >= 1:
-                # This is our header row
-                headers = []
-                for cell in row_data:
-                    if pd.isna(cell):
-                        headers.append("")
-                    else:
-                        # Trim surrounding whitespace
-                        headers.append(str(cell).strip())
-                return row_idx, headers
-
-        raise ValueError("No header row found with ≥1 non-empty cell")
-    except Exception as e:
+        # Read Excel with no header row and as text
+        df = pd.read_excel(file_path, sheet_name=sheet_name, header=None, dtype=str, engine="openpyxl")
+        
+        def is_nonempty_row(r):
+            return any((str(x).strip() != "") for x in r.tolist() if x is not None)
+        
+        # Find header row = first row with ≥1 non-empty cell after trimming
+        header_idx = next(i for i, r in df.iterrows() if is_nonempty_row(r))
+        
+        # Build headers from that row
+        headers = df.iloc[header_idx].fillna("").map(str).str.strip().tolist()
+        
+        return header_idx, headers
+    except (StopIteration, Exception) as e:
         raise ValueError(f"Error finding header row: {e}")
 
 
@@ -644,72 +643,38 @@ def analyze_column_data(
 ) -> List[Dict]:
     """Analyze column data to infer types, nullable status, and examples."""
     try:
-        # Read the full sheet to get access to all columns
-        df_full = pd.read_excel(file_path, sheet_name=sheet_name, header=None)
-
-        # Get data rows (everything after header row)
-        data_rows = (
-            df_full.iloc[header_row + 1 :]
-            if header_row + 1 < len(df_full)
-            else pd.DataFrame()
-        )
-
-        field_data = []
-        col_idx = 0
-
-        for header in headers:
-            if header.strip():  # Only process non-empty headers
-                # Find the column index for this header in the original data
-                if col_idx < len(data_rows.columns):
-                    column_data = data_rows.iloc[:, col_idx]
-
-                    # Check for nulls
-                    has_nulls = column_data.isna().any()
-
-                    # Get non-null values for type inference
-                    non_null_values = column_data.dropna()
-
-                    # Infer data type
-                    if len(non_null_values) > 0:
-                        dtype = infer_dtype(non_null_values, skipna=True)
-                        # Get first non-null value as example
-                        example = (
-                            str(non_null_values.iloc[0])
-                            if len(non_null_values) > 0
-                            else ""
-                        )
-                    else:
-                        dtype = "empty"
-                        example = ""
-
-                    field_data.append(
-                        OrderedDict(
-                            [
-                                ("field_name", header),
-                                ("field_description", None),
-                                ("example", example),
-                                ("dtype", dtype),
-                                ("nullable", bool(has_nulls)),
-                            ]
-                        )
-                    )
-                else:
-                    # Column index beyond available data
-                    field_data.append(
-                        OrderedDict(
-                            [
-                                ("field_name", header),
-                                ("field_description", None),
-                                ("example", ""),
-                                ("dtype", "empty"),
-                                ("nullable", True),
-                            ]
-                        )
-                    )
-
-            col_idx += 1
-
-        return field_data
+        # Read Excel with no header row and as text
+        df = pd.read_excel(file_path, sheet_name=sheet_name, header=None, dtype=str, engine="openpyxl")
+        
+        # Data rows may be zero
+        data = df.iloc[header_row + 1:].reset_index(drop=True)
+        
+        # Build source_fields even when data is empty
+        source_fields = []
+        for col_i, name in enumerate(headers, start=0):
+            if name == "": 
+                continue  # Skip empty headers
+            
+            col = data[col_i] if col_i in data.columns else pd.Series([], dtype="object")
+            col = col.astype(str).map(lambda s: s.strip()).replace({"": pd.NA})
+            example = (col.dropna().head(1).tolist() or [None])[0]
+            
+            if example is None:
+                dtype_val = "string"
+                nullable = True    # unknown → assume nullable
+            else:
+                dtype_val = infer_dtype([example])
+                nullable = col.isna().any()
+            
+            source_fields.append({
+                "field_name": name,
+                "field_description": None,
+                "example": example,
+                "dtype": dtype_val,
+                "nullable": bool(nullable),
+            })
+        
+        return source_fields
     except Exception as e:
         raise ValueError(f"Error analyzing column data: {e}")
 
@@ -756,6 +721,12 @@ def run_index_source_command(args):
             logger.log_error(error_data)
             sys.exit(3)
 
+        # Reject only if ALL headers are empty
+        if all(h == "" for h in headers):
+            error_data = {"error": "no_headers"}
+            logger.log_error(error_data)
+            sys.exit(3)
+
         # Filter out empty headers and warn about them
         processed_headers = []
         for i, header in enumerate(headers):
@@ -763,11 +734,6 @@ def run_index_source_command(args):
                 processed_headers.append(header)
             elif header == "":
                 warnings.append(f"Empty header found at column {i+1}")
-
-        if not processed_headers:
-            error_data = {"error": "no_headers"}
-            logger.log_error(error_data)
-            sys.exit(3)
 
         # Analyze column data
         try:
@@ -807,7 +773,7 @@ def run_index_source_command(args):
 
             # Write index_source.yaml
             with open(output_file, "w", encoding="utf-8") as f:
-                yaml.dump(source_data, f, default_flow_style=False, allow_unicode=True)
+                yaml.safe_dump(source_data, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
 
         # Update global object list
         update_object_list(args.object, args.variant, root_path)
@@ -823,13 +789,14 @@ def run_index_source_command(args):
             })
 
         # Log summary
+        total_columns = len([h for h in headers if h != ""])
         summary_data = {
             "step": "index_source",
             "object": args.object,
             "variant": args.variant,
             "input_file": str(input_file),
             "output_file": str(output_file),
-            "total_columns": len(source_fields),
+            "total_columns": total_columns,
             "warnings": warnings,
         }
         logger.log_event(summary_data, preview_data)
