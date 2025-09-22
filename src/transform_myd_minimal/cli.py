@@ -32,6 +32,7 @@ def setup_cli():
         "map",
         "index_source",
         "index_target",
+        "transform",
         "-h",
         "--help",
         "--version",
@@ -268,6 +269,35 @@ def setup_cli():
         "--quiet", action="store_true", help="No stdout output; still writes file unless --no-log-file"
     )
 
+    # Transform subcommand
+    transform_parser = subparsers.add_parser(
+        "transform", help="Transform raw data through ETL pipeline to SAP CSV"
+    )
+    transform_parser.add_argument(
+        "-o", "--object", required=True, help="Object name (e.g., m140)"
+    )
+    transform_parser.add_argument(
+        "-v", "--variant", required=True, help="Variant name (e.g., bnka)"
+    )
+    transform_parser.add_argument(
+        "--root", default=".", help="Root directory (default: .)"
+    )
+    transform_parser.add_argument(
+        "--force", action="store_true", help="Overwrite existing outputs"
+    )
+    transform_parser.add_argument(
+        "--json", action="store_true", help="Force JSONL output to stdout"
+    )
+    transform_parser.add_argument(
+        "--no-preview", action="store_true", help="Suppress preview table in human mode"
+    )
+    transform_parser.add_argument(
+        "--no-log-file", action="store_true", help="Do not write log file"
+    )
+    transform_parser.add_argument(
+        "--quiet", action="store_true", help="No stdout output; still writes file unless --no-log-file"
+    )
+
     # Parse arguments
     args = parser.parse_args()
 
@@ -277,14 +307,14 @@ def setup_cli():
         sys.exit(1)
 
     # Validate command
-    if args.command not in ["map", "index_source", "index_target"]:
+    if args.command not in ["map", "index_source", "index_target", "transform"]:
         parser.print_help()
         sys.exit(1)
 
     config.merge_with_cli_args(args)
 
-    # For index_source and index_target commands, we need object and variant
-    if args.command in ["index_source", "index_target"]:
+    # For index_source, index_target and transform commands, we need object and variant
+    if args.command in ["index_source", "index_target", "transform"]:
         # These commands always require object and variant from CLI args
         return args, config, False
 
