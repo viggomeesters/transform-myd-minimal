@@ -1122,6 +1122,86 @@ def run_index_target_command(args, config):
                 f.write(f"  decimal: {field['decimal']}\n")
                 f.write(f"  field_count: {field['field_count']}\n")
         
+        # Generate validation.yaml scaffold
+        validation_file = output_dir / "validation.yaml"
+        validation_warnings = []
+        
+        # Check overwrite policy for validation.yaml
+        validation_created = "created"
+        if validation_file.exists() and not args.force:
+            validation_created = "skipped:exists"
+            validation_warnings.append({
+                "warning": "validation_exists",
+                "message": f"validation.yaml exists, use --force to overwrite: {validation_file}"
+            })
+        else:
+            # Generate validation scaffold
+            validation_rules = []
+            has_decimals = False
+            
+            for field in target_fields:
+                base_field = field["sap_field"].upper()
+                key = field.get("key", False)
+                mandatory = field.get("mandatory", False)
+                data_type = field.get("data_type", "")
+                length = field.get("length")
+                decimal = field.get("decimal")
+                
+                # Handle conflict guard: key=true implies required=true
+                required = mandatory or key
+                if key and not mandatory:
+                    validation_warnings.append({
+                        "warning": "key_implies_required",
+                        "field": base_field
+                    })
+                
+                # Type inference from data_type
+                field_type = "string"  # default
+                if data_type:
+                    data_type_upper = data_type.upper()
+                    if "DATE" in data_type_upper:
+                        field_type = "date"
+                    elif "TIME" in data_type_upper:
+                        field_type = "time"
+                    elif "NUM" in data_type_upper or "DEC" in data_type_upper or decimal is not None:
+                        field_type = "decimal"
+                        if decimal is not None:
+                            has_decimals = True
+                
+                # Build validation rule with fixed key order
+                rule = {
+                    "field": base_field,
+                    "key": key,
+                    "required": required,
+                    "type": field_type
+                }
+                
+                # Add max_length only if length is a valid integer
+                if length is not None:
+                    try:
+                        max_length = int(length)
+                        rule["max_length"] = max_length
+                    except (ValueError, TypeError):
+                        pass  # omit max_length when invalid
+                
+                validation_rules.append(rule)
+            
+            # Create validation document structure
+            validation_doc = {
+                "validation": validation_rules
+            }
+            
+            # Add numeric_defaults section only if any field has decimals
+            if has_decimals:
+                validation_doc["numeric_defaults"] = {
+                    "decimal_separator": ".",
+                    "thousands_separator": ""
+                }
+            
+            # Write validation.yaml using yaml.safe_dump
+            with open(validation_file, "w", encoding="utf-8") as f:
+                yaml.safe_dump(validation_doc, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
+        
         # Prepare preview data for human output (first 8 fields)
         preview_data = []
         for field in target_fields[:8]:
@@ -1136,7 +1216,7 @@ def run_index_target_command(args, config):
                 "key": field.get("key", False)
             })
         
-        # Log summary
+        # Log summary with validation scaffold info
         summary_data = {
             "step": "index_target",
             "object": args.object,
@@ -1145,7 +1225,9 @@ def run_index_target_command(args, config):
             "output_file": str(output_file),
             "structure": f"S_{args.variant.upper()}",
             "total_fields": len(target_fields),
-            "warnings": []
+            "validation_scaffold": f"migrations/{args.object}/{args.variant}/validation.yaml",
+            "rules_count": len(validation_rules) if validation_created == "created" else 0,
+            "warnings": validation_warnings
         }
         logger.log_event(summary_data, preview_data)
     

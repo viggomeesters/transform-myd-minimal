@@ -1,0 +1,46 @@
+metadata:
+  object: m120
+  variant: cepc
+  target_file: data/02_target/index_target_m120_cepc.xml
+  generated_at: '2025-09-22T08:32:15.040590'
+  structure: S_CEPC
+  target_fields_count: 3
+
+
+
+target_fields:
+- sap_field: prctr
+  field_description: Profit Center Key
+  sap_table: cepc
+  mandatory: false
+  field_group: key
+  key: true
+  sheet_name: M120_CEPC
+  data_type: Text
+  length: 10
+  decimal: None
+  field_count: 1
+
+- sap_field: ltext
+  field_description: Description
+  sap_table: cepc
+  mandatory: false
+  field_group: data
+  key: false
+  sheet_name: M120_CEPC
+  data_type: Text
+  length: 40
+  decimal: None
+  field_count: 2
+
+- sap_field: uzeit
+  field_description: Update Time
+  sap_table: cepc
+  mandatory: false
+  field_group: data
+  key: false
+  sheet_name: M120_CEPC
+  data_type: Time
+  length: 6
+  decimal: None
+  field_count: 3

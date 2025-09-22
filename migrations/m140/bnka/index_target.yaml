@@ -1,0 +1,70 @@
+metadata:
+  object: m140
+  variant: bnka
+  target_file: data/02_target/index_target_m140_bnka.xml
+  generated_at: '2025-09-22T08:31:27.116657'
+  structure: S_BNKA
+  target_fields_count: 5
+
+
+
+target_fields:
+- sap_field: banks
+  field_description: Bank Key
+  sap_table: bnka
+  mandatory: true
+  field_group: key
+  key: true
+  sheet_name: M140_BNKA
+  data_type: Text
+  length: 15
+  decimal: None
+  field_count: 1
+
+- sap_field: banka
+  field_description: Bank Name
+  sap_table: bnka
+  mandatory: false
+  field_group: data
+  key: false
+  sheet_name: M140_BNKA
+  data_type: Text
+  length: 60
+  decimal: None
+  field_count: 2
+
+- sap_field: land1
+  field_description: Country
+  sap_table: bnka
+  mandatory: true
+  field_group: data
+  key: false
+  sheet_name: M140_BNKA
+  data_type: Text
+  length: 3
+  decimal: None
+  field_count: 3
+
+- sap_field: erdat
+  field_description: Creation Date
+  sap_table: bnka
+  mandatory: false
+  field_group: data
+  key: false
+  sheet_name: M140_BNKA
+  data_type: Date
+  length: 8
+  decimal: None
+  field_count: 4
+
+- sap_field: betrag
+  field_description: Amount
+  sap_table: bnka
+  mandatory: false
+  field_group: data
+  key: false
+  sheet_name: M140_BNKA
+  data_type: Number
+  length: 13
+  decimal: 2
+  field_count: 5
