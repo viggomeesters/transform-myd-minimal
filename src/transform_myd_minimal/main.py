@@ -1186,21 +1186,34 @@ def run_index_target_command(args, config):
                 
                 validation_rules.append(rule)
             
-            # Create validation document structure
-            validation_doc = {
-                "validation": validation_rules
-            }
-            
-            # Add numeric_defaults section only if any field has decimals
-            if has_decimals:
-                validation_doc["numeric_defaults"] = {
-                    "decimal_separator": ".",
-                    "thousands_separator": ""
-                }
-            
-            # Write validation.yaml using yaml.safe_dump
+            # Write validation.yaml with custom formatting
             with open(validation_file, "w", encoding="utf-8") as f:
-                yaml.safe_dump(validation_doc, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
+                # Write metadata section
+                f.write("metadata:\n")
+                f.write(f"  object: {args.object}\n")
+                f.write(f"  variant: {args.variant}\n")
+                f.write(f"  target_file: data/02_target/index_target_{args.object}_{args.variant}.xml\n")
+                f.write(f"  generated_at: '{datetime.now().isoformat()}'\n")
+                f.write(f"  structure: S_{args.variant.upper()}\n")
+                f.write("\n\n\n")  # Add 3 blank lines after metadata
+                
+                # Write validation section
+                f.write("validation:\n")
+                for i, rule in enumerate(validation_rules):
+                    if i > 0:
+                        f.write("\n")  # Add blank line between validation records
+                    f.write(f"- field: {rule['field']}\n")
+                    f.write(f"  key: {str(rule['key']).lower()}\n")
+                    f.write(f"  required: {str(rule['required']).lower()}\n")
+                    f.write(f"  type: {rule['type']}\n")
+                    if 'max_length' in rule:
+                        f.write(f"  max_length: {rule['max_length']}\n")
+                
+                # Add numeric_defaults section only if any field has decimals
+                if has_decimals:
+                    f.write("\n\nnumeric_defaults:\n")
+                    f.write("  decimal_separator: \".\"\n")
+                    f.write("  thousands_separator: \"\"\n")
         
         # Prepare preview data for human output (first 8 fields)
         preview_data = []
