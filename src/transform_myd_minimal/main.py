@@ -20,6 +20,8 @@ from datetime import datetime
 import pandas as pd
 import yaml
 from pandas.api.types import infer_dtype
+from rich.console import Console
+from rich.table import Table
 
 from .cli import setup_cli
 from .fuzzy import FuzzyConfig, FieldNormalizer, FuzzyMatcher
@@ -1662,27 +1664,41 @@ def run_map_command(args, config):
             "unmapped_target_fields": mapping_result["unmapped_target_fields"]
         }
 
-        # Write mapping.yaml with exact format and blank line between sections
+        # Write mapping.yaml with exact format and proper blank lines
         mapping_file.parent.mkdir(parents=True, exist_ok=True)
         with open(mapping_file, "w", encoding="utf-8") as f:
             # Write metadata section
             yaml.safe_dump({"metadata": output_data["metadata"]}, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
             
-            # Add blank line between metadata and mappings
-            f.write("\n")
+            # Add 3 blank lines between sections
+            f.write("\n\n\n")
             
-            # Write remaining sections with blank lines between each section
-            # Write mappings section
-            yaml.safe_dump({"mappings": output_data["mappings"]}, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
-            f.write("\n")
+            # Write mappings section with special formatting (1 blank line between records)
+            f.write("mappings:\n")
+            for i, mapping in enumerate(output_data["mappings"]):
+                # Write each mapping item with proper indentation
+                mapping_yaml = yaml.safe_dump([mapping], default_flow_style=False, allow_unicode=True)
+                # Remove the leading "- " and add proper indentation
+                lines = mapping_yaml.strip().split('\n')
+                f.write("- ")
+                f.write(lines[0][2:] + "\n")  # First line without "- "
+                for line in lines[1:]:
+                    f.write("  " + line + "\n")  # Indent subsequent lines
+                
+                # Add blank line between mapping records (except after the last one)
+                if i < len(output_data["mappings"]) - 1:
+                    f.write("\n")
+            
+            # Add 3 blank lines before next section
+            f.write("\n\n\n")
             
             # Write to_audit section
             yaml.safe_dump({"to_audit": output_data["to_audit"]}, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
-            f.write("\n")
+            f.write("\n\n\n")
             
             # Write unmapped_source_fields section
             yaml.safe_dump({"unmapped_source_fields": output_data["unmapped_source_fields"]}, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
-            f.write("\n")
+            f.write("\n\n\n")
             
             # Write unmapped_target_fields section
             yaml.safe_dump({"unmapped_target_fields": output_data["unmapped_target_fields"]}, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
@@ -1729,14 +1745,26 @@ def run_map_command(args, config):
                     }
                     print(json.dumps(audit_data))
             else:
-                # Human preview format
+                # Human preview format with Rich table like F01/F02
                 if not args.no_preview:
-                    print("\n=== Mapping Preview (first 12) ===")
-                    print(f"{'target_field':<20} | {'source_header':<25} | {'confidence':<10} | {'status':<10}")
-                    print("-" * 75)
+                    console = Console()
+                    table = Table(title="Mapping Preview (first 12)")
+                    table.add_column("target_field")
+                    table.add_column("source_header")
+                    table.add_column("confidence")
+                    table.add_column("status")
+                    
                     for i, mapping in enumerate(mapping_result["mappings"][:12]):
                         source_header = mapping["source_header"] or "null"
-                        print(f"{mapping['target_field']:<20} | {source_header:<25} | {mapping['confidence']:<10.2f} | {mapping['status']:<10}")
+                        table.add_row(
+                            mapping["target_field"],
+                            source_header,
+                            f"{mapping['confidence']:.2f}",
+                            mapping["status"]
+                        )
+                    
+                    console.print(table)
+                    
                     if len(mapping_result["mappings"]) > 12:
                         print(f"... and {len(mapping_result['mappings']) - 12} more")
                 
