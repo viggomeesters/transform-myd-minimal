@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workbook xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+    <ss:Worksheet ss:Name="Other Sheet">
+        <ss:Table>
+            <ss:Row>
+                <ss:Cell><ss:Data ss:Type="String">Some Data</ss:Data></ss:Cell>
+            </ss:Row>
+        </ss:Table>
+    </ss:Worksheet>
+</Workbook>

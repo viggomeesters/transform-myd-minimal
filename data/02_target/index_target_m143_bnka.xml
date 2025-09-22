@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+  <Worksheet ss:Name="Field List">
+    <Table>
+      <Row>
+        <Cell ss:Index="2"><Data ss:Type="String">Sheet Name</Data></Cell>
+        <Cell><Data ss:Type="String">Group Name</Data></Cell>
+        <Cell><Data ss:Type="String">Field Description</Data></Cell>
+        <Cell><Data ss:Type="String">Importance</Data></Cell>
+        <Cell><Data ss:Type="String">Type</Data></Cell>
+        <Cell><Data ss:Type="String">Length</Data></Cell>
+        <Cell><Data ss:Type="String">Decimal</Data></Cell>
+        <Cell><Data ss:Type="String">SAP Structure</Data></Cell>
+        <Cell><Data ss:Type="String">SAP Field</Data></Cell>
+      </Row>
+      <Row>
+        <Cell ss:Index="2"><Data ss:Type="String">BNKA</Data></Cell>
+        <Cell><Data ss:Type="String">key</Data></Cell>
+        <Cell><Data ss:Type="String">Bank Country Key</Data></Cell>
+        <Cell><Data ss:Type="String">mandatory</Data></Cell>
+        <Cell><Data ss:Type="String">CHAR</Data></Cell>
+        <Cell><Data ss:Type="String">3</Data></Cell>
+        <Cell><Data ss:Type="String">0</Data></Cell>
+        <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+        <Cell><Data ss:Type="String">banks</Data></Cell>
+      </Row>
+      <Row>
+        <Cell ss:Index="2"><Data ss:Type="String">BNKA</Data></Cell>
+        <Cell><Data ss:Type="String">key</Data></Cell>
+        <Cell><Data ss:Type="String">Bank Number</Data></Cell>
+        <Cell><Data ss:Type="String">mandatory</Data></Cell>
+        <Cell><Data ss:Type="String">CHAR</Data></Cell>
+        <Cell><Data ss:Type="String">15</Data></Cell>
+        <Cell><Data ss:Type="String">0</Data></Cell>
+        <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+        <Cell><Data ss:Type="String">bankl</Data></Cell>
+      </Row>
+      <Row>
+        <Cell ss:Index="2"><Data ss:Type="String">BNKA</Data></Cell>
+        <Cell><Data ss:Type="String">data</Data></Cell>
+        <Cell><Data ss:Type="String">Bank Name</Data></Cell>
+        <Cell><Data ss:Type="String">optional</Data></Cell>
+        <Cell><Data ss:Type="String">CHAR</Data></Cell>
+        <Cell><Data ss:Type="String">60</Data></Cell>
+        <Cell><Data ss:Type="String">0</Data></Cell>
+        <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+        <Cell><Data ss:Type="String">banka</Data></Cell>
+      </Row>
+      <Row>
+        <Cell ss:Index="2"><Data ss:Type="String">BNKA</Data></Cell>
+        <Cell><Data ss:Type="String">data</Data></Cell>
+        <Cell><Data ss:Type="String">City</Data></Cell>
+        <Cell><Data ss:Type="String">optional</Data></Cell>
+        <Cell><Data ss:Type="String">CHAR</Data></Cell>
+        <Cell><Data ss:Type="String">35</Data></Cell>
+        <Cell><Data ss:Type="String">0</Data></Cell>
+        <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+        <Cell><Data ss:Type="String">ort01</Data></Cell>
+      </Row>
+    </Table>
+  </Worksheet>
+</Workbook>
