@@ -49,7 +49,7 @@ data/08_transformed_validation/
 data/09_logging/
 
 # Test migrations output
-migrations/
+migrations/test
 
 # Log files
 *.jsonl
