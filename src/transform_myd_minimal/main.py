@@ -651,6 +651,7 @@ def analyze_column_data(
         
         # Build source_fields even when data is empty
         source_fields = []
+        field_count = 1
         for col_i, name in enumerate(headers, start=0):
             if name == "": 
                 continue  # Skip empty headers
@@ -670,9 +671,11 @@ def analyze_column_data(
                 "field_name": name,
                 "field_description": None,
                 "example": example,
+                "field_count": field_count,
                 "dtype": dtype_val,
                 "nullable": bool(nullable),
             })
+            field_count += 1
         
         return source_fields
     except Exception as e:
@@ -691,8 +694,8 @@ def run_index_source_command(args, config):
     logger = EnhancedLogger(args, "index_source", args.object, args.variant, root_path)
 
     try:
-        # Use configured input path
-        input_file = config.get_input_path(args.object, args.variant)
+        # Construct input file path for index_source command
+        input_file = root_path / config.input_dir / f"index_source_{args.object}_{args.variant}.xlsx"
 
         # Check if input file exists
         if not input_file.exists():
@@ -766,9 +769,31 @@ def run_index_source_command(args, config):
                 "source_fields": source_fields,
             }
 
-            # Write index_source.yaml
+            # Write index_source.yaml with custom formatting
             with open(output_file, "w", encoding="utf-8") as f:
-                yaml.safe_dump(source_data, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
+                # Write metadata section
+                f.write("metadata:\n")
+                f.write(f"  object: {args.object}\n")
+                f.write(f"  variant: {args.variant}\n")
+                f.write(f"  source_file: {input_file.relative_to(root_path)}\n")
+                f.write(f"  generated_at: '{datetime.now().isoformat()}'\n")
+                f.write(f"  sheet: {sheet_name}\n")
+                f.write(f"  source_fields_count: {len(source_fields)}\n")
+                
+                # Add 3 empty lines between large blocks
+                f.write("\n\n\n")
+                
+                # Write source_fields section
+                f.write("source_fields:\n")
+                for i, field in enumerate(source_fields):
+                    if i > 0:
+                        f.write("\n")  # Add 1 empty line between records
+                    f.write(f"- field_name: {field['field_name']}\n")
+                    f.write(f"  field_description: {field['field_description']}\n")
+                    f.write(f"  example: {repr(field['example']) if field['example'] is not None else 'null'}\n")
+                    f.write(f"  field_count: {field['field_count']}\n")
+                    f.write(f"  dtype: {field['dtype']}\n")
+                    f.write(f"  nullable: {str(field['nullable']).lower()}\n")
 
         # Update global object list
         update_object_list(args.object, args.variant, root_path)
@@ -899,6 +924,7 @@ def _parse_spreadsheetml_target_fields(xml_path: Path, variant: str) -> List[Dic
     # Process data rows
     target_fields = []
     structure_pattern = f"S_{variant.upper()}"
+    field_count = 1
     
     for row_data in parsed_rows[header_row_idx + 1:]:
         # Skip empty rows
@@ -989,8 +1015,10 @@ def _parse_spreadsheetml_target_fields(xml_path: Path, variant: str) -> List[Dic
         row_dict["data_type"] = data_type
         row_dict["length"] = length
         row_dict["decimal"] = decimal
+        row_dict["field_count"] = field_count
         
         target_fields.append(row_dict)
+        field_count += 1
     
     return target_fields
 
@@ -1063,9 +1091,36 @@ def run_index_target_command(args, config):
             "target_fields": target_fields
         }
         
-        # Write YAML with preserved order (using yaml.safe_dump as specified)
+        # Write index_target.yaml with custom formatting
         with open(output_file, "w", encoding="utf-8") as f:
-            yaml.safe_dump(target_data, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
+            # Write metadata section
+            f.write("metadata:\n")
+            f.write(f"  object: {args.object}\n")
+            f.write(f"  variant: {args.variant}\n")
+            f.write(f"  target_file: data/02_target/index_target_{args.object}_{args.variant}.xml\n")
+            f.write(f"  generated_at: '{datetime.now().isoformat()}'\n")
+            f.write(f"  structure: S_{args.variant.upper()}\n")
+            f.write(f"  target_fields_count: {len(target_fields)}\n")
+            
+            # Add 3 empty lines between large blocks
+            f.write("\n\n\n")
+            
+            # Write target_fields section
+            f.write("target_fields:\n")
+            for i, field in enumerate(target_fields):
+                if i > 0:
+                    f.write("\n")  # Add 1 empty line between records
+                f.write(f"- sap_field: {field['sap_field']}\n")
+                f.write(f"  field_description: {field['field_description']}\n")
+                f.write(f"  sap_table: {field['sap_table']}\n")
+                f.write(f"  mandatory: {str(field['mandatory']).lower()}\n")
+                f.write(f"  field_group: {field['field_group']}\n")
+                f.write(f"  key: {str(field['key']).lower()}\n")
+                f.write(f"  sheet_name: {field['sheet_name']}\n")
+                f.write(f"  data_type: {field['data_type']}\n")
+                f.write(f"  length: {field['length']}\n")
+                f.write(f"  decimal: {field['decimal']}\n")
+                f.write(f"  field_count: {field['field_count']}\n")
         
         # Prepare preview data for human output (first 8 fields)
         preview_data = []
