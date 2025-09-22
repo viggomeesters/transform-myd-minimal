@@ -6,7 +6,6 @@ to replace print statements throughout the application.
 """
 
 import logging
-import os
 import sys
 from typing import Optional
 

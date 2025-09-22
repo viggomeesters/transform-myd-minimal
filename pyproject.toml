@@ -43,7 +43,7 @@ dev = [
 ]
 
 [project.scripts]
-transform-myd-minimal = "tmm.cli:app"
+transform-myd-minimal = "transform_myd_minimal.cli:app"
 
 [project.urls]
 Homepage = "https://github.com/viggomeesters/transform-myd-minimal"

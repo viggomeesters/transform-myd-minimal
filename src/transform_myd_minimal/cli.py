@@ -129,11 +129,13 @@ def setup_cli():
     if not variant_required:
         variant_help += f" (default from config: {config.variant})"
 
-    map_parser.add_argument("-o", "--object", required=object_required, help=object_help)
-    map_parser.add_argument("-v", "--variant", required=variant_required, help=variant_help)
     map_parser.add_argument(
-        "--root", default=".", help="Root directory (default: .)"
+        "-o", "--object", required=object_required, help=object_help
     )
+    map_parser.add_argument(
+        "-v", "--variant", required=variant_required, help=variant_help
+    )
+    map_parser.add_argument("--root", default=".", help="Root directory (default: .)")
     map_parser.add_argument(
         "--force", action="store_true", help="Overwrite existing outputs"
     )
@@ -147,54 +149,44 @@ def setup_cli():
         "--no-log-file", action="store_true", help="Do not write log file"
     )
     map_parser.add_argument(
-        "--quiet", action="store_true", help="No stdout output; still writes file unless --no-log-file"
+        "--quiet",
+        action="store_true",
+        help="No stdout output; still writes file unless --no-log-file",
     )
-    
+
     # Fuzzy matching options for map command
     map_parser.add_argument(
-        "--fuzzy-threshold", 
-        type=float, 
+        "--fuzzy-threshold",
+        type=float,
         default=config.fuzzy_threshold,
-        help=f"Fuzzy matching threshold (0.0-1.0, default: {config.fuzzy_threshold})"
+        help=f"Fuzzy matching threshold (0.0-1.0, default: {config.fuzzy_threshold})",
     )
     map_parser.add_argument(
-        "--max-suggestions", 
-        type=int, 
+        "--max-suggestions",
+        type=int,
         default=config.max_suggestions,
-        help=f"Maximum fuzzy match suggestions (default: {config.max_suggestions})"
+        help=f"Maximum fuzzy match suggestions (default: {config.max_suggestions})",
     )
     map_parser.add_argument(
-        "--disable-fuzzy", 
-        action="store_true", 
+        "--disable-fuzzy",
+        action="store_true",
         default=config.disable_fuzzy,
-        help="Disable fuzzy matching completely"
+        help="Disable fuzzy matching completely",
     )
-    
+
     # Source-based mapping options for map command
     map_parser.add_argument(
-        "--source-headers-xlsx", 
-        type=str, 
-        help="Path to source headers XLSX file"
+        "--source-headers-xlsx", type=str, help="Path to source headers XLSX file"
     )
     map_parser.add_argument(
-        "--source-headers-sheet", 
-        type=str, 
-        help="Sheet name in source XLSX"
+        "--source-headers-sheet", type=str, help="Sheet name in source XLSX"
     )
     map_parser.add_argument(
-        "--source-headers-row", 
-        type=int, 
-        help="Header row number in source XLSX"
+        "--source-headers-row", type=int, help="Header row number in source XLSX"
     )
+    map_parser.add_argument("--target-xml", type=str, help="Path to target XML file")
     map_parser.add_argument(
-        "--target-xml", 
-        type=str, 
-        help="Path to target XML file"
-    )
-    map_parser.add_argument(
-        "--target-xml-worksheet", 
-        type=str, 
-        help="Worksheet name in target XML"
+        "--target-xml-worksheet", type=str, help="Worksheet name in target XML"
     )
 
     # Index source subcommand
@@ -218,7 +210,9 @@ def setup_cli():
         "--json", action="store_true", help="Force JSONL output to stdout"
     )
     index_source_parser.add_argument(
-        "--format", choices=["human", "jsonl"], help="Output format (overrides TTY detection)"
+        "--format",
+        choices=["human", "jsonl"],
+        help="Output format (overrides TTY detection)",
     )
     index_source_parser.add_argument(
         "--log-file", type=str, help="Override log file path"
@@ -230,7 +224,9 @@ def setup_cli():
         "--no-preview", action="store_true", help="Suppress preview table in human mode"
     )
     index_source_parser.add_argument(
-        "--quiet", action="store_true", help="No stdout output; still writes file unless --no-log-file"
+        "--quiet",
+        action="store_true",
+        help="No stdout output; still writes file unless --no-log-file",
     )
 
     # Index target subcommand
@@ -254,7 +250,9 @@ def setup_cli():
         "--json", action="store_true", help="Force JSONL output to stdout"
     )
     index_target_parser.add_argument(
-        "--format", choices=["human", "jsonl"], help="Output format (overrides TTY detection)"
+        "--format",
+        choices=["human", "jsonl"],
+        help="Output format (overrides TTY detection)",
     )
     index_target_parser.add_argument(
         "--log-file", type=str, help="Override log file path"
@@ -266,7 +264,9 @@ def setup_cli():
         "--no-preview", action="store_true", help="Suppress preview table in human mode"
     )
     index_target_parser.add_argument(
-        "--quiet", action="store_true", help="No stdout output; still writes file unless --no-log-file"
+        "--quiet",
+        action="store_true",
+        help="No stdout output; still writes file unless --no-log-file",
     )
 
     # Transform subcommand
@@ -295,7 +295,9 @@ def setup_cli():
         "--no-log-file", action="store_true", help="Do not write log file"
     )
     transform_parser.add_argument(
-        "--quiet", action="store_true", help="No stdout output; still writes file unless --no-log-file"
+        "--quiet",
+        action="store_true",
+        help="No stdout output; still writes file unless --no-log-file",
     )
 
     # Parse arguments
@@ -331,3 +333,10 @@ def setup_cli():
         sys.exit(1)
 
     return args, config, False  # False indicates new format
+
+
+def app():
+    """Console script entry point."""
+    from .main import main
+
+    main()
