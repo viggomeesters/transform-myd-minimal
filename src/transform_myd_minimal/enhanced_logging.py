@@ -138,6 +138,14 @@ class EnhancedLogger:
             structure = event.get("structure", "")
             if structure:
                 self.console.print(f"  structure: {structure}")
+            
+            # Validation scaffold line
+            validation_scaffold = event.get("validation_scaffold", "")
+            rules_count = event.get("rules_count", 0)
+            if validation_scaffold:
+                # Determine status based on rules_count
+                validation_status = "created" if rules_count > 0 else "skipped:exists"
+                self.console.print(f"  validation: rules={rules_count} → {validation_scaffold} ({validation_status})")
         
         # Duration and warnings
         duration_ms = event.get("duration_ms", 0)
