@@ -1,7 +1,7 @@
 metadata:
   object: m144
   variant: bnka
-  generated_at: '2025-09-20T11:13:54.021966'
+  generated_at: '2025-09-22T07:45:40.781380'
   source_index: migrations/m144/bnka/index_source.yaml
   target_index: migrations/m144/bnka/index_target.yaml
   mapped_count: 11
@@ -95,7 +95,9 @@ mappings:
   confidence: 0.0
   status: unmapped
   rationale: Added without source match, to comply with SAP template
+
 to_audit: []
+
 unmapped_source_fields:
 - MANDT
 - ERDAT
@@ -123,6 +125,7 @@ unmapped_source_fields:
 - ZRES10
 - BICKY
 - RCCODE
+
 unmapped_target_fields:
 - target_table: bnka
   target_field: ISNOTOVERWRITE

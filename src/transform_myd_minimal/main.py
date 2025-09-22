@@ -1521,14 +1521,21 @@ def run_map_command(args, config):
             # Add blank line between metadata and mappings
             f.write("\n")
             
-            # Write remaining sections
-            remaining_data = {
-                "mappings": output_data["mappings"],
-                "to_audit": output_data["to_audit"],
-                "unmapped_source_fields": output_data["unmapped_source_fields"],
-                "unmapped_target_fields": output_data["unmapped_target_fields"]
-            }
-            yaml.safe_dump(remaining_data, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
+            # Write remaining sections with blank lines between each section
+            # Write mappings section
+            yaml.safe_dump({"mappings": output_data["mappings"]}, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
+            f.write("\n")
+            
+            # Write to_audit section
+            yaml.safe_dump({"to_audit": output_data["to_audit"]}, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
+            f.write("\n")
+            
+            # Write unmapped_source_fields section
+            yaml.safe_dump({"unmapped_source_fields": output_data["unmapped_source_fields"]}, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
+            f.write("\n")
+            
+            # Write unmapped_target_fields section
+            yaml.safe_dump({"unmapped_target_fields": output_data["unmapped_target_fields"]}, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
 
         duration_ms = int((time.time() - start_time) * 1000)
 

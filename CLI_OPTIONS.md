@@ -39,7 +39,7 @@
 ### File Path Patterns (v4.0)
 
 #### Input Files
-- **Source XLSX**: `data/02_fields/fields_{object}_{variant}.xlsx`
+- **Source XLSX**: `data/01_source/fields_{object}_{variant}.xlsx`
 - **Target XML**: `data/02_target/index_target_{object}_{variant}.xml`
 
 #### Output Files
@@ -176,7 +176,7 @@ All examples in this document use the new wrapper script format.
 #### `--object`
 - **Purpose**: Specifies the object name for the transformation
 - **Format**: String, typically alphanumeric (e.g., "m140", "p100")
-- **Usage**: Determines the input Excel file path: `data/02_fields/fields_{object}_{variant}.xlsx`
+- **Usage**: Determines the input Excel file path: `data/01_source/fields_{object}_{variant}.xlsx`
 - **Example**: `--object m140`
 
 #### `--variant` 
@@ -259,8 +259,8 @@ All examples in this document use the new wrapper script format.
 ## File Path Patterns
 
 ### Input Files
-- **Excel Input**: `data/02_fields/fields_{object}_{variant}.xlsx`
-- **Example**: `data/02_fields/fields_m140_bnka.xlsx`
+- **Excel Input**: `data/01_source/fields_{object}_{variant}.xlsx`
+- **Example**: `data/01_source/fields_m140_bnka.xlsx`
 
 ### Output Files  
 - **Global Config Files**: `output/object_list.yaml`, `output/mapping.yaml`, `output/targets.yaml`

@@ -26,7 +26,7 @@ class Config:
         self.fuzzy_threshold = 0.6
         self.max_suggestions = 3
         self.disable_fuzzy = False
-        self.input_dir = "data/02_fields"
+        self.input_dir = "data/01_source"
         self.output_dir = "output"
 
         # Optional default object and variant (can be set in config)
@@ -36,13 +36,13 @@ class Config:
         # New mapping configuration defaults
         self.mapping_from_sources = False
         self.source_headers = {
-            "path": "data/02_fields/BNKA_headers.xlsx",
+            "path": "data/01_source/BNKA_headers.xlsx",
             "sheet": "Sheet1",
             "header_row": 1,
             "ignore_data_below": True,
         }
         self.target_xml = {
-            "path": "data/02_fields/Source data for Bank.xml",
+            "path": "data/01_source/Source data for Bank.xml",
             "worksheet_name": "Field List",
             "header_match": {
                 "sheet_name": "Sheet Name",

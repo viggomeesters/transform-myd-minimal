@@ -32,7 +32,7 @@ Deze nieuwe workflow zorgt ervoor dat elke stap een aparte CLI-command is en all
 ```
 
 **Werking:**  
-- Zoekt naar het bestand: `data/02_fields/fields_{object}_{variant}.xlsx`
+- Zoekt naar het bestand: `data/01_source/fields_{object}_{variant}.xlsx`
 - Parseert de headers uit deze XLSX
 - Zet de velden om naar een YAML-structuur (`index_source.yaml`)
 - Maakt (indien nodig) de folder: `migrations/{object}/{variant}/`
@@ -69,7 +69,7 @@ Deze nieuwe workflow zorgt ervoor dat elke stap een aparte CLI-command is en all
 
 ```
 data/
-  02_fields/                     # Source Excel files
+  01_source/                     # Source Excel files
     fields_m140_bnka.xlsx        # Source headers 
   02_target/                     # Target XML files
     index_target_m140_bnka.xml   # Target field definitions
@@ -138,8 +138,8 @@ See [LOGGING.md](LOGGING.md) for complete documentation.
 Implementeert directe mappinggeneratie vanuit de bronbestanden i.p.v. fields.xlsx:
 
 ### ✅ Ondersteunde Bronbestanden
-- **Source headers (XLSX)**: `data/02_fields/BNKA_headers.xlsx` - bevat source system veldnamen als kolomkoppen
-- **Target velden (SpreadsheetML)**: `data/02_fields/Source data for Bank.xml` - Excel 2003 XML met target field metadata
+- **Source headers (XLSX)**: `data/01_source/BNKA_headers.xlsx` - bevat source system veldnamen als kolomkoppen
+- **Target velden (SpreadsheetML)**: `data/01_source/Source data for Bank.xml` - Excel 2003 XML met target field metadata
 
 ### 🎯 Source-Based Workflow
 ```bash
@@ -148,8 +148,8 @@ Implementeert directe mappinggeneratie vanuit de bronbestanden i.p.v. fields.xls
 
 # Met CLI overrides
 ./transform-myd-minimal map -object test -variant test \
-  --source-headers-xlsx "data/02_fields/BNKA_headers.xlsx" \
-  --target-xml "data/02_fields/Source data for Bank.xml" \
+  --source-headers-xlsx "data/01_source/BNKA_headers.xlsx" \
+  --target-xml "data/01_source/Source data for Bank.xml" \
   --target-xml-worksheet "Field List"
 ```
 
@@ -171,13 +171,13 @@ mapping:
   from_sources: true
 
   source_headers:
-    path: data/02_fields/BNKA_headers.xlsx
+    path: data/01_source/BNKA_headers.xlsx
     sheet: Sheet1
     header_row: 1
     ignore_data_below: true
 
   target_xml:
-    path: data/02_fields/Source data for Bank.xml
+    path: data/01_source/Source data for Bank.xml
     worksheet_name: "Field List"
     header_match:
       sheet_name: "Sheet Name"
@@ -417,7 +417,7 @@ max_suggestions: 3          # Maximum number of fuzzy match suggestions
 disable_fuzzy: false        # Whether to disable fuzzy matching
 
 # Directory configuration
-input_dir: "data/02_fields" # Input directory for Excel files
+input_dir: "data/01_source" # Input directory for Excel files
 output_dir: "output"        # Output directory for generated YAML files
 ```
 
@@ -430,7 +430,7 @@ output_dir: "output"        # Output directory for generated YAML files
 | `fuzzy_threshold` | float | 0.6 | Fuzzy matching threshold (0.0-1.0) |
 | `max_suggestions` | int | 3 | Maximum aantal fuzzy match suggesties |
 | `disable_fuzzy` | boolean | false | Schakel fuzzy matching uit |
-| `input_dir` | string | "data/02_fields" | Input directory voor Excel bestanden |
+| `input_dir` | string | "data/01_source" | Input directory voor Excel bestanden |
 | `output_dir` | string | "output" | Output directory voor YAML bestanden |
 
 ### Voorrang (Precedence)
@@ -480,7 +480,7 @@ max_suggestions: 5
 disable_fuzzy: false
 
 # Directory instellingen  
-input_dir: "data/02_fields"
+input_dir: "data/01_source"
 output_dir: "output"
 ```
 
@@ -559,7 +559,7 @@ Elk run toont:
 - Details van audit matches voor transparency
 
 Dit commando:
-1. Leest het bestand `data/02_fields/fields_{object}_{variant}.xlsx`
+1. Leest het bestand `data/01_source/fields_{object}_{variant}.xlsx`
 2. Past geavanceerde matching algoritmen toe
 3. Genereert `config/{object}/{variant}/column_map.yaml` met uitgebreide metadata
 
@@ -579,7 +579,7 @@ pip install pandas openpyxl pyyaml
 ## Bestandsstructuur
 
 Het script verwacht de volgende structuur:
-- `data/02_fields/fields_{object}_{variant}.xlsx` - Input Excel bestand
+- `data/01_source/fields_{object}_{variant}.xlsx` - Input Excel bestand
 - `config/{object}/{variant}/column_map.yaml` - Output YAML bestand (wordt gegenereerd)
 
 ## Help
@@ -737,7 +737,7 @@ De migration generator is geïntegreerd in het hoofdscript. Bij elke `map` opdra
 - `migrations/{OBJECT}/{table}/validation.yaml` - Per table validatie regels
 - `migrations/{OBJECT}/{table}/transformations.yaml` - Per table transformaties
 
-Het script scant automatisch de bestaande Excel-bestanden in `data/02_fields/fields_{object}_{variant}.xlsx`.
+Het script scant automatisch de bestaande Excel-bestanden in `data/01_source/fields_{object}_{variant}.xlsx`.
 
 ## Versie Informatie
 

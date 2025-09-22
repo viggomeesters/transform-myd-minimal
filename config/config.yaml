@@ -11,7 +11,7 @@ max_suggestions: 3          # Maximum number of fuzzy match suggestions
 disable_fuzzy: false        # Whether to disable fuzzy matching
 
 # Directory configuration
-input_dir: "data/02_fields" # Input directory for Excel files
+input_dir: "data/01_source" # Input directory for Excel files
 output_dir: "output"        # Output directory for generated YAML files
 
 # Advanced mapping configuration for direct source file processing
@@ -19,13 +19,13 @@ mapping:
   from_sources: true        # Enable direct mapping from source files
 
   source_headers:
-    path: data/02_fields/BNKA_headers.xlsx
+    path: data/01_source/BNKA_headers.xlsx
     sheet: Sheet1
     header_row: 1
     ignore_data_below: true
 
   target_xml:
-    path: data/02_fields/Source data for Bank.xml
+    path: data/01_source/Source data for Bank.xml
     worksheet_name: "Field List"
     header_match:
       sheet_name: "Sheet Name"
