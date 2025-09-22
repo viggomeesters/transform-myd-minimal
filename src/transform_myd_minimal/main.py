@@ -711,11 +711,11 @@ def run_index_source_command(args, config):
     logger = EnhancedLogger(args, "index_source", args.object, args.variant, root_path)
 
     try:
-        # Construct input file path for index_source command
+        # Construct input file path for index_source command (F01 spec: data/01_source/<object>_<variant>.xlsx)
         input_file = (
             root_path
             / config.input_dir
-            / f"index_source_{args.object}_{args.variant}.xlsx"
+            / f"{args.object}_{args.variant}.xlsx"
         )
 
         # Check if input file exists
@@ -1960,7 +1960,7 @@ def run_transform_command(args, config):
     transformed_validation_dir = root_path / "data" / "08_transformed_validation"
     transformed_validation_dir.mkdir(parents=True, exist_ok=True)
 
-    # Template glob pattern
+    # Template glob pattern  
     template_glob = str(
         root_path / "data" / "03_templates" / f"S_{args.variant.upper()}#*.csv"
     )

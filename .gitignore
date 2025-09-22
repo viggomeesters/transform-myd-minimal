@@ -38,7 +38,7 @@ config/*/column_map.yaml
 config/*/fields.yaml
 config/*/value_rules.yaml
 
-# Data files
+# Data files per spec F01-F04
 data/01_source
 data/02_target/  # test data
 data/04_raw/
