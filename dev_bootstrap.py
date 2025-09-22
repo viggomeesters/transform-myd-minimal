@@ -422,13 +422,13 @@ def run_smoke_tests(venv_path: Path):
 
     # Test 1: Import package
     try:
-        sh([venv_python, "-c", "import tmm, sys; print('Package import: OK')"])
+        sh([venv_python, "-c", "import transform_myd_minimal; print('Package import: OK')"])
         print_success("Package import test passed")
     except subprocess.CalledProcessError:
         print_error("Package import test failed")
         return False
 
-    # Test 2: CLI help
+    # Test 2: CLI help (with --quiet for cleaner output)
     try:
         sh([venv_python, "-m", "pip", "show", "transform-myd-minimal"])
         if platform.system() == "Windows":

@@ -14,8 +14,9 @@ python dev_bootstrap.py
 # macOS/Linux
 source .venv/bin/activate
 
-# verify installation
+# verify installation - both methods work
 transform-myd-minimal --help
+python -m transform_myd_minimal --help
 ```
 
 ## 🆕 NEW: Step-by-Step Workflow (v4.0)
@@ -28,22 +29,31 @@ Deze nieuwe workflow zorgt ervoor dat elke stap een aparte CLI-command is en all
 
 **Command:**  
 ```bash
+# Linux/macOS
 ./transform-myd-minimal index_source --object {object} --variant {variant}
+
+# Windows PowerShell
+python -m transform_myd_minimal index_source --object {object} --variant {variant}
 ```
 
 **Werking:**  
-- Zoekt naar het bestand: `data/01_source/fields_{object}_{variant}.xlsx`
+- Zoekt naar het bestand: `data/01_source/{object}_{variant}.xlsx`
 - Parseert de headers uit deze XLSX
 - Zet de velden om naar een YAML-structuur (`index_source.yaml`)
 - Maakt (indien nodig) de folder: `migrations/{object}/{variant}/`
 - Schrijft het resultaat naar: `migrations/{object}/{variant}/index_source.yaml`
 - Voegt het object/variant toe aan de globale lijst: `migrations/object_list.yaml`
+- Automatic log files: `data/09_logging/index_source_{object}_{variant}_{YYYYMMDD_HHmm}.jsonl`
 
 #### 2. index_target - Indexeer doelvelden
 
 **Command:**  
 ```bash
+# Linux/macOS
 ./transform-myd-minimal index_target --object {object} --variant {variant}
+
+# Windows PowerShell  
+python -m transform_myd_minimal index_target --object {object} --variant {variant}
 ```
 
 **Werking:**  
@@ -57,7 +67,11 @@ Deze nieuwe workflow zorgt ervoor dat elke stap een aparte CLI-command is en all
 
 **Command:**  
 ```bash
+# Linux/macOS
 ./transform-myd-minimal map --object {object} --variant {variant}
+
+# Windows PowerShell
+python -m transform_myd_minimal map --object {object} --variant {variant}
 ```
 
 **Werking:**  
@@ -69,10 +83,27 @@ Deze nieuwe workflow zorgt ervoor dat elke stap een aparte CLI-command is en all
 
 ```
 data/
-  01_source/                     # Source Excel files
-    fields_m140_bnka.xlsx        # Source headers 
-  02_target/                     # Target XML files
+  01_source/                     # Source Excel files (F01)
+    m140_bnka.xlsx              # Source headers 
+  02_target/                     # Target XML files (F02)
     index_target_m140_bnka.xml   # Target field definitions
+  03_templates/                  # CSV templates (F04)
+    S_BNKA#*.csv                # Template files for variant
+  04_raw/                        # Raw data for transformation (F04)
+    raw_m140_bnka.xlsx          # Raw data input
+  05_raw_validation/             # Raw validation outputs
+  06_rejected/                   # Rejected records
+  07_transformed/                # Final CSV outputs (F04)
+  08_transformed_validation/     # Post-transform validation
+  09_logging/                    # Log files (all steps)
+
+migrations/
+  m140/                          # Per object
+    bnka/                        # Per variant 
+      index_source.yaml          # F01 output
+      index_target.yaml          # F02 output  
+      mapping.yaml               # F03 output
+```
 migrations/
   object_list.yaml               # Global object/variant registry
   m140/
