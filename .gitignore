@@ -50,6 +50,7 @@ data/09_logging/
 
 # Test migrations output
 migrations/test
+migrations/object_list.yaml
 
 # Log files
 *.jsonl
