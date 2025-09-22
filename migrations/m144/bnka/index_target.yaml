@@ -2,9 +2,12 @@ metadata:
   object: m144
   variant: bnka
   target_file: data/02_target/index_target_m144_bnka.xml
-  generated_at: '2025-09-22T07:46:19.109482'
+  generated_at: '2025-09-22T08:08:26.903305'
   structure: S_BNKA
   target_fields_count: 12
+
+
+
 target_fields:
 - sap_field: banks
   field_description: Bank Country/Region Key
@@ -15,7 +18,9 @@ target_fields:
   sheet_name: Field List
   data_type: Text
   length: 80
-  decimal: null
+  decimal: None
+  field_count: 1
+
 - sap_field: bankl
   field_description: Bank Key
   sap_table: bnka
@@ -25,7 +30,9 @@ target_fields:
   sheet_name: Field List
   data_type: Text
   length: 80
-  decimal: null
+  decimal: None
+  field_count: 2
+
 - sap_field: banka
   field_description: Name of Bank
   sap_table: bnka
@@ -35,7 +42,9 @@ target_fields:
   sheet_name: Field List
   data_type: Text
   length: 60
-  decimal: null
+  decimal: None
+  field_count: 3
+
 - sap_field: provz
   field_description: Region (State, Province, Country)
   sap_table: bnka
@@ -45,7 +54,9 @@ target_fields:
   sheet_name: Field List
   data_type: Text
   length: 80
-  decimal: null
+  decimal: None
+  field_count: 4
+
 - sap_field: stras
   field_description: House Number and Street
   sap_table: bnka
@@ -55,7 +66,9 @@ target_fields:
   sheet_name: Field List
   data_type: Text
   length: 35
-  decimal: null
+  decimal: None
+  field_count: 5
+
 - sap_field: ort01
   field_description: City
   sap_table: bnka
@@ -65,7 +78,9 @@ target_fields:
   sheet_name: Field List
   data_type: Text
   length: 35
-  decimal: null
+  decimal: None
+  field_count: 6
+
 - sap_field: brnch
   field_description: Bank Branch
   sap_table: bnka
@@ -75,7 +90,9 @@ target_fields:
   sheet_name: Field List
   data_type: Text
   length: 40
-  decimal: null
+  decimal: None
+  field_count: 7
+
 - sap_field: swift
   field_description: SWIFT Code for International Payments
   sap_table: bnka
@@ -85,7 +102,9 @@ target_fields:
   sheet_name: Field List
   data_type: Text
   length: 11
-  decimal: null
+  decimal: None
+  field_count: 8
+
 - sap_field: xpgro
   field_description: Post Office Bank Current Account
   sap_table: bnka
@@ -95,7 +114,9 @@ target_fields:
   sheet_name: Field List
   data_type: Text
   length: 1
-  decimal: null
+  decimal: None
+  field_count: 9
+
 - sap_field: bnklz
   field_description: Bank Number
   sap_table: bnka
@@ -105,7 +126,9 @@ target_fields:
   sheet_name: Field List
   data_type: Text
   length: 15
-  decimal: null
+  decimal: None
+  field_count: 10
+
 - sap_field: bgrup
   field_description: Bank Group (Bank Network)
   sap_table: bnka
@@ -115,7 +138,9 @@ target_fields:
   sheet_name: Field List
   data_type: Text
   length: 2
-  decimal: null
+  decimal: None
+  field_count: 11
+
 - sap_field: isnotoverwrite
   field_description: Do Not Overwrite Existing Data
   sap_table: bnka
@@ -125,4 +150,5 @@ target_fields:
   sheet_name: Field List
   data_type: Text
   length: 1
-  decimal: null
+  decimal: None
+  field_count: 12
