@@ -607,12 +607,20 @@ def find_first_non_empty_worksheet(file_path: Path) -> str:
         excel_file = pd.ExcelFile(file_path)
         for sheet_name in excel_file.sheet_names:
             # Read with no header row and as text to properly detect headers
-            df = pd.read_excel(file_path, sheet_name=sheet_name, header=None, dtype=str, engine="openpyxl")
+            df = pd.read_excel(
+                file_path,
+                sheet_name=sheet_name,
+                header=None,
+                dtype=str,
+                engine="openpyxl",
+            )
             if not df.empty:
                 # Check if any row has non-empty content
                 def is_nonempty_row(r):
-                    return any((str(x).strip() != "") for x in r.tolist() if x is not None)
-                
+                    return any(
+                        (str(x).strip() != "") for x in r.tolist() if x is not None
+                    )
+
                 if any(is_nonempty_row(row) for _, row in df.iterrows()):
                     return sheet_name
         raise ValueError("No non-empty worksheets found")
@@ -624,17 +632,19 @@ def find_header_row(file_path: Path, sheet_name: str) -> Tuple[int, List[str]]:
     """Find the first row with ≥1 non-empty cell and return headers."""
     try:
         # Read Excel with no header row and as text
-        df = pd.read_excel(file_path, sheet_name=sheet_name, header=None, dtype=str, engine="openpyxl")
-        
+        df = pd.read_excel(
+            file_path, sheet_name=sheet_name, header=None, dtype=str, engine="openpyxl"
+        )
+
         def is_nonempty_row(r):
             return any((str(x).strip() != "") for x in r.tolist() if x is not None)
-        
+
         # Find header row = first row with ≥1 non-empty cell after trimming
         header_idx = next(i for i, r in df.iterrows() if is_nonempty_row(r))
-        
+
         # Build headers from that row
         headers = df.iloc[header_idx].fillna("").map(str).str.strip().tolist()
-        
+
         return header_idx, headers
     except (StopIteration, Exception) as e:
         raise ValueError(f"Error finding header row: {e}")
@@ -646,58 +656,67 @@ def analyze_column_data(
     """Analyze column data to infer types, nullable status, and examples."""
     try:
         # Read Excel with no header row and as text
-        df = pd.read_excel(file_path, sheet_name=sheet_name, header=None, dtype=str, engine="openpyxl")
-        
+        df = pd.read_excel(
+            file_path, sheet_name=sheet_name, header=None, dtype=str, engine="openpyxl"
+        )
+
         # Data rows may be zero
-        data = df.iloc[header_row + 1:].reset_index(drop=True)
-        
+        data = df.iloc[header_row + 1 :].reset_index(drop=True)
+
         # Build source_fields even when data is empty
         source_fields = []
         field_count = 1
         for col_i, name in enumerate(headers, start=0):
-            if name == "": 
+            if name == "":
                 continue  # Skip empty headers
-            
-            col = data[col_i] if col_i in data.columns else pd.Series([], dtype="object")
+
+            col = (
+                data[col_i] if col_i in data.columns else pd.Series([], dtype="object")
+            )
             col = col.astype(str).map(lambda s: s.strip()).replace({"": pd.NA})
             example = (col.dropna().head(1).tolist() or [None])[0]
-            
+
             if example is None:
                 dtype_val = "string"
-                nullable = True    # unknown → assume nullable
+                nullable = True  # unknown → assume nullable
             else:
                 dtype_val = infer_dtype([example])
                 nullable = col.isna().any()
-            
-            source_fields.append({
-                "field_name": name,
-                "field_description": None,
-                "example": example,
-                "field_count": field_count,
-                "dtype": dtype_val,
-                "nullable": bool(nullable),
-            })
+
+            source_fields.append(
+                {
+                    "field_name": name,
+                    "field_description": None,
+                    "example": example,
+                    "field_count": field_count,
+                    "dtype": dtype_val,
+                    "nullable": bool(nullable),
+                }
+            )
             field_count += 1
-        
+
         return source_fields
     except Exception as e:
         raise ValueError(f"Error analyzing column data: {e}")
 
 
-
 def run_index_source_command(args, config):
     """Run the index_source command - parse headers from XLSX and create index_source.yaml."""
     from .enhanced_logging import EnhancedLogger
-    
+
     warnings = []
     root_path = Path(args.root) if hasattr(args, "root") else Path(".")
-    
+
     # Initialize enhanced logger
     logger = EnhancedLogger(args, "index_source", args.object, args.variant, root_path)
 
     try:
         # Construct input file path for index_source command
-        input_file = root_path / config.input_dir / f"index_source_{args.object}_{args.variant}.xlsx"
+        input_file = (
+            root_path
+            / config.input_dir
+            / f"index_source_{args.object}_{args.variant}.xlsx"
+        )
 
         # Check if input file exists
         if not input_file.exists():
@@ -781,10 +800,10 @@ def run_index_source_command(args, config):
                 f.write(f"  generated_at: '{datetime.now().isoformat()}'\n")
                 f.write(f"  sheet: {sheet_name}\n")
                 f.write(f"  source_fields_count: {len(source_fields)}\n")
-                
+
                 # Add 3 empty lines between large blocks
                 f.write("\n\n\n")
-                
+
                 # Write source_fields section
                 f.write("source_fields:\n")
                 for i, field in enumerate(source_fields):
@@ -792,7 +811,9 @@ def run_index_source_command(args, config):
                         f.write("\n")  # Add 1 empty line between records
                     f.write(f"- field_name: {field['field_name']}\n")
                     f.write(f"  field_description: {field['field_description']}\n")
-                    f.write(f"  example: {repr(field['example']) if field['example'] is not None else 'null'}\n")
+                    f.write(
+                        f"  example: {repr(field['example']) if field['example'] is not None else 'null'}\n"
+                    )
                     f.write(f"  field_count: {field['field_count']}\n")
                     f.write(f"  dtype: {field['dtype']}\n")
                     f.write(f"  nullable: {str(field['nullable']).lower()}\n")
@@ -803,12 +824,14 @@ def run_index_source_command(args, config):
         # Prepare preview data for human output (first 8 headers)
         preview_data = []
         for i, field in enumerate(source_fields[:8]):
-            preview_data.append({
-                "field_name": field.get("field_name", ""),
-                "dtype": field.get("dtype", ""),
-                "nullable": field.get("nullable", True),
-                "example": field.get("example", "")
-            })
+            preview_data.append(
+                {
+                    "field_name": field.get("field_name", ""),
+                    "dtype": field.get("dtype", ""),
+                    "nullable": field.get("nullable", True),
+                    "example": field.get("example", ""),
+                }
+            )
 
         # Log summary
         total_columns = len([h for h in headers if h != ""])
@@ -829,22 +852,24 @@ def run_index_source_command(args, config):
         sys.exit(1)
 
 
-def _parse_spreadsheetml_target_fields(xml_path: Path, variant: str) -> List[Dict[str, Any]]:
+def _parse_spreadsheetml_target_fields(
+    xml_path: Path, variant: str
+) -> List[Dict[str, Any]]:
     """
     Parse SpreadsheetML XML file according to F02 specification.
-    
+
     Returns list of target field dictionaries with exact key ordering:
     ["sap_field","field_description","sap_table","mandatory","field_group","key","sheet_name","data_type","length","decimal"]
     """
     import xml.etree.ElementTree as ET
-    
+
     # Parse XML
     tree = ET.parse(xml_path)
     root = tree.getroot()
-    
+
     # Define namespace
     ns = {"ss": "urn:schemas-microsoft-com:office:spreadsheet"}
-    
+
     # Find the "Field List" worksheet
     worksheet = None
     for ws in root.findall(".//ss:Worksheet", ns):
@@ -852,24 +877,24 @@ def _parse_spreadsheetml_target_fields(xml_path: Path, variant: str) -> List[Dic
         if name == "Field List":
             worksheet = ws
             break
-    
+
     if worksheet is None:
         raise ValueError("Worksheet 'Field List' not found")
-    
+
     # Get worksheet name for fallback
     worksheet_name = worksheet.get(f'{{{ns["ss"]}}}Name', "")
-    
+
     # Get all rows
     rows = worksheet.findall(".//ss:Row", ns)
-    
+
     # Parse rows with ss:Index and ss:MergeDown support
     parsed_rows = []
     carry = {}  # For vertical propagation (ss:MergeDown)
-    
+
     for row_idx, row in enumerate(rows):
         col = 1  # 1-based column pointer
         row_data = [None] * 15  # Pre-allocate for up to 15 columns
-        
+
         # Apply carry-over values from previous rows
         for carry_col, carry_info in list(carry.items()):
             if carry_info["remaining"] > 0:
@@ -877,39 +902,39 @@ def _parse_spreadsheetml_target_fields(xml_path: Path, variant: str) -> List[Dic
                 carry_info["remaining"] -= 1
                 if carry_info["remaining"] == 0:
                     del carry[carry_col]
-        
+
         # Process cells in this row
         for cell in row.findall("ss:Cell", ns):
             # Handle ss:Index (sparse cells)
             index_attr = cell.get(f'{{{ns["ss"]}}}Index')
             if index_attr:
                 col = int(index_attr)
-            
+
             # Extract cell value
             data_elem = cell.find("ss:Data", ns)
             cell_value = data_elem.text if data_elem is not None else None
-            
+
             # Trim and convert empty to None
             if cell_value:
                 cell_value = cell_value.strip()
                 if not cell_value:
                     cell_value = None
-            
+
             # Place value at current column (convert to 0-based)
             if col <= len(row_data):
                 if col - 1 < len(row_data):
                     row_data[col - 1] = cell_value
-            
+
             # Handle ss:MergeDown
             merge_down_attr = cell.get(f'{{{ns["ss"]}}}MergeDown')
             if merge_down_attr and cell_value is not None:
                 merge_count = int(merge_down_attr)
                 carry[col] = {"value": cell_value, "remaining": merge_count}
-            
+
             col += 1
-        
+
         parsed_rows.append(row_data)
-    
+
     # Find header row - look for "Sheet Name" in any column
     header_row_idx = None
     for i, row_data in enumerate(parsed_rows):
@@ -919,24 +944,24 @@ def _parse_spreadsheetml_target_fields(xml_path: Path, variant: str) -> List[Dic
                 break
         if header_row_idx is not None:
             break
-    
+
     if header_row_idx is None:
         raise ValueError("Header row with 'Sheet Name' not found")
-    
+
     # Process data rows
     target_fields = []
     structure_pattern = f"S_{variant.upper()}"
     field_count = 1
-    
-    for row_data in parsed_rows[header_row_idx + 1:]:
+
+    for row_data in parsed_rows[header_row_idx + 1 :]:
         # Skip empty rows
         if not any(cell for cell in row_data if cell and str(cell).strip()):
             continue
-            
+
         # Map columns according to specification:
         # Note: XML has ss:Index="2" for first column, so offset by 1
         # 2 "Sheet Name" → sheet_name
-        # 3 "Group Name" → field_group  
+        # 3 "Group Name" → field_group
         # 4 "Field Description" → field_description
         # 5 "Importance" → mandatory (to bool)
         # 6 "Type" → data_type
@@ -944,42 +969,55 @@ def _parse_spreadsheetml_target_fields(xml_path: Path, variant: str) -> List[Dic
         # 8 "Decimal" → decimal (int|null)
         # 9 "SAP Structure" → sap_table (strip "S_")
         # 10 "SAP Field" → sap_field
-        
+
         sheet_name = row_data[1] if len(row_data) > 1 else None  # Column 2 -> index 1
-        field_group_raw = row_data[2] if len(row_data) > 2 else None  # Column 3 -> index 2
-        field_description = row_data[3] if len(row_data) > 3 else None  # Column 4 -> index 3
-        importance_raw = row_data[4] if len(row_data) > 4 else None  # Column 5 -> index 4
+        field_group_raw = (
+            row_data[2] if len(row_data) > 2 else None
+        )  # Column 3 -> index 2
+        field_description = (
+            row_data[3] if len(row_data) > 3 else None
+        )  # Column 4 -> index 3
+        importance_raw = (
+            row_data[4] if len(row_data) > 4 else None
+        )  # Column 5 -> index 4
         data_type = row_data[5] if len(row_data) > 5 else None  # Column 6 -> index 5
         length_raw = row_data[6] if len(row_data) > 6 else None  # Column 7 -> index 6
         decimal_raw = row_data[7] if len(row_data) > 7 else None  # Column 8 -> index 7
-        sap_table_raw = row_data[8] if len(row_data) > 8 else None  # Column 9 -> index 8
-        sap_field_raw = row_data[9] if len(row_data) > 9 else None  # Column 10 -> index 9
-        
+        sap_table_raw = (
+            row_data[8] if len(row_data) > 8 else None
+        )  # Column 9 -> index 8
+        sap_field_raw = (
+            row_data[9] if len(row_data) > 9 else None
+        )  # Column 10 -> index 9
+
         # Apply sheet_name fallback
         if not sheet_name:
             sheet_name = worksheet_name
-            
+
         # Filter: only rows where column 8 starts with "S_" and matches variant
         if not sap_table_raw or not str(sap_table_raw).startswith("S_"):
             continue
-            
+
         # Check if matches variant (case-insensitive)
         sap_table_clean = str(sap_table_raw)[2:].lower()  # Remove "S_" and lowercase
         if sap_table_clean != variant.lower():
             continue
-        
+
         # Normalize fields
         # field_group: lower(); if equals "key" then key=true else false
         field_group = field_group_raw.lower() if field_group_raw else ""
-        key = (field_group == "key")
-        
+        key = field_group == "key"
+
         # mandatory: true if contains "mandatory" or in {"X","x","true","1"}
         mandatory = False
         if importance_raw:
             importance_str = str(importance_raw).lower()
-            mandatory = ("mandatory" in importance_str or 
-                        importance_str in {"x", "true", "1"})
-        
+            mandatory = "mandatory" in importance_str or importance_str in {
+                "x",
+                "true",
+                "1",
+            }
+
         # length, decimal: parse int; invalid → None
         length = None
         if length_raw:
@@ -987,29 +1025,29 @@ def _parse_spreadsheetml_target_fields(xml_path: Path, variant: str) -> List[Dic
                 length = int(str(length_raw).strip())
             except (ValueError, AttributeError):
                 length = None
-                
+
         decimal = None
         if decimal_raw:
             try:
                 decimal = int(str(decimal_raw).strip())
             except (ValueError, AttributeError):
                 decimal = None
-        
+
         # sap_table: strip prefix "S_"/"s_", then lower
         sap_table = sap_table_raw[2:].lower() if sap_table_raw else ""
-        
+
         # sap_field: lower
         sap_field = sap_field_raw.lower() if sap_field_raw else ""
-        
+
         # Skip rows without required sap_field
         if not sap_field:
             continue
-        
+
         # Build row dict with EXACT key ordering
         row_dict = {}
         row_dict["sap_field"] = sap_field
         row_dict["field_description"] = field_description
-        row_dict["sap_table"] = sap_table  
+        row_dict["sap_table"] = sap_table
         row_dict["mandatory"] = mandatory
         row_dict["field_group"] = field_group
         row_dict["key"] = key
@@ -1018,10 +1056,10 @@ def _parse_spreadsheetml_target_fields(xml_path: Path, variant: str) -> List[Dic
         row_dict["length"] = length
         row_dict["decimal"] = decimal
         row_dict["field_count"] = field_count
-        
+
         target_fields.append(row_dict)
         field_count += 1
-    
+
     return target_fields
 
 
@@ -1031,20 +1069,26 @@ def run_index_target_command(args, config):
     import xml.etree.ElementTree as ET
     from datetime import datetime
     from pathlib import Path
-    
+
     root_path = Path(args.root).resolve()
-    
+
     # Initialize enhanced logger
     logger = EnhancedLogger(args, "index_target", args.object, args.variant, root_path)
-    
+
     # Construct input file path - check both .xml and fallback formats
-    input_file = root_path / f"data/02_target/index_target_{args.object}_{args.variant}.xml"
-    
+    input_file = (
+        root_path / f"data/02_target/index_target_{args.object}_{args.variant}.xml"
+    )
+
     # Check for fallback files if XML doesn't exist
     if not input_file.exists():
-        json_file = root_path / f"data/02_target/index_target_{args.object}_{args.variant}.json"
-        yaml_file = root_path / f"data/02_target/index_target_{args.object}_{args.variant}.yaml"
-        
+        json_file = (
+            root_path / f"data/02_target/index_target_{args.object}_{args.variant}.json"
+        )
+        yaml_file = (
+            root_path / f"data/02_target/index_target_{args.object}_{args.variant}.yaml"
+        )
+
         if json_file.exists():
             input_file = json_file
         elif yaml_file.exists():
@@ -1053,33 +1097,33 @@ def run_index_target_command(args, config):
             error_data = {"error": "missing_input", "path": str(input_file)}
             logger.log_error(error_data)
             sys.exit(2)
-    
+
     # Create output directory structure
     output_dir = root_path / f"migrations/{args.object}/{args.variant}"
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     output_file = output_dir / "index_target.yaml"
-    
+
     # Check overwrite policy
     if output_file.exists() and not args.force:
         error_data = {"error": "would_overwrite", "path": str(output_file)}
         logger.log_error(error_data)
         sys.exit(5)
-    
+
     try:
-        if input_file.suffix == '.xml':
+        if input_file.suffix == ".xml":
             target_fields = _parse_spreadsheetml_target_fields(input_file, args.variant)
         else:
             # Handle JSON/YAML fallback (simplified for now)
             error_data = {"error": "unsupported_format", "path": str(input_file)}
             logger.log_error(error_data)
             sys.exit(1)
-        
+
         if not target_fields:
             error_data = {"error": "structure_not_found", "variant": args.variant}
             logger.log_error(error_data)
             sys.exit(3)
-        
+
         # Create output YAML structure with exact metadata schema
         target_data = {
             "metadata": {
@@ -1088,25 +1132,27 @@ def run_index_target_command(args, config):
                 "target_file": f"data/02_target/index_target_{args.object}_{args.variant}.xml",
                 "generated_at": datetime.now().isoformat(),
                 "structure": f"S_{args.variant.upper()}",
-                "target_fields_count": len(target_fields)
+                "target_fields_count": len(target_fields),
             },
-            "target_fields": target_fields
+            "target_fields": target_fields,
         }
-        
+
         # Write index_target.yaml with custom formatting
         with open(output_file, "w", encoding="utf-8") as f:
             # Write metadata section
             f.write("metadata:\n")
             f.write(f"  object: {args.object}\n")
             f.write(f"  variant: {args.variant}\n")
-            f.write(f"  target_file: data/02_target/index_target_{args.object}_{args.variant}.xml\n")
+            f.write(
+                f"  target_file: data/02_target/index_target_{args.object}_{args.variant}.xml\n"
+            )
             f.write(f"  generated_at: '{datetime.now().isoformat()}'\n")
             f.write(f"  structure: S_{args.variant.upper()}\n")
             f.write(f"  target_fields_count: {len(target_fields)}\n")
-            
+
             # Add 3 empty lines between large blocks
             f.write("\n\n\n")
-            
+
             # Write target_fields section
             f.write("target_fields:\n")
             for i, field in enumerate(target_fields):
@@ -1123,24 +1169,26 @@ def run_index_target_command(args, config):
                 f.write(f"  length: {field['length']}\n")
                 f.write(f"  decimal: {field['decimal']}\n")
                 f.write(f"  field_count: {field['field_count']}\n")
-        
+
         # Generate validation.yaml scaffold
         validation_file = output_dir / "validation.yaml"
         validation_warnings = []
-        
+
         # Check overwrite policy for validation.yaml
         validation_created = "created"
         if validation_file.exists() and not args.force:
             validation_created = "skipped:exists"
-            validation_warnings.append({
-                "warning": "validation_exists",
-                "message": f"validation.yaml exists, use --force to overwrite: {validation_file}"
-            })
+            validation_warnings.append(
+                {
+                    "warning": "validation_exists",
+                    "message": f"validation.yaml exists, use --force to overwrite: {validation_file}",
+                }
+            )
         else:
             # Generate validation scaffold
             validation_rules = []
             has_decimals = False
-            
+
             for field in target_fields:
                 base_field = field["sap_field"].upper()
                 key = field.get("key", False)
@@ -1148,15 +1196,14 @@ def run_index_target_command(args, config):
                 data_type = field.get("data_type", "")
                 length = field.get("length")
                 decimal = field.get("decimal")
-                
+
                 # Handle conflict guard: key=true implies required=true
                 required = mandatory or key
                 if key and not mandatory:
-                    validation_warnings.append({
-                        "warning": "key_implies_required",
-                        "field": base_field
-                    })
-                
+                    validation_warnings.append(
+                        {"warning": "key_implies_required", "field": base_field}
+                    )
+
                 # Type inference from data_type
                 field_type = "string"  # default
                 if data_type:
@@ -1165,19 +1212,23 @@ def run_index_target_command(args, config):
                         field_type = "date"
                     elif "TIME" in data_type_upper:
                         field_type = "time"
-                    elif "NUM" in data_type_upper or "DEC" in data_type_upper or decimal is not None:
+                    elif (
+                        "NUM" in data_type_upper
+                        or "DEC" in data_type_upper
+                        or decimal is not None
+                    ):
                         field_type = "decimal"
                         if decimal is not None:
                             has_decimals = True
-                
+
                 # Build validation rule with fixed key order
                 rule = {
                     "field": base_field,
                     "key": key,
                     "required": required,
-                    "type": field_type
+                    "type": field_type,
                 }
-                
+
                 # Add max_length only if length is a valid integer
                 if length is not None:
                     try:
@@ -1185,20 +1236,22 @@ def run_index_target_command(args, config):
                         rule["max_length"] = max_length
                     except (ValueError, TypeError):
                         pass  # omit max_length when invalid
-                
+
                 validation_rules.append(rule)
-            
+
             # Write validation.yaml with custom formatting
             with open(validation_file, "w", encoding="utf-8") as f:
                 # Write metadata section
                 f.write("metadata:\n")
                 f.write(f"  object: {args.object}\n")
                 f.write(f"  variant: {args.variant}\n")
-                f.write(f"  target_file: data/02_target/index_target_{args.object}_{args.variant}.xml\n")
+                f.write(
+                    f"  target_file: data/02_target/index_target_{args.object}_{args.variant}.xml\n"
+                )
                 f.write(f"  generated_at: '{datetime.now().isoformat()}'\n")
                 f.write(f"  structure: S_{args.variant.upper()}\n")
                 f.write("\n\n\n")  # Add 3 blank lines after metadata
-                
+
                 # Write validation section
                 f.write("validation:\n")
                 for i, rule in enumerate(validation_rules):
@@ -1208,29 +1261,31 @@ def run_index_target_command(args, config):
                     f.write(f"  key: {str(rule['key']).lower()}\n")
                     f.write(f"  required: {str(rule['required']).lower()}\n")
                     f.write(f"  type: {rule['type']}\n")
-                    if 'max_length' in rule:
+                    if "max_length" in rule:
                         f.write(f"  max_length: {rule['max_length']}\n")
-                
+
                 # Add numeric_defaults section only if any field has decimals
                 if has_decimals:
                     f.write("\n\nnumeric_defaults:\n")
-                    f.write("  decimal_separator: \".\"\n")
-                    f.write("  thousands_separator: \"\"\n")
-        
+                    f.write('  decimal_separator: "."\n')
+                    f.write('  thousands_separator: ""\n')
+
         # Prepare preview data for human output (first 8 fields)
         preview_data = []
         for field in target_fields[:8]:
-            preview_data.append({
-                "sap_field": field.get("sap_field", ""),
-                "field_description": field.get("field_description", ""),
-                "mandatory": field.get("mandatory", False),
-                "data_type": field.get("data_type", ""),
-                "length": field.get("length", ""),
-                "decimal": field.get("decimal", ""),
-                "field_group": field.get("field_group", ""),
-                "key": field.get("key", False)
-            })
-        
+            preview_data.append(
+                {
+                    "sap_field": field.get("sap_field", ""),
+                    "field_description": field.get("field_description", ""),
+                    "mandatory": field.get("mandatory", False),
+                    "data_type": field.get("data_type", ""),
+                    "length": field.get("length", ""),
+                    "decimal": field.get("decimal", ""),
+                    "field_group": field.get("field_group", ""),
+                    "key": field.get("key", False),
+                }
+            )
+
         # Log summary with validation scaffold info
         summary_data = {
             "step": "index_target",
@@ -1241,11 +1296,13 @@ def run_index_target_command(args, config):
             "structure": f"S_{args.variant.upper()}",
             "total_fields": len(target_fields),
             "validation_scaffold": f"migrations/{args.object}/{args.variant}/validation.yaml",
-            "rules_count": len(validation_rules) if validation_created == "created" else 0,
-            "warnings": validation_warnings
+            "rules_count": (
+                len(validation_rules) if validation_created == "created" else 0
+            ),
+            "warnings": validation_warnings,
         }
         logger.log_event(summary_data, preview_data)
-    
+
     except Exception as e:
         error_data = {"error": "exception", "message": str(e)}
         logger.log_error(error_data)
@@ -1293,24 +1350,25 @@ def update_object_list(object_name: str, variant: str, root_path: Path = None):
 def process_f03_mapping(source_fields, target_fields, synonyms, object_name, variant):
     """
     Process mapping according to F03 specification.
-    
+
     Args:
         source_fields: List of source field dicts with field_name, dtype, nullable, example
         target_fields: List of target field dicts with exact 10 keys in F02 order
         synonyms: Dict of synonym mappings from central_mapping_memory.yaml
         object_name: Object name for transformer_id generation
         variant: Variant name for transformer_id generation
-    
+
     Returns:
         Dict with metadata, mappings, to_audit, unmapped_source_fields, unmapped_target_fields
     """
     from datetime import datetime
     from .fuzzy import FieldNormalizer, FuzzyMatcher
-    
+
     # Helper function for tiebreakers (as per spec: longest common substring, then shortest source header)
     def is_better_match(candidate, current_best, target_name):
         if not current_best:
             return True
+
         # Longest common substring
         def longest_common_substring(s1, s2):
             if not s1 or not s2:
@@ -1322,34 +1380,38 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
                     if substr in s2:
                         max_len = max(max_len, len(substr))
             return max_len
-        
+
         candidate_lcs = longest_common_substring(candidate.lower(), target_name.lower())
-        current_lcs = longest_common_substring(current_best.lower(), target_name.lower())
-        
+        current_lcs = longest_common_substring(
+            current_best.lower(), target_name.lower()
+        )
+
         if candidate_lcs > current_lcs:
             return True
         elif candidate_lcs == current_lcs:
             # Tie in LCS, use shortest header
             return len(candidate) < len(current_best)
         return False
+
     def norm(s):
         if not s:
             return ""
         # lower → non-alphanumeric to space → collapse spaces → strip
         import re
+
         lowered = s.lower()
-        spaces = re.sub(r'[^a-zA-Z0-9]', ' ', lowered)
-        collapsed = re.sub(r'\s+', ' ', spaces)
+        spaces = re.sub(r"[^a-zA-Z0-9]", " ", lowered)
+        collapsed = re.sub(r"\s+", " ", spaces)
         return collapsed.strip()
-    
+
     # Extract verbatim and normalized headers
     verbatim_headers = [field.get("field_name", "") for field in source_fields]
     norm_headers = [norm(header) for header in verbatim_headers]
-    
+
     # Create fuzzy matcher components
     normalizer = FieldNormalizer()
     fuzzy_matcher = FuzzyMatcher()
-    
+
     # Initialize result structures
     mappings = []
     to_audit = []
@@ -1357,19 +1419,19 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
     unmapped_target_fields = []
     used_sources = set()
     reused_sources = {}  # Track sources used multiple times
-    
+
     # Process each target field (target-centric approach)
     for target in target_fields:
         t_name = target.get("sap_field", "").lower()
         t_desc = (target.get("field_description") or "").lower()
         t_table = target.get("sap_table", "").lower()
         required = bool(target.get("mandatory", False))
-        
+
         best_match = None
         best_confidence = 0.0
         best_rationale = "none"
         candidates = []  # For tie-break detection
-        
+
         # 1. EXACT MATCH: norm(header) == t_name
         for i, header in enumerate(verbatim_headers):
             if norm(header) == t_name:
@@ -1377,7 +1439,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
                 best_confidence = 1.00
                 best_rationale = "Exact field name match"
                 break
-        
+
         # 2. SYNONYM MATCH: if no exact match and synonyms available
         if not best_match and synonyms:
             t_name_upper = t_name.upper()
@@ -1389,64 +1451,82 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
                         best_confidence = 0.95
                         best_rationale = "Matched via synonym definition"
                         break
-        
+
         # 3. FUZZY MATCH: against t_name and t_desc
         if not best_match:
             for i, header in enumerate(verbatim_headers):
                 norm_header = normalizer.normalize_field_name(header)
-                
+
                 # Try against target field name
                 name_score = 0.0
                 if t_name:
                     norm_target_name = normalizer.normalize_field_name(t_name)
-                    lev_sim = fuzzy_matcher.levenshtein_similarity(norm_header, norm_target_name)
-                    jw_sim = fuzzy_matcher.jaro_winkler_similarity(norm_header, norm_target_name) 
+                    lev_sim = fuzzy_matcher.levenshtein_similarity(
+                        norm_header, norm_target_name
+                    )
+                    jw_sim = fuzzy_matcher.jaro_winkler_similarity(
+                        norm_header, norm_target_name
+                    )
                     name_score = max(lev_sim, jw_sim)
-                
+
                 # Try against target description
                 desc_score = 0.0
                 if t_desc:
                     norm_target_desc = normalizer.normalize_field_name(t_desc)
-                    lev_sim = fuzzy_matcher.levenshtein_similarity(norm_header, norm_target_desc)
-                    jw_sim = fuzzy_matcher.jaro_winkler_similarity(norm_header, norm_target_desc)
+                    lev_sim = fuzzy_matcher.levenshtein_similarity(
+                        norm_header, norm_target_desc
+                    )
+                    jw_sim = fuzzy_matcher.jaro_winkler_similarity(
+                        norm_header, norm_target_desc
+                    )
                     desc_score = max(lev_sim, jw_sim)
-                
+
                 # Take the maximum score from name and description matching
                 score = max(name_score, desc_score)
-                
+
                 # Apply thresholds per spec
                 if score >= 0.85:
-                    if score > best_confidence or (score == best_confidence and is_better_match(header, best_match, t_name)):
+                    if score > best_confidence or (
+                        score == best_confidence
+                        and is_better_match(header, best_match, t_name)
+                    ):
                         best_match = header
                         best_confidence = score
                         best_rationale = f"Fuzzy match with {score:.0%} confidence"
                     candidates.append((header, score))
                 elif 0.80 <= score < 0.85 and required:
                     # Only map if target is mandatory
-                    if score > best_confidence or (score == best_confidence and is_better_match(header, best_match, t_name)):
+                    if score > best_confidence or (
+                        score == best_confidence
+                        and is_better_match(header, best_match, t_name)
+                    ):
                         best_match = header
                         best_confidence = score
-                        best_rationale = f"Fuzzy match with {score:.0%} confidence (mandatory field)"
+                        best_rationale = (
+                            f"Fuzzy match with {score:.0%} confidence (mandatory field)"
+                        )
                     candidates.append((header, score))
-        
+
         # Handle tiebreakers (tie when delta score <= 0.02)
         candidates.sort(key=lambda x: x[1], reverse=True)
         if len(candidates) > 1 and abs(candidates[0][1] - candidates[1][1]) <= 0.02:
             # Tie detected - add to audit
-            to_audit.append({
-                "target_table": t_table,
-                "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
-                "source_header": best_match,
-                "confidence": best_confidence,
-                "reason": "tie_break"
-            })
-        
+            to_audit.append(
+                {
+                    "target_table": t_table,
+                    "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
+                    "source_header": best_match,
+                    "confidence": best_confidence,
+                    "reason": "tie_break",
+                }
+            )
+
         # Create mapping entry
         status = "auto" if best_match else "unmapped"
         # Set appropriate rationale for unmapped fields
         if not best_match:
             best_rationale = "Added without source match, to comply with SAP template"
-        
+
         mapping = {
             "target_table": t_table,
             "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
@@ -1454,10 +1534,10 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             "required": required,
             "confidence": round(best_confidence, 2),
             "status": status,
-            "rationale": best_rationale
+            "rationale": best_rationale,
         }
         mappings.append(mapping)
-        
+
         # Track source usage for reuse detection
         if best_match:
             if best_match in used_sources:
@@ -1466,75 +1546,87 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
                 reused_sources[best_match].append(mapping)
             else:
                 used_sources.add(best_match)
-        
+
         # Add to audit based on conditions
         if best_match:
             # Low confidence fuzzy
             if 0.80 <= best_confidence < 0.90:
-                to_audit.append({
-                    "target_table": t_table,
-                    "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
-                    "source_header": best_match,
-                    "confidence": best_confidence,
-                    "reason": "low_confidence_fuzzy"
-                })
-            
+                to_audit.append(
+                    {
+                        "target_table": t_table,
+                        "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
+                        "source_header": best_match,
+                        "confidence": best_confidence,
+                        "reason": "low_confidence_fuzzy",
+                    }
+                )
+
             # Synonym based
             if best_rationale == "Matched via synonym definition":
-                to_audit.append({
-                    "target_table": t_table,
-                    "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
-                    "source_header": best_match,
-                    "confidence": best_confidence,
-                    "reason": "synonym_based"
-                })
+                to_audit.append(
+                    {
+                        "target_table": t_table,
+                        "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
+                        "source_header": best_match,
+                        "confidence": best_confidence,
+                        "reason": "synonym_based",
+                    }
+                )
         else:
             # Required unmapped
             if required:
-                to_audit.append({
+                to_audit.append(
+                    {
+                        "target_table": t_table,
+                        "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
+                        "source_header": None,
+                        "confidence": 0.00,
+                        "reason": "required_unmapped",
+                    }
+                )
+
+            # Add to unmapped targets
+            unmapped_target_fields.append(
+                {
                     "target_table": t_table,
                     "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
-                    "source_header": None,
-                    "confidence": 0.00,
-                    "reason": "required_unmapped"
-                })
-            
-            # Add to unmapped targets
-            unmapped_target_fields.append({
-                "target_table": t_table,
-                "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
-                "required": required
-            })
-    
+                    "required": required,
+                }
+            )
+
     # Handle reused sources audit
     for source_header, mappings_list in reused_sources.items():
         for mapping in mappings_list:
-            to_audit.append({
-                "target_table": mapping["target_table"],
-                "target_field": mapping["target_field"],
-                "source_header": source_header,
-                "confidence": mapping["confidence"],
-                "reason": "reused_source"
-            })
-    
+            to_audit.append(
+                {
+                    "target_table": mapping["target_table"],
+                    "target_field": mapping["target_field"],
+                    "source_header": source_header,
+                    "confidence": mapping["confidence"],
+                    "reason": "reused_source",
+                }
+            )
+
     # Find unmapped source fields
-    unmapped_source_fields = [header for header in verbatim_headers if header not in used_sources]
-    
+    unmapped_source_fields = [
+        header for header in verbatim_headers if header not in used_sources
+    ]
+
     # Create metadata
     metadata = {
         "object": object_name,
         "variant": variant,
         "generated_at": datetime.now().isoformat(),
         "source_index": f"migrations/{object_name}/{variant}/index_source.yaml",
-        "target_index": f"migrations/{object_name}/{variant}/index_target.yaml"
+        "target_index": f"migrations/{object_name}/{variant}/index_target.yaml",
     }
-    
+
     return {
         "metadata": metadata,
         "mappings": mappings,
         "to_audit": to_audit,
         "unmapped_source_fields": unmapped_source_fields,
-        "unmapped_target_fields": unmapped_target_fields
+        "unmapped_target_fields": unmapped_target_fields,
     }
 
 
@@ -1543,7 +1635,7 @@ def run_map_command(args, config):
     import json
     import time
     from collections import OrderedDict
-    
+
     start_time = time.time()
     logger.info(f"=== Map Command: {args.object}/{args.variant} ===")
 
@@ -1553,7 +1645,7 @@ def run_map_command(args, config):
     source_index_file = migrations_dir / "index_source.yaml"
     target_index_file = migrations_dir / "index_target.yaml"
     mapping_file = migrations_dir / "mapping.yaml"
-    
+
     # Central mapping memory (optional)
     central_mapping_file = root_path / "config" / "central_mapping_memory.yaml"
     if not central_mapping_file.exists():
@@ -1565,7 +1657,7 @@ def run_map_command(args, config):
             "error": "missing_index_source",
             "object": args.object,
             "variant": args.variant,
-            "expected_path": str(source_index_file)
+            "expected_path": str(source_index_file),
         }
         if args.json or not sys.stdout.isatty():
             print(json.dumps(error_data))
@@ -1578,7 +1670,7 @@ def run_map_command(args, config):
             "error": "missing_index_target",
             "object": args.object,
             "variant": args.variant,
-            "expected_path": str(target_index_file)
+            "expected_path": str(target_index_file),
         }
         if args.json or not sys.stdout.isatty():
             print(json.dumps(error_data))
@@ -1593,32 +1685,34 @@ def run_map_command(args, config):
             "object": args.object,
             "variant": args.variant,
             "existing_file": str(mapping_file),
-            "message": "Use --force to overwrite existing mapping.yaml"
+            "message": "Use --force to overwrite existing mapping.yaml",
         }
         if args.json or not sys.stdout.isatty():
             print(json.dumps(error_data))
         else:
-            logger.error(f"Output file exists: {mapping_file}. Use --force to overwrite.")
+            logger.error(
+                f"Output file exists: {mapping_file}. Use --force to overwrite."
+            )
         sys.exit(5)
 
     try:
         # Load source fields
         with open(source_index_file, "r", encoding="utf-8") as f:
             source_data = yaml.safe_load(f)
-        
-        # Load target fields  
+
+        # Load target fields
         with open(target_index_file, "r", encoding="utf-8") as f:
             target_data = yaml.safe_load(f)
 
         source_fields = source_data.get("source_fields", [])
         target_fields = target_data.get("target_fields", [])
-        
+
         if not target_fields:
             error_data = {
                 "error": "no_targets",
                 "object": args.object,
                 "variant": args.variant,
-                "message": "No target fields found in index_target.yaml"
+                "message": "No target fields found in index_target.yaml",
             }
             if args.json or not sys.stdout.isatty():
                 print(json.dumps(error_data))
@@ -1642,12 +1736,14 @@ def run_map_command(args, config):
         )
 
         # Calculate metrics for metadata
-        mapped_count = len([m for m in mapping_result["mappings"] if m["status"] == "auto"])
+        mapped_count = len(
+            [m for m in mapping_result["mappings"] if m["status"] == "auto"]
+        )
         unmapped_count = len(mapping_result["unmapped_target_fields"])
         to_audit_count = len(mapping_result["to_audit"])
         unused_sources_count = len(mapping_result["unmapped_source_fields"])
         unused_targets_count = 0  # As specified in the requirement
-        
+
         # Add metrics to metadata
         mapping_result["metadata"]["mapped_count"] = mapped_count
         mapping_result["metadata"]["unmapped_count"] = unmapped_count
@@ -1661,47 +1757,82 @@ def run_map_command(args, config):
             "mappings": mapping_result["mappings"],
             "to_audit": mapping_result["to_audit"],
             "unmapped_source_fields": mapping_result["unmapped_source_fields"],
-            "unmapped_target_fields": mapping_result["unmapped_target_fields"]
+            "unmapped_target_fields": mapping_result["unmapped_target_fields"],
         }
 
         # Write mapping.yaml with exact format and proper blank lines
         mapping_file.parent.mkdir(parents=True, exist_ok=True)
         with open(mapping_file, "w", encoding="utf-8") as f:
             # Write metadata section
-            yaml.safe_dump({"metadata": output_data["metadata"]}, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
-            
+            yaml.safe_dump(
+                {"metadata": output_data["metadata"]},
+                f,
+                sort_keys=False,
+                allow_unicode=True,
+                default_flow_style=False,
+            )
+
             # Add 3 blank lines between sections
             f.write("\n\n\n")
-            
+
             # Write mappings section with special formatting (1 blank line between records)
             f.write("mappings:\n")
             for i, mapping in enumerate(output_data["mappings"]):
                 # Write each mapping item with proper indentation
-                mapping_yaml = yaml.safe_dump([mapping], default_flow_style=False, allow_unicode=True)
-                # Remove the leading "- " and add proper indentation
-                lines = mapping_yaml.strip().split('\n')
-                f.write("- ")
-                f.write(lines[0][2:] + "\n")  # First line without "- "
-                for line in lines[1:]:
-                    f.write("  " + line + "\n")  # Indent subsequent lines
-                
+                mapping_yaml = yaml.safe_dump(
+                    [mapping], default_flow_style=False, allow_unicode=True
+                )
+                # Process the YAML lines correctly to maintain proper structure
+                lines = mapping_yaml.strip().split("\n")
+                for j, line in enumerate(lines):
+                    if j == 0:
+                        # First line: ensure it starts with "- " for list item
+                        if line.startswith("- "):
+                            f.write(line + "\n")
+                        else:
+                            f.write("- " + line + "\n")
+                    else:
+                        # Subsequent lines: maintain proper 2-space indentation for list item content
+                        if line.startswith("  "):
+                            f.write(line + "\n")
+                        else:
+                            f.write("  " + line + "\n")
+
                 # Add blank line between mapping records (except after the last one)
                 if i < len(output_data["mappings"]) - 1:
                     f.write("\n")
-            
+
             # Add 3 blank lines before next section
             f.write("\n\n\n")
-            
+
             # Write to_audit section
-            yaml.safe_dump({"to_audit": output_data["to_audit"]}, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
+            yaml.safe_dump(
+                {"to_audit": output_data["to_audit"]},
+                f,
+                sort_keys=False,
+                allow_unicode=True,
+                default_flow_style=False,
+            )
             f.write("\n\n\n")
-            
+
             # Write unmapped_source_fields section
-            yaml.safe_dump({"unmapped_source_fields": output_data["unmapped_source_fields"]}, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
+            yaml.safe_dump(
+                {"unmapped_source_fields": output_data["unmapped_source_fields"]},
+                f,
+                sort_keys=False,
+                allow_unicode=True,
+                default_flow_style=False,
+            )
             f.write("\n\n\n")
-            
+
             # Write unmapped_target_fields section
-            yaml.safe_dump({"unmapped_target_fields": output_data["unmapped_target_fields"]}, f, sort_keys=False, allow_unicode=True, default_flow_style=False)
+            yaml.safe_dump(
+                {"unmapped_target_fields": output_data["unmapped_target_fields"]},
+                f,
+                sort_keys=False,
+                allow_unicode=True,
+                default_flow_style=False,
+            )
 
         duration_ms = int((time.time() - start_time) * 1000)
 
@@ -1718,13 +1849,17 @@ def run_map_command(args, config):
             "to_audit": to_audit_count,
             "unused_sources": unused_sources_count,
             "duration_ms": duration_ms,
-            "warnings": []
+            "warnings": [],
         }
 
         # Add ruleset_sources to metadata if central mapping file exists
         if central_mapping_file.exists():
-            output_data["metadata"]["ruleset_sources"] = str(central_mapping_file).replace("\\", "/")
-            summary_data["ruleset_sources"] = str(central_mapping_file).replace("\\", "/")
+            output_data["metadata"]["ruleset_sources"] = str(
+                central_mapping_file
+            ).replace("\\", "/")
+            summary_data["ruleset_sources"] = str(central_mapping_file).replace(
+                "\\", "/"
+            )
 
         # Log JSONL summary and audit records
         if not args.quiet:
@@ -1739,9 +1874,9 @@ def run_map_command(args, config):
                             "source": mapping["source_header"],
                             "confidence": mapping["confidence"],
                             "status": mapping["status"],
-                            "reason": mapping["rationale"]
+                            "reason": mapping["rationale"],
                         },
-                        "candidates": []  # Could add top-3 candidates here if we track them
+                        "candidates": [],  # Could add top-3 candidates here if we track them
                     }
                     print(json.dumps(audit_data))
             else:
@@ -1753,22 +1888,24 @@ def run_map_command(args, config):
                     table.add_column("source_header")
                     table.add_column("confidence")
                     table.add_column("status")
-                    
+
                     for i, mapping in enumerate(mapping_result["mappings"][:12]):
                         source_header = mapping["source_header"] or "null"
                         table.add_row(
                             mapping["target_field"],
                             source_header,
                             f"{mapping['confidence']:.2f}",
-                            mapping["status"]
+                            mapping["status"],
                         )
-                    
+
                     console.print(table)
-                    
+
                     if len(mapping_result["mappings"]) > 12:
                         print(f"... and {len(mapping_result['mappings']) - 12} more")
-                
-                print(f"\nmapped {mapped_count} • unmapped {unmapped_count} • to-audit {to_audit_count} • unused sources {unused_sources_count}")
+
+                print(
+                    f"\nmapped {mapped_count} • unmapped {unmapped_count} • to-audit {to_audit_count} • unused sources {unused_sources_count}"
+                )
 
         logger.info(f"Generated mapping.yaml: {mapping_file}")
         logger.info("✓ Map command completed successfully!")
