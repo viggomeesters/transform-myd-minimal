@@ -41,7 +41,7 @@ config/*/value_rules.yaml
 # Data files per spec F01-F04
 data/01_source
 data/02_target/  # test data
-data/03_raw/
+data/04_raw/
 data/05_raw_validation/
 data/06_rejected/
 data/07_transformed/
