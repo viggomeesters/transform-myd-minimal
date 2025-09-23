@@ -1,0 +1,159 @@
+metadata:
+  object: m140
+  variant: bnka
+  generated_at: '2025-09-23T04:30:00.447338'
+  source_index: migrations/m140/bnka/index_source.yaml
+  target_index: migrations/m140/bnka/index_target.yaml
+  mapped_count: 6
+  unmapped_count: 4
+  to_audit: 8
+  unused_sources: 1
+  unused_targets: 0
+
+
+
+mappings:
+- confidence: 0.0
+  rationale: Added without source match, to comply with SAP template
+  required: true
+  source_header: null
+  status: unmapped
+  target_field: BUKRS
+  target_table: bnka
+
+- confidence: 0.91
+  rationale: Fuzzy match with 91% confidence
+  required: true
+  source_header: Bank Country/Region Key
+  status: auto
+  target_field: BANKS
+  target_table: bnka
+
+- confidence: 0.87
+  rationale: Fuzzy match with 87% confidence
+  required: true
+  source_header: Bank Name
+  status: auto
+  target_field: BANKL
+  target_table: bnka
+
+- confidence: 0.95
+  rationale: Matched via synonym definition
+  required: false
+  source_header: Bank Name
+  status: auto
+  target_field: BANKA
+  target_table: bnka
+
+- confidence: 1.0
+  rationale: Fuzzy match with 100% confidence
+  required: false
+  source_header: Swift Code
+  status: auto
+  target_field: SWIFT
+  target_table: bnka
+
+- confidence: 0.95
+  rationale: Fuzzy match with 95% confidence
+  required: false
+  source_header: Currency Key
+  status: auto
+  target_field: WAERS
+  target_table: bnka
+
+- confidence: 1.0
+  rationale: Fuzzy match with 100% confidence
+  required: false
+  source_header: Account Holder
+  status: auto
+  target_field: KOINH
+  target_table: bnka
+
+- confidence: 0.0
+  rationale: Added without source match, to comply with SAP template
+  required: true
+  source_header: null
+  status: unmapped
+  target_field: MANDT
+  target_table: bnka
+
+- confidence: 0.0
+  rationale: Added without source match, to comply with SAP template
+  required: true
+  source_header: null
+  status: unmapped
+  target_field: RECTYPE
+  target_table: bnka
+
+- confidence: 0.0
+  rationale: Added without source match, to comply with SAP template
+  required: true
+  source_header: null
+  status: unmapped
+  target_field: EXTRACT_DATE
+  target_table: bnka
+
+
+
+to_audit:
+- target_table: bnka
+  target_field: BUKRS
+  source_header: null
+  confidence: 0.0
+  reason: required_unmapped
+- target_table: bnka
+  target_field: BANKS
+  source_header: Bank Country/Region Key
+  confidence: 0.91
+  reason: tie_break
+- target_table: bnka
+  target_field: BANKL
+  source_header: Bank Name
+  confidence: 0.8678571428571429
+  reason: low_confidence_fuzzy
+- target_table: bnka
+  target_field: BANKA
+  source_header: Bank Name
+  confidence: 0.95
+  reason: synonym_based
+- target_table: bnka
+  target_field: MANDT
+  source_header: null
+  confidence: 0.0
+  reason: required_unmapped
+- target_table: bnka
+  target_field: RECTYPE
+  source_header: null
+  confidence: 0.0
+  reason: required_unmapped
+- target_table: bnka
+  target_field: EXTRACT_DATE
+  source_header: null
+  confidence: 0.0
+  reason: required_unmapped
+- target_table: bnka
+  target_field: BANKA
+  source_header: Bank Name
+  confidence: 0.95
+  reason: reused_source
+
+
+
+unmapped_source_fields:
+- Bank Account Number
+
+
+
+unmapped_target_fields:
+- target_table: bnka
+  target_field: BUKRS
+  required: true
+- target_table: bnka
+  target_field: MANDT
+  required: true
+- target_table: bnka
+  target_field: RECTYPE
+  required: true
+- target_table: bnka
+  target_field: EXTRACT_DATE
+  required: true

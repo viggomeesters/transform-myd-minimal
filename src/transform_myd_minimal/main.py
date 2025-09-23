@@ -2048,6 +2048,86 @@ def run_map_command(args, config):
                     f"\nmapped {mapped_count} • unmapped {unmapped_count} • to-audit {to_audit_count} • unused sources {unused_sources_count}"
                 )
 
+        # Generate HTML report if enabled
+        if not getattr(args, 'no_html', False):
+            from .reporting import write_html_report
+            import json
+            from datetime import datetime as dt
+            
+            timestamp = dt.now().strftime("%Y%m%d_%H%M")
+            
+            # Determine report directory
+            if hasattr(args, 'html_dir') and args.html_dir:
+                reports_dir = Path(args.html_dir)
+            else:
+                reports_dir = Path(args.root) / "migrations" / args.object / args.variant / "reports"
+            
+            # Generate enriched summary for HTML report
+            html_summary = {
+                "step": "map",
+                "object": args.object,
+                "variant": args.variant,
+                "ts": dt.now().isoformat(),
+                "source_index": str(source_index_file.relative_to(Path(args.root))),
+                "target_index": str(target_index_file.relative_to(Path(args.root))),
+                "mapped": mapped_count,
+                "unmapped": unmapped_count,
+                "to_audit": to_audit_count,
+                "unused_sources": unused_sources_count,
+                "mappings": [
+                    {
+                        "target_table": mapping.get("target_table", ""),
+                        "target_field": mapping["target_field"],
+                        "source_header": mapping["source_header"],
+                        "required": mapping.get("required", False),
+                        "confidence": mapping["confidence"],
+                        "status": mapping["status"],
+                        "rationale": mapping["rationale"]
+                    }
+                    for mapping in mapping_result["mappings"]
+                ],
+                "to_audit_rows": [
+                    {
+                        "target_table": audit.get("target_table", ""),
+                        "target_field": audit["target_field"],
+                        "source_header": audit.get("source_header"),
+                        "confidence": audit.get("confidence", 0.0),
+                        "reason": audit.get("reason", "")
+                    }
+                    for audit in mapping_result["to_audit"]
+                ],
+                "unmapped_source_fields": mapping_result["unmapped_source_fields"],
+                "unmapped_target_fields": [
+                    {
+                        "target_table": target.get("target_table", ""),
+                        "target_field": target.get("target_field", str(target)),
+                        "required": target.get("required", False)
+                    } if isinstance(target, dict) else {"target_field": str(target), "required": False}
+                    for target in mapping_result["unmapped_target_fields"]
+                ],
+                "warnings": []
+            }
+            
+            # Write JSON summary
+            json_filename = f"mapping_{timestamp}.json"
+            json_path = reports_dir / json_filename
+            json_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            with open(json_path, 'w', encoding='utf-8') as f:
+                json.dump(html_summary, f, ensure_ascii=False, indent=2)
+            
+            # Write HTML report
+            html_filename = f"mapping_{timestamp}.html"
+            html_path = reports_dir / html_filename
+            title = f"mapping · {args.object}/{args.variant}"
+            
+            write_html_report(html_summary, html_path, title)
+            
+            # Human-readable logging with forward slashes
+            html_path_display = str(html_path.relative_to(Path(args.root))).replace('\\', '/')
+            if not (args.json or not sys.stdout.isatty()):
+                print(f"report: {html_path_display}")
+
         logger.info(f"Generated mapping.yaml: {mapping_file}")
         logger.info("✓ Map command completed successfully!")
 
