@@ -2127,7 +2127,7 @@ def run_transform_command(args, config):
 
     # Template glob pattern  
     template_glob = str(
-        root_path / "data" / "03_templates" / f"S_{args.variant.upper()}#*.csv"
+        root_path / "data" / "03_template" / f"S_{args.variant.upper()}#*.csv"
     )
 
     # Primary outputs
@@ -2542,7 +2542,6 @@ def run_transform_command(args, config):
                     f,
                     delimiter=",",
                     quotechar='"',
-                    escapechar='"',
                     lineterminator="\r\n",
                     quoting=csv.QUOTE_MINIMAL,
                 )
@@ -2652,7 +2651,7 @@ def run_transform_command(args, config):
                 "rows_out": rows_out,
                 "rows_rejected": rows_rejected,
                 "mapped_coverage": mapped_coverage,
-                "template_used": template_path or f"data/03_templates/S_{args.variant.upper()}#*.csv",
+                "template_used": template_path or f"data/03_template/S_{args.variant.upper()}#*.csv",
                 "ignored_targets": ignored_targets,
                 "errors_by_rule": error_stats,
                 "errors_by_field": post_stats["errors_by_field"],
