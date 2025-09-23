@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+ 
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+ </Styles>
+ 
+ <Worksheet ss:Name="Field List">
+  <Table>
+   <Row>
+    <Cell><Data ss:Type="String">Field Number</Data></Cell>
+    <Cell><Data ss:Type="String">Sheet Name</Data></Cell>
+    <Cell><Data ss:Type="String">Group Name</Data></Cell>
+    <Cell><Data ss:Type="String">Field Description</Data></Cell>
+    <Cell><Data ss:Type="String">Importance</Data></Cell>
+    <Cell><Data ss:Type="String">Type</Data></Cell>
+    <Cell><Data ss:Type="String">Length</Data></Cell>
+    <Cell><Data ss:Type="String">Decimal</Data></Cell>
+    <Cell><Data ss:Type="String">SAP Structure</Data></Cell>
+    <Cell><Data ss:Type="String">SAP Field</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">1</Data></Cell>
+    <Cell><Data ss:Type="String">BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">key</Data></Cell>
+    <Cell><Data ss:Type="String">Company Code</Data></Cell>
+    <Cell><Data ss:Type="String">mandatory</Data></Cell>
+    <Cell><Data ss:Type="String">Text</Data></Cell>
+    <Cell><Data ss:Type="String">4</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">BUKRS</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">2</Data></Cell>
+    <Cell><Data ss:Type="String">BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">key</Data></Cell>
+    <Cell><Data ss:Type="String">Bank Country</Data></Cell>
+    <Cell><Data ss:Type="String">mandatory</Data></Cell>
+    <Cell><Data ss:Type="String">Text</Data></Cell>
+    <Cell><Data ss:Type="String">3</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">BANKS</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">3</Data></Cell>
+    <Cell><Data ss:Type="String">BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">key</Data></Cell>
+    <Cell><Data ss:Type="String">Bank Key</Data></Cell>
+    <Cell><Data ss:Type="String">mandatory</Data></Cell>
+    <Cell><Data ss:Type="String">Text</Data></Cell>
+    <Cell><Data ss:Type="String">15</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">BANKL</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">4</Data></Cell>
+    <Cell><Data ss:Type="String">BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">control data</Data></Cell>
+    <Cell><Data ss:Type="String">Bank Name</Data></Cell>
+    <Cell><Data ss:Type="String">optional</Data></Cell>
+    <Cell><Data ss:Type="String">Text</Data></Cell>
+    <Cell><Data ss:Type="String">60</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">BANKA</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">5</Data></Cell>
+    <Cell><Data ss:Type="String">BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">control data</Data></Cell>
+    <Cell><Data ss:Type="String">SWIFT Code</Data></Cell>
+    <Cell><Data ss:Type="String">optional</Data></Cell>
+    <Cell><Data ss:Type="String">Text</Data></Cell>
+    <Cell><Data ss:Type="String">11</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">SWIFT</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">6</Data></Cell>
+    <Cell><Data ss:Type="String">BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">control data</Data></Cell>
+    <Cell><Data ss:Type="String">Currency</Data></Cell>
+    <Cell><Data ss:Type="String">optional</Data></Cell>
+    <Cell><Data ss:Type="String">Text</Data></Cell>
+    <Cell><Data ss:Type="String">5</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">WAERS</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">7</Data></Cell>
+    <Cell><Data ss:Type="String">BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">control data</Data></Cell>
+    <Cell><Data ss:Type="String">Account Holder</Data></Cell>
+    <Cell><Data ss:Type="String">optional</Data></Cell>
+    <Cell><Data ss:Type="String">Text</Data></Cell>
+    <Cell><Data ss:Type="String">60</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">KOINH</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">8</Data></Cell>
+    <Cell><Data ss:Type="String">BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">key</Data></Cell>
+    <Cell><Data ss:Type="String">Client</Data></Cell>
+    <Cell><Data ss:Type="String">mandatory</Data></Cell>
+    <Cell><Data ss:Type="String">Text</Data></Cell>
+    <Cell><Data ss:Type="String">3</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">MANDT</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">9</Data></Cell>
+    <Cell><Data ss:Type="String">BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">key</Data></Cell>
+    <Cell><Data ss:Type="String">Record Type</Data></Cell>
+    <Cell><Data ss:Type="String">mandatory</Data></Cell>
+    <Cell><Data ss:Type="String">Text</Data></Cell>
+    <Cell><Data ss:Type="String">1</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">RECTYPE</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">10</Data></Cell>
+    <Cell><Data ss:Type="String">BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">key</Data></Cell>
+    <Cell><Data ss:Type="String">Extract Date</Data></Cell>
+    <Cell><Data ss:Type="String">mandatory</Data></Cell>
+    <Cell><Data ss:Type="String">Date</Data></Cell>
+    <Cell><Data ss:Type="String">8</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">EXTRACT_DATE</Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+</Workbook>

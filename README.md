@@ -152,6 +152,71 @@ migrations/
 
 See [LOGGING.md](LOGGING.md) for complete documentation.
 
+### 📊 Rapportage per stap (F01–F04)
+
+Elke workflow stap genereert automatisch zowel JSON als **self-contained HTML rapporten** met interactieve visualisaties:
+
+#### 🎯 HTML Rapportage Features
+- **Self-contained**: Alle CSS/JS inline embedded, geen externe dependencies
+- **Interactief**: Client-side sorting, filtering en zoeken in tabellen
+- **Visueel**: KPI cards, bar charts (inline SVG), responsive design
+- **Export**: CSV-downloadknoppen voor alle data (client-side generatie)
+- **Embedded data**: JSON data in `<script id="data">` tag voor verdere analyse
+
+#### 📁 Rapportage Locaties
+
+**F01-F03 (per object/variant):**
+```
+migrations/<object>/<variant>/reports/
+├── index_source_YYYYMMDD_HHMM.{html,json}
+├── index_target_YYYYMMDD_HHMM.{html,json}
+└── mapping_YYYYMMDD_HHMM.{html,json}
+```
+
+**F04 (validatie):**
+```
+data/05_raw_validation/      # RAW validatie
+├── raw_validation_<object>_<variant>_<ts>.{html,json,jsonl}
+
+data/08_transformed_validation/  # POST-transform validatie  
+├── post_transform_validation_<object>_<variant>_<ts>.{html,json,jsonl}
+```
+
+#### 🎛️ CLI Opties
+```bash
+# HTML rapportage uitschakelen
+./transform-myd-minimal index_source --object m140 --variant bnka --no-html
+
+# Custom rapportage directory
+./transform-myd-minimal map --object m140 --variant bnka --html-dir /custom/reports
+
+# HTML staat standaard AAN; JSON/JSONL blijven ongewijzigd
+```
+
+#### 📋 Rapportage Inhoud per Stap
+
+**F01 (index_source)**: Headers analyse
+- KPI: total columns, duplicates, empty headers  
+- Headers tabel: field name, dtype, nullable, example
+- Duplicates lijst en warnings
+
+**F02 (index_target)**: Target fields analyse
+- KPI: total fields, mandatory, keys
+- Field groups distributie chart (key vs control data)
+- Target fields tabel: SAP field, table, mandatory, key, data type, length
+- Validation scaffold status
+
+**F03 (map)**: Mapping resultaten
+- KPI: mapped, unmapped, to-audit, unused sources
+- Mappings tabel: target field, source header, confidence, status, rationale
+- To-audit items voor handmatige review
+- Unmapped source/target fields lijsten
+
+**F04 (transform)**: Validatie rapporten
+- **RAW**: rows in, null rates by source, missing sources
+- **POST**: rows in/out/rejected, coverage %, errors by rule/field, sample rejected rows
+- CSV export requirements (UTF-8, CRLF, etc.) voor POST rapport
+
 ### ✅ Voordelen Nieuwe Workflow
 
 - **Stapsgewijze controle**: Elke stap kan afzonderlijk uitgevoerd worden
