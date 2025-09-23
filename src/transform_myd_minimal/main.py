@@ -2367,6 +2367,10 @@ def run_transform_command(args, config):
             null_rate_by_source = {stat["source_header"]: stat["pct_empty"] / 100.0 for stat in raw_stats}
             missing_sources = [stat["source_header"] for stat in raw_stats if stat["pct_empty"] == 100.0]
             
+            # Add data profiling for RAW validation
+            from .reporting import profile_dataframe
+            raw_profiles = profile_dataframe(raw_df)
+            
             html_summary_raw = {
                 "step": "raw_validation",
                 "object": args.object,
@@ -2375,6 +2379,7 @@ def run_transform_command(args, config):
                 "rows_in": len(raw_df),
                 "null_rate_by_source": null_rate_by_source,
                 "missing_sources": missing_sources,
+                "field_profiles": raw_profiles,
                 "warnings": [w for w in warnings if w.get("warning") == "missing_source_column"]
             }
             
@@ -2683,6 +2688,18 @@ def run_transform_command(args, config):
                     row_dict["errors"] = row_errors
                     sample_rows.append(row_dict)
             
+            # Add data profiling for POST-transform validation (on skeleton before split)
+            from .reporting import profile_dataframe
+            
+            # Prepare validation rules mapping for profiler
+            validation_rules_mapping = {}
+            if validation_config:
+                for field_name, rules in validation_config.items():
+                    validation_rules_mapping[field_name.lower()] = rules
+            
+            # Profile the skeleton (transformed target columns before splitting)
+            post_profiles = profile_dataframe(skeleton, validation_rules_mapping)
+            
             # Generate enriched summary for POST-transform validation HTML report
             html_summary_post = {
                 "step": "post_transform_validation",
@@ -2699,6 +2716,7 @@ def run_transform_command(args, config):
                 "errors_by_rule": error_stats,
                 "errors_by_field": post_stats["errors_by_field"],
                 "sample_rows": sample_rows,
+                "field_profiles": post_profiles,
                 "warnings": warnings
             }
             
