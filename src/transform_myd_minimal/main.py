@@ -1074,18 +1074,18 @@ def run_index_target_command(args, config):
     # Initialize enhanced logger
     logger = EnhancedLogger(args, "index_target", args.object, args.variant, root_path)
 
-    # Construct input file path - check both .xml and fallback formats
+    # Construct input file path - check both .xml and fallback formats (F02 spec: data/02_target/{object}_{variant}.xml)
     input_file = (
-        root_path / f"data/02_target/index_target_{args.object}_{args.variant}.xml"
+        root_path / f"data/02_target/{args.object}_{args.variant}.xml"
     )
 
     # Check for fallback files if XML doesn't exist
     if not input_file.exists():
         json_file = (
-            root_path / f"data/02_target/index_target_{args.object}_{args.variant}.json"
+            root_path / f"data/02_target/{args.object}_{args.variant}.json"
         )
         yaml_file = (
-            root_path / f"data/02_target/index_target_{args.object}_{args.variant}.yaml"
+            root_path / f"data/02_target/{args.object}_{args.variant}.yaml"
         )
 
         if json_file.exists():
@@ -1128,7 +1128,7 @@ def run_index_target_command(args, config):
             "metadata": {
                 "object": args.object,
                 "variant": args.variant,
-                "target_file": f"data/02_target/index_target_{args.object}_{args.variant}.xml",
+                "target_file": f"data/02_target/{args.object}_{args.variant}.xml",
                 "generated_at": datetime.now().isoformat(),
                 "structure": f"S_{args.variant.upper()}",
                 "target_fields_count": len(target_fields),
@@ -1143,7 +1143,7 @@ def run_index_target_command(args, config):
             f.write(f"  object: {args.object}\n")
             f.write(f"  variant: {args.variant}\n")
             f.write(
-                f"  target_file: data/02_target/index_target_{args.object}_{args.variant}.xml\n"
+                f"  target_file: data/02_target/{args.object}_{args.variant}.xml\n"
             )
             f.write(f"  generated_at: '{datetime.now().isoformat()}'\n")
             f.write(f"  structure: S_{args.variant.upper()}\n")
@@ -1245,7 +1245,7 @@ def run_index_target_command(args, config):
                 f.write(f"  object: {args.object}\n")
                 f.write(f"  variant: {args.variant}\n")
                 f.write(
-                    f"  target_file: data/02_target/index_target_{args.object}_{args.variant}.xml\n"
+                    f"  target_file: data/02_target/{args.object}_{args.variant}.xml\n"
                 )
                 f.write(f"  generated_at: '{datetime.now().isoformat()}'\n")
                 f.write(f"  structure: S_{args.variant.upper()}\n")
@@ -1936,8 +1936,8 @@ def run_transform_command(args, config):
     root_path = Path(args.root)
     migrations_dir = root_path / "migrations" / args.object / args.variant
 
-    # Input files
-    raw_file = root_path / "data" / "04_raw" / f"raw_{args.object}_{args.variant}.xlsx"
+    # Input files (F04 spec: data/03_raw/{object}_{variant}.xlsx)
+    raw_file = root_path / "data" / "03_raw" / f"{args.object}_{args.variant}.xlsx"
     mapping_file = migrations_dir / "mapping.yaml"
     target_index_file = migrations_dir / "index_target.yaml"
 

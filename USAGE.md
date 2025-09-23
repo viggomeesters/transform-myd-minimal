@@ -19,11 +19,11 @@ project/
 │   ├── 01_source/               # F01 inputs
 │   │   └── m140_bnka.xlsx      # Source headers
 │   ├── 02_target/               # F02 inputs  
-│   │   └── index_target_m140_bnka.xml
+│   │   └── m140_bnka.xml
 │   ├── 03_templates/            # F04 templates
 │   │   └── S_BNKA#template.csv 
-│   ├── 04_raw/                  # F04 inputs
-│   │   └── raw_m140_bnka.xlsx  # Raw data
+│   ├── 03_raw/                  # F04 inputs
+│   │   └── m140_bnka.xlsx       # Raw data
 │   ├── 05_raw_validation/       # F04 validation outputs
 │   ├── 06_rejected/             # F04 rejected records
 │   ├── 07_transformed/          # F04 final outputs
@@ -83,7 +83,7 @@ source_fields:
 #### Step 2: F02 - Index Target Fields
 
 **Input Required:**
-- `data/02_target/index_target_m140_bnka.xml` - SpreadsheetML with target definitions
+- `data/02_target/m140_bnka.xml` - SpreadsheetML with target definitions
 
 **Commands:**
 ```bash
@@ -104,7 +104,7 @@ python -m transform_myd_minimal index_target --object m140 --variant bnka
 metadata:
   object: m140
   variant: bnka
-  target_file: data/02_target/index_target_m140_bnka.xml
+  target_file: data/02_target/m140_bnka.xml
   generated_at: '2024-09-22T14:31:20'
   structure: S_BNKA
   target_fields_count: 30
@@ -177,7 +177,7 @@ unmapped_target_fields:
 #### Step 4: F04 - Transform Data
 
 **Inputs Required:**
-- `data/04_raw/raw_m140_bnka.xlsx` - Raw data to transform
+- `data/03_raw/m140_bnka.xlsx` - Raw data to transform
 - `migrations/m140/bnka/mapping.yaml` (from Step 3)
 - `migrations/m140/bnka/index_target.yaml` (from Step 2)
 - `data/03_templates/S_BNKA#*.csv` - CSV template files

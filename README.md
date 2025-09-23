@@ -57,7 +57,7 @@ python -m transform_myd_minimal index_target --object {object} --variant {varian
 ```
 
 **Werking:**  
-- Zoekt naar het bestand: `data/02_target/index_target_{object}_{variant}.xml`
+- Zoekt naar het bestand: `data/02_target/{object}_{variant}.xml`
 - Parseert XML en filtert target fields behorend bij deze variant
 - Bijvoorbeeld: Zoek velden die beginnen met `S_{variant}` zoals `S_BNKA` als variant=`bnka`
 - Zet de target fields om naar YAML (`index_target.yaml`)
@@ -86,11 +86,11 @@ data/
   01_source/                     # Source Excel files (F01)
     m140_bnka.xlsx              # Source headers 
   02_target/                     # Target XML files (F02)
-    index_target_m140_bnka.xml   # Target field definitions
+    m140_bnka.xml               # Target field definitions
   03_templates/                  # CSV templates (F04)
     S_BNKA#*.csv                # Template files for variant
-  04_raw/                        # Raw data for transformation (F04)
-    raw_m140_bnka.xlsx          # Raw data input
+  03_raw/                        # Raw data for transformation (F04)
+    m140_bnka.xlsx              # Raw data input
   05_raw_validation/             # Raw validation outputs
   06_rejected/                   # Rejected records
   07_transformed/                # Final CSV outputs (F04)
