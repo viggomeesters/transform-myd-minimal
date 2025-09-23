@@ -844,6 +844,65 @@ def run_index_source_command(args, config):
             "total_columns": total_columns,
             "warnings": warnings,
         }
+        
+        # Generate HTML report if enabled
+        if not getattr(args, 'no_html', False):
+            from .reporting import write_html_report
+            import json
+            from datetime import datetime as dt
+            
+            timestamp = dt.now().strftime("%Y%m%d_%H%M")
+            
+            # Determine report directory
+            if hasattr(args, 'html_dir') and args.html_dir:
+                reports_dir = Path(args.html_dir)
+            else:
+                reports_dir = migrations_dir / "reports"
+            
+            # Generate enriched summary for HTML report
+            html_summary = {
+                "step": "index_source",
+                "object": args.object,
+                "variant": args.variant,
+                "ts": dt.now().isoformat(),
+                "input_file": str(input_file.relative_to(root_path)),
+                "sheet": sheet_name,
+                "total_columns": total_columns,
+                "headers": [
+                    {
+                        "index": i + 1,
+                        "field_name": header,
+                        "dtype": "string",  # Could be enhanced with actual dtype detection
+                        "nullable": True,   # Could be enhanced with actual nullable detection
+                        "example": None     # Could be enhanced with sample data
+                    }
+                    for i, header in enumerate([h for h in headers if h != ""])
+                ],
+                "duplicates": [h for h in headers if headers.count(h) > 1 and h != ""],
+                "empty_headers": len([h for h in headers if h == ""]),
+                "warnings": warnings
+            }
+            
+            # Write JSON summary
+            json_filename = f"index_source_{timestamp}.json"
+            json_path = reports_dir / json_filename
+            json_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            with open(json_path, 'w', encoding='utf-8') as f:
+                json.dump(html_summary, f, ensure_ascii=False, indent=2)
+            
+            # Write HTML report
+            html_filename = f"index_source_{timestamp}.html"
+            html_path = reports_dir / html_filename
+            title = f"index_source · {args.object}/{args.variant}"
+            
+            write_html_report(html_summary, html_path, title)
+            
+            # Human-readable logging with forward slashes
+            html_path_display = str(html_path.relative_to(root_path)).replace('\\', '/')
+            if not (args.json or not sys.stdout.isatty()):
+                print(f"report: {html_path_display}")
+        
         logger.log_event(summary_data, preview_data)
 
     except Exception as e:

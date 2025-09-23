@@ -1,0 +1,52 @@
+metadata:
+  object: m140
+  variant: bnka
+  source_file: data/01_source/m140_bnka.xlsx
+  generated_at: '2025-09-23T04:23:52.874077'
+  sheet: Sheet1
+  source_fields_count: 6
+
+
+
+source_fields:
+- field_name: Bank Country/Region Key
+  field_description: None
+  example: 'US'
+  field_count: 1
+  dtype: string
+  nullable: false
+
+- field_name: Bank Account Number
+  field_description: None
+  example: '123456789'
+  field_count: 2
+  dtype: string
+  nullable: false
+
+- field_name: Bank Name
+  field_description: None
+  example: 'Bank of America'
+  field_count: 3
+  dtype: string
+  nullable: false
+
+- field_name: Swift Code
+  field_description: None
+  example: 'BOFAUS3N'
+  field_count: 4
+  dtype: string
+  nullable: false
+
+- field_name: Currency Key
+  field_description: None
+  example: 'USD'
+  field_count: 5
+  dtype: string
+  nullable: false
+
+- field_name: Account Holder
+  field_description: None
+  example: 'nan'
+  field_count: 6
+  dtype: string
+  nullable: false

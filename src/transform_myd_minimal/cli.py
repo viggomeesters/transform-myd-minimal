@@ -153,6 +153,14 @@ def setup_cli():
         action="store_true",
         help="No stdout output; still writes file unless --no-log-file",
     )
+    
+    # HTML reporting options for map command
+    map_parser.add_argument(
+        "--no-html", action="store_true", help="Skip HTML report generation"
+    )
+    map_parser.add_argument(
+        "--html-dir", type=str, help="Custom directory for HTML and JSON reports"
+    )
 
     # Fuzzy matching options for map command
     map_parser.add_argument(
@@ -228,6 +236,14 @@ def setup_cli():
         action="store_true",
         help="No stdout output; still writes file unless --no-log-file",
     )
+    
+    # HTML reporting options for index_source command
+    index_source_parser.add_argument(
+        "--no-html", action="store_true", help="Skip HTML report generation"
+    )
+    index_source_parser.add_argument(
+        "--html-dir", type=str, help="Custom directory for HTML and JSON reports"
+    )
 
     # Index target subcommand
     index_target_parser = subparsers.add_parser(
@@ -268,6 +284,14 @@ def setup_cli():
         action="store_true",
         help="No stdout output; still writes file unless --no-log-file",
     )
+    
+    # HTML reporting options for index_target command
+    index_target_parser.add_argument(
+        "--no-html", action="store_true", help="Skip HTML report generation"
+    )
+    index_target_parser.add_argument(
+        "--html-dir", type=str, help="Custom directory for HTML and JSON reports"
+    )
 
     # Transform subcommand
     transform_parser = subparsers.add_parser(
@@ -298,6 +322,14 @@ def setup_cli():
         "--quiet",
         action="store_true",
         help="No stdout output; still writes file unless --no-log-file",
+    )
+    
+    # HTML reporting options for transform command
+    transform_parser.add_argument(
+        "--no-html", action="store_true", help="Skip HTML report generation"
+    )
+    transform_parser.add_argument(
+        "--html-dir", type=str, help="Custom directory for HTML and JSON reports"
     )
 
     # Parse arguments
