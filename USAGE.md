@@ -244,6 +244,108 @@ python -m transform_myd_minimal index_source --object m140 --variant bnka --no-l
 python -m transform_myd_minimal index_source --object m140 --variant bnka --log-file /custom/path/my_log.jsonl
 ```
 
+## HTML Reporting
+
+Transform MYD Minimal automatically generates interactive HTML reports for all F01–F04 steps alongside JSON summaries.
+
+### HTML Report Features
+
+- **Self-contained**: No external dependencies, all CSS/JS embedded inline
+- **Interactive**: Client-side table sorting, filtering, and search
+- **Visual**: KPI cards, bar charts using inline SVG
+- **Export**: CSV download buttons for all data tables
+- **Mobile-friendly**: Responsive design that works on all devices
+
+### Report Locations
+
+**F01-F03 Reports** (per object/variant):
+```
+migrations/<object>/<variant>/reports/
+├── index_source_20240922_1432.html     # F01: Source headers analysis
+├── index_source_20240922_1432.json
+├── index_target_20240922_1433.html     # F02: Target fields analysis  
+├── index_target_20240922_1433.json
+├── mapping_20240922_1434.html          # F03: Mapping results
+└── mapping_20240922_1434.json
+```
+
+**F04 Reports** (validation):
+```
+data/05_raw_validation/
+├── raw_validation_m140_bnka_20240922_1435.html     # Raw data validation
+├── raw_validation_m140_bnka_20240922_1435.json
+└── raw_validation_m140_bnka_20240922_1435.jsonl
+
+data/08_transformed_validation/  
+├── post_transform_validation_m140_bnka_20240922_1435.html  # Post-transform validation
+├── post_transform_validation_m140_bnka_20240922_1435.json
+└── post_transform_validation_m140_bnka_20240922_1435.jsonl
+```
+
+### Example Usage
+
+```bash
+# Default: Generate HTML + JSON reports
+python -m transform_myd_minimal index_source --object m140 --variant bnka
+# Output: report: migrations/m140/bnka/reports/index_source_20240922_1432.html
+
+# Skip HTML generation (JSON only)
+python -m transform_myd_minimal map --object m140 --variant bnka --no-html
+
+# Custom report directory
+python -m transform_myd_minimal transform --object m140 --variant bnka --html-dir /custom/reports
+```
+
+### Report Content by Step
+
+**F01 (index_source)** - Source Headers Analysis:
+- **KPIs**: Total columns, duplicates count, empty headers
+- **Chart**: N/A (header analysis)
+- **Tables**: Headers (field name, dtype, nullable, example)
+- **Lists**: Duplicate headers, warnings
+- **Downloads**: headers.csv
+
+**F02 (index_target)** - Target Fields Analysis:
+- **KPIs**: Total fields, mandatory fields, key fields  
+- **Chart**: Field groups distribution (key vs control data)
+- **Tables**: Target fields (SAP field, table, mandatory, key, data type, length)
+- **Lists**: Anomalies, validation scaffold status
+- **Downloads**: target_fields.csv
+
+**F03 (map)** - Mapping Results:
+- **KPIs**: Mapped, unmapped, to-audit, unused sources
+- **Chart**: N/A (mapping analysis)
+- **Tables**: Mappings (target field, source header, confidence, status, rationale), To-audit items
+- **Lists**: Unmapped source fields, unmapped target fields
+- **Downloads**: mappings.csv, to_audit.csv, unmapped_sources.csv, unmapped_targets.csv
+
+**F04 (transform)** - Validation Reports:
+
+*RAW Validation (Step 2):*
+- **KPIs**: Rows in, missing sources count
+- **Chart**: Top null rates by source column  
+- **Tables**: Null rates by source (column, percentage)
+- **Lists**: Missing source columns
+- **Downloads**: null_rates.csv, missing_sources.csv
+
+*POST Validation (Step 8):*
+- **KPIs**: Rows in/out/rejected, mapped coverage percentage
+- **Chart**: Top errors by validation rule
+- **Tables**: Errors by rule, errors by field, sample rejected rows
+- **Lists**: Ignored target fields
+- **Downloads**: errors_by_rule.csv, errors_by_field.csv, sample_rows.csv
+- **Footer**: CSV export requirements (UTF-8, CRLF, etc.)
+
+### Accessing Reports
+
+HTML reports are self-contained and can be:
+- Opened directly in any web browser
+- Shared via email or file transfer
+- Hosted on web servers for team access
+- Archived for audit purposes
+
+The embedded JSON data in each HTML report (in `<script id="data">` tag) can be extracted for further analysis or integration with other tools.
+
 ## Error Handling
 
 ### Exit Codes
