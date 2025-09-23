@@ -1,0 +1,69 @@
+metadata:
+  object: m140
+  variant: bnka
+  target_file: data/02_target/m140_bnka.xml
+  generated_at: '2025-09-23T04:28:26.375511'
+  structure: S_BNKA
+
+
+
+validation:
+- field: BUKRS
+  key: true
+  required: true
+  type: string
+  max_length: 4
+
+- field: BANKS
+  key: true
+  required: true
+  type: string
+  max_length: 3
+
+- field: BANKL
+  key: true
+  required: true
+  type: string
+  max_length: 15
+
+- field: BANKA
+  key: false
+  required: false
+  type: string
+  max_length: 60
+
+- field: SWIFT
+  key: false
+  required: false
+  type: string
+  max_length: 11
+
+- field: WAERS
+  key: false
+  required: false
+  type: string
+  max_length: 5
+
+- field: KOINH
+  key: false
+  required: false
+  type: string
+  max_length: 60
+
+- field: MANDT
+  key: true
+  required: true
+  type: string
+  max_length: 3
+
+- field: RECTYPE
+  key: true
+  required: true
+  type: string
+  max_length: 1
+
+- field: EXTRACT_DATE
+  key: true
+  required: true
+  type: date
+  max_length: 8

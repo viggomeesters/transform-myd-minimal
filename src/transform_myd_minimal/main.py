@@ -1359,6 +1359,91 @@ def run_index_target_command(args, config):
             ),
             "warnings": validation_warnings,
         }
+        
+        # Generate HTML report if enabled
+        if not getattr(args, 'no_html', False):
+            from .reporting import write_html_report
+            import json
+            from datetime import datetime as dt
+            
+            timestamp = dt.now().strftime("%Y%m%d_%H%M")
+            
+            # Determine report directory
+            if hasattr(args, 'html_dir') and args.html_dir:
+                reports_dir = Path(args.html_dir)
+            else:
+                reports_dir = output_dir / "reports"
+            
+            # Count field groups for chart data
+            field_groups = {}
+            mandatory_count = 0
+            key_count = 0
+            
+            for field in target_fields:
+                group = field.get("field_group", "unknown")
+                field_groups[group] = field_groups.get(group, 0) + 1
+                if field.get("mandatory", False):
+                    mandatory_count += 1
+                if field.get("key", False):
+                    key_count += 1
+            
+            # Check for enforced 10-key rule
+            order_ok = key_count == 10
+            
+            # Generate enriched summary for HTML report
+            html_summary = {
+                "step": "index_target",
+                "object": args.object,
+                "variant": args.variant,
+                "structure": f"S_{args.variant.upper()}",
+                "ts": dt.now().isoformat(),
+                "input_file": str(input_file.relative_to(root_path)),
+                "total_fields": len(target_fields),
+                "mandatory": mandatory_count,
+                "keys": key_count,
+                "groups": field_groups,
+                "order_ok": order_ok,
+                "sample_fields": [
+                    {
+                        "sap_field": field.get("sap_field", ""),
+                        "sap_table": field.get("sap_table", ""),
+                        "mandatory": field.get("mandatory", False),
+                        "key": field.get("key", False),
+                        "data_type": field.get("data_type", ""),
+                        "length": field.get("length", ""),
+                        "decimal": field.get("decimal", "")
+                    }
+                    for field in target_fields
+                ],
+                "anomalies": [],  # Could be enhanced with anomaly detection
+                "validation_scaffold": {
+                    "created": validation_created == "created",
+                    "path": f"migrations/{args.object}/{args.variant}/validation.yaml",
+                    "rules_count": len(validation_rules) if validation_created == "created" else 0
+                },
+                "warnings": validation_warnings
+            }
+            
+            # Write JSON summary
+            json_filename = f"index_target_{timestamp}.json"
+            json_path = reports_dir / json_filename
+            json_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            with open(json_path, 'w', encoding='utf-8') as f:
+                json.dump(html_summary, f, ensure_ascii=False, indent=2)
+            
+            # Write HTML report
+            html_filename = f"index_target_{timestamp}.html"
+            html_path = reports_dir / html_filename
+            title = f"index_target · S_{args.variant.upper()} · {args.object}/{args.variant}"
+            
+            write_html_report(html_summary, html_path, title)
+            
+            # Human-readable logging with forward slashes
+            html_path_display = str(html_path.relative_to(root_path)).replace('\\', '/')
+            if not (args.json or not sys.stdout.isatty()):
+                print(f"report: {html_path_display}")
+        
         logger.log_event(summary_data, preview_data)
 
     except Exception as e:
