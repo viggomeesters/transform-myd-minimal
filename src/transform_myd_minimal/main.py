@@ -2350,6 +2350,54 @@ def run_transform_command(args, config):
         with open(raw_validation_json, "w", encoding="utf-8") as f:
             json.dump(raw_stats, f, indent=2)
 
+        # Generate HTML report for RAW validation if enabled
+        if not getattr(args, 'no_html', False):
+            from .reporting import write_html_report
+            from datetime import datetime as dt
+            
+            timestamp_html = dt.now().strftime("%Y%m%d_%H%M")
+            
+            # Determine report directory for RAW validation
+            if hasattr(args, 'html_dir') and args.html_dir:
+                reports_dir = Path(args.html_dir)
+            else:
+                reports_dir = raw_validation_dir
+            
+            # Generate enriched summary for RAW validation HTML report
+            null_rate_by_source = {stat["source_header"]: stat["pct_empty"] / 100.0 for stat in raw_stats}
+            missing_sources = [stat["source_header"] for stat in raw_stats if stat["pct_empty"] == 100.0]
+            
+            html_summary_raw = {
+                "step": "raw_validation",
+                "object": args.object,
+                "variant": args.variant,
+                "ts": dt.now().isoformat(),
+                "rows_in": len(raw_df),
+                "null_rate_by_source": null_rate_by_source,
+                "missing_sources": missing_sources,
+                "warnings": [w for w in warnings if w.get("warning") == "missing_source_column"]
+            }
+            
+            # Write JSON summary for RAW validation
+            json_filename_raw = f"raw_validation_{args.object}_{args.variant}_{timestamp_html}.json"
+            json_path_raw = reports_dir / json_filename_raw
+            json_path_raw.parent.mkdir(parents=True, exist_ok=True)
+            
+            with open(json_path_raw, 'w', encoding='utf-8') as f:
+                json.dump(html_summary_raw, f, ensure_ascii=False, indent=2)
+            
+            # Write HTML report for RAW validation
+            html_filename_raw = f"raw_validation_{args.object}_{args.variant}_{timestamp_html}.html"
+            html_path_raw = reports_dir / html_filename_raw
+            title_raw = f"raw_validation · {args.object}/{args.variant}"
+            
+            write_html_report(html_summary_raw, html_path_raw, title_raw)
+            
+            # Human-readable logging with forward slashes
+            html_path_display_raw = str(html_path_raw.relative_to(root_path)).replace('\\', '/')
+            if not (args.json or not sys.stdout.isatty()):
+                print(f"report: {html_path_display_raw}")
+
         # 3) Create skeleton DataFrame with target field base names
         logger.info("Creating skeleton with target fields...")
         skeleton_columns = {}
@@ -2597,6 +2645,82 @@ def run_transform_command(args, config):
 
         with open(post_transform_json, "w", encoding="utf-8") as f:
             json.dump(post_stats, f, indent=2)
+
+        # Generate HTML report for POST-transform validation if enabled
+        if not getattr(args, 'no_html', False):
+            from .reporting import write_html_report
+            from datetime import datetime as dt
+            
+            timestamp_html = dt.now().strftime("%Y%m%d_%H%M")
+            
+            # Determine report directory for POST validation
+            if hasattr(args, 'html_dir') and args.html_dir:
+                reports_dir = Path(args.html_dir)
+            else:
+                reports_dir = transformed_validation_dir
+            
+            # Calculate mapped coverage
+            total_mapped_fields = len([m for m in mapping_entries if m.get("source_header")])
+            total_target_fields = len(target_fields)
+            mapped_coverage = total_mapped_fields / total_target_fields if total_target_fields > 0 else 0.0
+            
+            # Generate sample rows with errors
+            sample_rows = []
+            if len(final_data) > 0:
+                error_sample = final_data.head(200)  # Take first 200 rows
+                for idx, row in error_sample.iterrows():
+                    row_dict = {"__rownum": idx + 1}
+                    # Add top 3 target fields as sample
+                    target_sample = list(final_data.columns)[:3]
+                    for col in target_sample:
+                        row_dict[col] = str(row[col]) if pd.notna(row[col]) else ""
+                    
+                    # Add errors (simplified - could be enhanced with actual validation)
+                    row_errors = []
+                    for col in target_sample:
+                        if pd.isna(row[col]) or str(row[col]).strip() == "":
+                            row_errors.append(f"{col}.required")
+                    row_dict["errors"] = row_errors
+                    sample_rows.append(row_dict)
+            
+            # Generate enriched summary for POST-transform validation HTML report
+            html_summary_post = {
+                "step": "post_transform_validation",
+                "object": args.object,
+                "variant": args.variant,
+                "structure": f"S_{args.variant.upper()}",
+                "ts": dt.now().isoformat(),
+                "rows_in": rows_in,
+                "rows_out": rows_out,
+                "rows_rejected": rows_rejected,
+                "mapped_coverage": mapped_coverage,
+                "template_used": template_path or f"data/03_templates/S_{args.variant.upper()}#*.csv",
+                "ignored_targets": ignored_targets,
+                "errors_by_rule": error_stats,
+                "errors_by_field": post_stats["errors_by_field"],
+                "sample_rows": sample_rows,
+                "warnings": warnings
+            }
+            
+            # Write JSON summary for POST validation
+            json_filename_post = f"post_transform_validation_{args.object}_{args.variant}_{timestamp_html}.json"
+            json_path_post = reports_dir / json_filename_post
+            json_path_post.parent.mkdir(parents=True, exist_ok=True)
+            
+            with open(json_path_post, 'w', encoding='utf-8') as f:
+                json.dump(html_summary_post, f, ensure_ascii=False, indent=2)
+            
+            # Write HTML report for POST validation
+            html_filename_post = f"post_transform_validation_{args.object}_{args.variant}_{timestamp_html}.html"
+            html_path_post = reports_dir / html_filename_post
+            title_post = f"post_transform_validation · S_{args.variant.upper()} · {args.object}/{args.variant}"
+            
+            write_html_report(html_summary_post, html_path_post, title_post)
+            
+            # Human-readable logging with forward slashes
+            html_path_display_post = str(html_path_post.relative_to(root_path)).replace('\\', '/')
+            if not (args.json or not sys.stdout.isatty()):
+                print(f"report: {html_path_display_post}")
 
         # Calculate final metrics
         duration_ms = int((time.time() - start_time) * 1000)
