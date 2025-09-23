@@ -1775,13 +1775,16 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
 
 def run_map_command(args, config):
     """Run the map command - generates mapping from indexed source and target YAML files."""
+    from .enhanced_logging import EnhancedLogger
     import time
 
     start_time = time.time()
-    logger.info(f"=== Map Command: {args.object}/{args.variant} ===")
-
+    
     # Set up paths using root directory
     root_path = Path(args.root)
+    
+    # Initialize enhanced logger
+    logger = EnhancedLogger(args, "map", args.object, args.variant, root_path)
     migrations_dir = root_path / "migrations" / args.object / args.variant
     source_index_file = migrations_dir / "index_source.yaml"
     target_index_file = migrations_dir / "index_target.yaml"
@@ -1795,45 +1798,27 @@ def run_map_command(args, config):
     # Check for required files with proper exit codes
     if not source_index_file.exists():
         error_data = {
-            "error": "missing_index_source",
-            "object": args.object,
-            "variant": args.variant,
-            "expected_path": str(source_index_file),
+            "error": "missing_input",
+            "path": str(source_index_file),
         }
-        if args.json or not sys.stdout.isatty():
-            print(json.dumps(error_data))
-        else:
-            logger.error(f"Source index file not found: {source_index_file}")
+        logger.log_error(error_data)
         sys.exit(2)
 
     if not target_index_file.exists():
         error_data = {
-            "error": "missing_index_target",
-            "object": args.object,
-            "variant": args.variant,
-            "expected_path": str(target_index_file),
+            "error": "missing_input",
+            "path": str(target_index_file),
         }
-        if args.json or not sys.stdout.isatty():
-            print(json.dumps(error_data))
-        else:
-            logger.error(f"Target index file not found: {target_index_file}")
+        logger.log_error(error_data)
         sys.exit(3)
 
     # Check if output exists and enforce --force policy
     if mapping_file.exists() and not args.force:
         error_data = {
             "error": "would_overwrite",
-            "object": args.object,
-            "variant": args.variant,
-            "existing_file": str(mapping_file),
-            "message": "Use --force to overwrite existing mapping.yaml",
+            "path": str(mapping_file),
         }
-        if args.json or not sys.stdout.isatty():
-            print(json.dumps(error_data))
-        else:
-            logger.error(
-                f"Output file exists: {mapping_file}. Use --force to overwrite."
-            )
+        logger.log_error(error_data)
         sys.exit(5)
 
     try:
@@ -1850,15 +1835,10 @@ def run_map_command(args, config):
 
         if not target_fields:
             error_data = {
-                "error": "no_targets",
-                "object": args.object,
-                "variant": args.variant,
+                "error": "exception",
                 "message": "No target fields found in index_target.yaml",
             }
-            if args.json or not sys.stdout.isatty():
-                print(json.dumps(error_data))
-            else:
-                logger.error("No target fields found in index_target.yaml")
+            logger.log_error(error_data)
             sys.exit(4)
 
         # Load central mapping memory (synonyms) if available
@@ -2002,51 +1982,18 @@ def run_map_command(args, config):
                 "\\", "/"
             )
 
-        # Log JSONL summary and audit records
-        if not args.quiet:
-            if args.json or not sys.stdout.isatty():
-                print(json.dumps(summary_data))
-                # Log audit records for each target
-                for mapping in mapping_result["mappings"]:
-                    audit_data = {
-                        "step": "map",
-                        "target": f"S_{args.variant.upper()}.{mapping['target_field']}",
-                        "decision": {
-                            "source": mapping["source_header"],
-                            "confidence": mapping["confidence"],
-                            "status": mapping["status"],
-                            "reason": mapping["rationale"],
-                        },
-                        "candidates": [],  # Could add top-3 candidates here if we track them
-                    }
-                    print(json.dumps(audit_data))
-            else:
-                # Human preview format with Rich table like F01/F02
-                if not args.no_preview:
-                    console = Console()
-                    table = Table(title="Mapping Preview (first 12)")
-                    table.add_column("target_field")
-                    table.add_column("source_header")
-                    table.add_column("confidence")
-                    table.add_column("status")
+        # Prepare preview data for human output (first 12 mappings)
+        preview_data = []
+        for mapping in mapping_result["mappings"][:12]:
+            preview_data.append({
+                "target_field": mapping["target_field"],
+                "source_header": mapping["source_header"] or "null",
+                "confidence": f"{mapping['confidence']:.2f}",
+                "status": mapping["status"],
+            })
 
-                    for i, mapping in enumerate(mapping_result["mappings"][:12]):
-                        source_header = mapping["source_header"] or "null"
-                        table.add_row(
-                            mapping["target_field"],
-                            source_header,
-                            f"{mapping['confidence']:.2f}",
-                            mapping["status"],
-                        )
-
-                    console.print(table)
-
-                    if len(mapping_result["mappings"]) > 12:
-                        print(f"... and {len(mapping_result['mappings']) - 12} more")
-
-                print(
-                    f"\nmapped {mapped_count} • unmapped {unmapped_count} • to-audit {to_audit_count} • unused sources {unused_sources_count}"
-                )
+        # Log event using Enhanced Logger (this will handle both stdout and file logging)
+        logger.log_event(summary_data, preview_data)
 
         # Generate HTML report if enabled
         if not getattr(args, 'no_html', False):
@@ -2128,15 +2075,9 @@ def run_map_command(args, config):
             if not (args.json or not sys.stdout.isatty()):
                 print(f"report: {html_path_display}")
 
-        logger.info(f"Generated mapping.yaml: {mapping_file}")
-        logger.info("✓ Map command completed successfully!")
-
     except Exception as e:
         error_data = {"error": "exception", "message": str(e)}
-        if args.json or not sys.stdout.isatty():
-            print(json.dumps(error_data))
-        else:
-            logger.error(f"Error creating mapping: {e}")
+        logger.log_error(error_data)
         sys.exit(1)
 
 
@@ -2160,8 +2101,8 @@ def run_transform_command(args, config):
     root_path = Path(args.root)
     migrations_dir = root_path / "migrations" / args.object / args.variant
 
-    # Input files (F04 spec: data/03_raw/{object}_{variant}.xlsx)
-    raw_file = root_path / "data" / "03_raw" / f"{args.object}_{args.variant}.xlsx"
+    # Input files (F04 spec: data/04_raw/{object}_{variant}.xlsx)
+    raw_file = root_path / "data" / "04_raw" / f"{args.object}_{args.variant}.xlsx"
     mapping_file = migrations_dir / "mapping.yaml"
     target_index_file = migrations_dir / "index_target.yaml"
 
