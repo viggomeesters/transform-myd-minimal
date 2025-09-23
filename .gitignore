@@ -39,14 +39,25 @@ config/*/fields.yaml
 config/*/value_rules.yaml
 
 # Data files per spec F01-F04
-data/01_source
-data/02_target/  # test data
-data/04_raw/
-data/05_raw_validation/
-data/06_rejected/
-data/07_transformed/
-data/08_transformed_validation/
-data/09_logging/
+data/01_source/*
+!data/01_source/*test*
+
+data/04_raw/*
+!data/04_raw/*test*
+
+data/05_raw_validation/*
+!data/05_raw_validation/*test*
+
+data/06_rejected/*
+!data/06_rejected/*test*
+
+data/07_transformed/*
+!data/07_transformed/*test*
+
+data/08_transformed_validation/*
+!data/08_transformed_validation/*test*
+
+data/09_logging/*
 
 # Test migrations output
 migrations/test
@@ -54,6 +65,7 @@ migrations/object_list.yaml
 
 # Log files
 *.jsonl
+!data/09_logging/*test*.jsonl
 
 # Legacy output directory - deprecated
 output/
