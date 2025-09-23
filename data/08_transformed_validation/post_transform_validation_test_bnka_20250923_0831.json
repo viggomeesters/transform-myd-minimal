@@ -1,0 +1,922 @@
+{
+  "step": "post_transform_validation",
+  "object": "test",
+  "variant": "bnka",
+  "structure": "S_BNKA",
+  "ts": "2025-09-23T08:31:24.169778",
+  "rows_in": 8,
+  "rows_out": 8,
+  "rows_rejected": 0,
+  "mapped_coverage": 0.9166666666666666,
+  "template_used": "data/03_templates/S_BNKA#*.csv",
+  "ignored_targets": [],
+  "errors_by_rule": {},
+  "errors_by_field": {},
+  "sample_rows": [
+    {
+      "__rownum": 1,
+      "BANKS(k/*)": "NL",
+      "BANKL(k/*)": "11000",
+      "BANKA(*)": "Paarden BANK",
+      "errors": []
+    },
+    {
+      "__rownum": 2,
+      "BANKS(k/*)": "DE",
+      "BANKL(k/*)": "12000",
+      "BANKA(*)": "Herten Bank",
+      "errors": []
+    },
+    {
+      "__rownum": 3,
+      "BANKS(k/*)": "FR",
+      "BANKL(k/*)": "13500",
+      "BANKA(*)": "Water Bank NL",
+      "errors": []
+    },
+    {
+      "__rownum": 4,
+      "BANKS(k/*)": "GER",
+      "BANKL(k/*)": "16000",
+      "BANKA(*)": "Money Bank",
+      "errors": []
+    },
+    {
+      "__rownum": 5,
+      "BANKS(k/*)": "AT",
+      "BANKL(k/*)": "25000",
+      "BANKA(*)": "Bank Bank",
+      "errors": []
+    },
+    {
+      "__rownum": 6,
+      "BANKS(k/*)": "PL",
+      "BANKL(k/*)": "32000",
+      "BANKA(*)": "Gold Bank",
+      "errors": []
+    },
+    {
+      "__rownum": 7,
+      "BANKS(k/*)": "UK",
+      "BANKL(k/*)": "33000",
+      "BANKA(*)": "Fort Knox",
+      "errors": []
+    },
+    {
+      "__rownum": 8,
+      "BANKS(k/*)": "AT",
+      "BANKL(k/*)": "41000",
+      "BANKA(*)": "W bank",
+      "errors": []
+    }
+  ],
+  "field_profiles": {
+    "banks": {
+      "field": "banks",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 7,
+      "unique_ratio": 0.875,
+      "quality_score": 97.5,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 87.5,
+      "top_values": [
+        {
+          "value": "AT",
+          "count": 2
+        },
+        {
+          "value": "DE",
+          "count": 1
+        },
+        {
+          "value": "NL",
+          "count": 1
+        },
+        {
+          "value": "FR",
+          "count": 1
+        },
+        {
+          "value": "GER",
+          "count": 1
+        },
+        {
+          "value": "PL",
+          "count": 1
+        },
+        {
+          "value": "UK",
+          "count": 1
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-3"
+        ],
+        "counts": [
+          7,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "length": {
+        "min": 2,
+        "p50": 2,
+        "p95": 2,
+        "max": 3,
+        "mean": 2.12
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 1.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 0.0
+      },
+      "digit_ratio": 0.0,
+      "alpha_ratio": 1.0
+    },
+    "bankl": {
+      "field": "bankl",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 8,
+      "unique_ratio": 1.0,
+      "quality_score": 100,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 100.0,
+      "top_values": [
+        {
+          "value": "11000",
+          "count": 1
+        },
+        {
+          "value": "12000",
+          "count": 1
+        },
+        {
+          "value": "13500",
+          "count": 1
+        },
+        {
+          "value": "16000",
+          "count": 1
+        },
+        {
+          "value": "25000",
+          "count": 1
+        },
+        {
+          "value": "32000",
+          "count": 1
+        },
+        {
+          "value": "33000",
+          "count": 1
+        },
+        {
+          "value": "41000",
+          "count": 1
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "4-4",
+          "4-4",
+          "4-4",
+          "4-4",
+          "4-4",
+          "4-5",
+          "5-5",
+          "5-5",
+          "5-5",
+          "5-5",
+          "5-5",
+          "5-5"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 5,
+        "p50": 5,
+        "p95": 5,
+        "max": 5,
+        "mean": 5.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "banka": {
+      "field": "banka",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 8,
+      "unique_ratio": 1.0,
+      "quality_score": 100,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 100.0,
+      "top_values": [
+        {
+          "value": "Paarden BANK",
+          "count": 1
+        },
+        {
+          "value": "Herten Bank",
+          "count": 1
+        },
+        {
+          "value": "Water Bank NL",
+          "count": 1
+        },
+        {
+          "value": "Money Bank",
+          "count": 1
+        },
+        {
+          "value": "Bank Bank",
+          "count": 1
+        },
+        {
+          "value": "Gold Bank",
+          "count": 1
+        },
+        {
+          "value": "Fort Knox",
+          "count": 1
+        },
+        {
+          "value": "W bank",
+          "count": 1
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "6-6",
+          "6-7",
+          "7-7",
+          "7-8",
+          "8-8",
+          "8-9",
+          "9-10",
+          "10-10",
+          "10-11",
+          "11-11",
+          "11-12",
+          "12-13"
+        ],
+        "counts": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          3,
+          1,
+          0,
+          1,
+          0,
+          1,
+          1
+        ]
+      },
+      "length": {
+        "min": 6,
+        "p50": 9,
+        "p95": 12,
+        "max": 13,
+        "mean": 9.88
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 0.0,
+      "alpha_ratio": 0.884
+    },
+    "provz": {
+      "field": "provz",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "stras": {
+      "field": "stras",
+      "type": "string",
+      "count": 1,
+      "missing": 7,
+      "invalid": 0,
+      "unique": 1,
+      "unique_ratio": 1.0,
+      "quality_score": 65.0,
+      "missing_pct": 87.5,
+      "invalid_pct": 0.0,
+      "unique_pct": 100.0,
+      "top_values": [
+        {
+          "value": "HOECHTLGASSE 6",
+          "count": 1
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "0-1",
+          "1-2",
+          "2-3",
+          "3-4",
+          "4-5",
+          "5-7",
+          "7-8",
+          "8-9",
+          "9-10",
+          "10-11",
+          "11-12",
+          "12-14"
+        ],
+        "counts": [
+          7,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "length": {
+        "min": 14,
+        "p50": 14,
+        "p95": 14,
+        "max": 14,
+        "mean": 14.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 1.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 0.0
+      },
+      "digit_ratio": 0.0714,
+      "alpha_ratio": 0.8571
+    },
+    "ort01": {
+      "field": "ort01",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 8,
+      "unique_ratio": 1.0,
+      "quality_score": 100,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 100.0,
+      "top_values": [
+        {
+          "value": "Rotterdam",
+          "count": 1
+        },
+        {
+          "value": "Amsterdam",
+          "count": 1
+        },
+        {
+          "value": "Papendrecht",
+          "count": 1
+        },
+        {
+          "value": "Tilburg",
+          "count": 1
+        },
+        {
+          "value": "Groningen",
+          "count": 1
+        },
+        {
+          "value": "TOegauw",
+          "count": 1
+        },
+        {
+          "value": "Pramtal",
+          "count": 1
+        },
+        {
+          "value": "ödling",
+          "count": 1
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "6-6",
+          "6-6",
+          "6-7",
+          "7-7",
+          "7-8",
+          "8-8",
+          "8-8",
+          "8-9",
+          "9-9",
+          "9-10",
+          "10-10",
+          "10-11"
+        ],
+        "counts": [
+          1,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "length": {
+        "min": 6,
+        "p50": 8,
+        "p95": 10,
+        "max": 11,
+        "mean": 8.12
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.125,
+        "mixed_ratio": 0.875
+      },
+      "digit_ratio": 0.0,
+      "alpha_ratio": 0.9792
+    },
+    "brnch": {
+      "field": "brnch",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "swift": {
+      "field": "swift",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 8,
+      "unique_ratio": 1.0,
+      "quality_score": 100,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 100.0,
+      "top_values": [
+        {
+          "value": "EBILAEAD",
+          "count": 1
+        },
+        {
+          "value": "BAWAATWW",
+          "count": 1
+        },
+        {
+          "value": "GEBAATWW",
+          "count": 1
+        },
+        {
+          "value": "DEUTATWW",
+          "count": 1
+        },
+        {
+          "value": "RZBAATWW",
+          "count": 1
+        },
+        {
+          "value": "RLBBAT2E002",
+          "count": 1
+        },
+        {
+          "value": "RZOOAT2L455",
+          "count": 1
+        },
+        {
+          "value": "VBOEATWWBAD",
+          "count": 1
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "8-8",
+          "8-8",
+          "8-8",
+          "8-9",
+          "9-9",
+          "9-9",
+          "9-9",
+          "9-10",
+          "10-10",
+          "10-10",
+          "10-10",
+          "10-11"
+        ],
+        "counts": [
+          5,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3
+        ]
+      },
+      "length": {
+        "min": 8,
+        "p50": 8,
+        "p95": 11,
+        "max": 11,
+        "mean": 9.12
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 1.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 0.0
+      },
+      "digit_ratio": 0.0909,
+      "alpha_ratio": 0.9091
+    },
+    "xpgro": {
+      "field": "xpgro",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "bnklz": {
+      "field": "bnklz",
+      "type": "string",
+      "count": 7,
+      "missing": 1,
+      "invalid": 0,
+      "unique": 7,
+      "unique_ratio": 1.0,
+      "quality_score": 95.0,
+      "missing_pct": 12.5,
+      "invalid_pct": 0.0,
+      "unique_pct": 100.0,
+      "top_values": [
+        {
+          "value": "12000",
+          "count": 1
+        },
+        {
+          "value": "13000",
+          "count": 1
+        },
+        {
+          "value": "14000",
+          "count": 1
+        },
+        {
+          "value": "15000",
+          "count": 1
+        },
+        {
+          "value": "16000",
+          "count": 1
+        },
+        {
+          "value": "17000",
+          "count": 1
+        },
+        {
+          "value": "18000",
+          "count": 1
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-1",
+          "1-1",
+          "1-2",
+          "2-2",
+          "2-2",
+          "2-3",
+          "3-3",
+          "3-4",
+          "4-4",
+          "4-5"
+        ],
+        "counts": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          7
+        ]
+      },
+      "length": {
+        "min": 5,
+        "p50": 5,
+        "p95": 5,
+        "max": 5,
+        "mean": 5.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "bgrup": {
+      "field": "bgrup",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "isnotoverwrite": {
+      "field": "isnotoverwrite",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "warnings": [
+    {
+      "warning": "template_missing"
+    }
+  ]
+}
