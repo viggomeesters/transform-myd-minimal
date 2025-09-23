@@ -310,27 +310,41 @@ def generate_mapping_yaml(mapping_result: Dict[str, Any], output_path: Path) -> 
         f.write(
             f"# Coverage: {mapping_result['stats']['coverage_percentage']:.1f}%\n\n"
         )
-        
+
         # Write metadata section
         metadata_data = {"metadata": mapping_data["metadata"]}
         yaml.dump(metadata_data, f, default_flow_style=False, allow_unicode=True)
         f.write("\n")  # Add empty line after metadata
-        
+
         # Write mappings section
         mappings_section = {"mappings": mapping_data["mappings"]}
         yaml.dump(mappings_section, f, default_flow_style=False, allow_unicode=True)
         f.write("\n")  # Add empty line after mappings
-        
+
         # Write unmatched sources section
         if mapping_data["unmatched_sources"]:
-            unmatched_sources_section = {"unmatched_sources": mapping_data["unmatched_sources"]}
-            yaml.dump(unmatched_sources_section, f, default_flow_style=False, allow_unicode=True)
+            unmatched_sources_section = {
+                "unmatched_sources": mapping_data["unmatched_sources"]
+            }
+            yaml.dump(
+                unmatched_sources_section,
+                f,
+                default_flow_style=False,
+                allow_unicode=True,
+            )
             f.write("\n")  # Add empty line after unmatched_sources
-        
+
         # Write unmatched targets section
         if mapping_data["unmatched_targets"]:
-            unmatched_targets_section = {"unmatched_targets": mapping_data["unmatched_targets"]}
-            yaml.dump(unmatched_targets_section, f, default_flow_style=False, allow_unicode=True)
+            unmatched_targets_section = {
+                "unmatched_targets": mapping_data["unmatched_targets"]
+            }
+            yaml.dump(
+                unmatched_targets_section,
+                f,
+                default_flow_style=False,
+                allow_unicode=True,
+            )
 
     logger.info(f"Generated mapping.yaml: {output_path}")
 

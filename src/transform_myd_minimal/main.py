@@ -711,11 +711,11 @@ def run_index_source_command(args, config):
     logger = EnhancedLogger(args, "index_source", args.object, args.variant, root_path)
 
     try:
-        # Construct input file path for index_source command
+        # Construct input file path for index_source command (F01 spec: data/01_source/<object>_<variant>.xlsx)
         input_file = (
             root_path
             / config.input_dir
-            / f"index_source_{args.object}_{args.variant}.xlsx"
+            / f"{args.object}_{args.variant}.xlsx"
         )
 
         # Check if input file exists
@@ -778,7 +778,7 @@ def run_index_source_command(args, config):
             )
         else:
             # Create YAML structure with correct schema
-            source_data = {
+            {
                 "metadata": {
                     "object": args.object,
                     "variant": args.variant,
@@ -950,7 +950,7 @@ def _parse_spreadsheetml_target_fields(
 
     # Process data rows
     target_fields = []
-    structure_pattern = f"S_{variant.upper()}"
+    f"S_{variant.upper()}"
     field_count = 1
 
     for row_data in parsed_rows[header_row_idx + 1 :]:
@@ -1066,7 +1066,6 @@ def _parse_spreadsheetml_target_fields(
 def run_index_target_command(args, config):
     """Run the index_target command - parse XML and filter target fields by variant."""
     from .enhanced_logging import EnhancedLogger
-    import xml.etree.ElementTree as ET
     from datetime import datetime
     from pathlib import Path
 
@@ -1075,18 +1074,18 @@ def run_index_target_command(args, config):
     # Initialize enhanced logger
     logger = EnhancedLogger(args, "index_target", args.object, args.variant, root_path)
 
-    # Construct input file path - check both .xml and fallback formats
+    # Construct input file path - check both .xml and fallback formats (F02 spec: data/02_target/{object}_{variant}.xml)
     input_file = (
-        root_path / f"data/02_target/index_target_{args.object}_{args.variant}.xml"
+        root_path / f"data/02_target/{args.object}_{args.variant}.xml"
     )
 
     # Check for fallback files if XML doesn't exist
     if not input_file.exists():
         json_file = (
-            root_path / f"data/02_target/index_target_{args.object}_{args.variant}.json"
+            root_path / f"data/02_target/{args.object}_{args.variant}.json"
         )
         yaml_file = (
-            root_path / f"data/02_target/index_target_{args.object}_{args.variant}.yaml"
+            root_path / f"data/02_target/{args.object}_{args.variant}.yaml"
         )
 
         if json_file.exists():
@@ -1125,11 +1124,11 @@ def run_index_target_command(args, config):
             sys.exit(3)
 
         # Create output YAML structure with exact metadata schema
-        target_data = {
+        {
             "metadata": {
                 "object": args.object,
                 "variant": args.variant,
-                "target_file": f"data/02_target/index_target_{args.object}_{args.variant}.xml",
+                "target_file": f"data/02_target/{args.object}_{args.variant}.xml",
                 "generated_at": datetime.now().isoformat(),
                 "structure": f"S_{args.variant.upper()}",
                 "target_fields_count": len(target_fields),
@@ -1144,7 +1143,7 @@ def run_index_target_command(args, config):
             f.write(f"  object: {args.object}\n")
             f.write(f"  variant: {args.variant}\n")
             f.write(
-                f"  target_file: data/02_target/index_target_{args.object}_{args.variant}.xml\n"
+                f"  target_file: data/02_target/{args.object}_{args.variant}.xml\n"
             )
             f.write(f"  generated_at: '{datetime.now().isoformat()}'\n")
             f.write(f"  structure: S_{args.variant.upper()}\n")
@@ -1246,7 +1245,7 @@ def run_index_target_command(args, config):
                 f.write(f"  object: {args.object}\n")
                 f.write(f"  variant: {args.variant}\n")
                 f.write(
-                    f"  target_file: data/02_target/index_target_{args.object}_{args.variant}.xml\n"
+                    f"  target_file: data/02_target/{args.object}_{args.variant}.xml\n"
                 )
                 f.write(f"  generated_at: '{datetime.now().isoformat()}'\n")
                 f.write(f"  structure: S_{args.variant.upper()}\n")
@@ -1406,7 +1405,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
 
     # Extract verbatim and normalized headers
     verbatim_headers = [field.get("field_name", "") for field in source_fields]
-    norm_headers = [norm(header) for header in verbatim_headers]
+    [norm(header) for header in verbatim_headers]
 
     # Create fuzzy matcher components
     normalizer = FieldNormalizer()
@@ -1632,9 +1631,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
 
 def run_map_command(args, config):
     """Run the map command - generates mapping from indexed source and target YAML files."""
-    import json
     import time
-    from collections import OrderedDict
 
     start_time = time.time()
     logger.info(f"=== Map Command: {args.object}/{args.variant} ===")
@@ -1923,110 +1920,112 @@ def run_transform_command(args, config):
     """Run the transform command - transforms raw data through ETL pipeline to SAP CSV."""
     import csv
     import glob
-    import json
     import re
     import time
-    from collections import OrderedDict
     from datetime import datetime
 
     start_time = time.time()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-    
+
     # Track warnings for final summary
     warnings = []
-    
+
     logger.info(f"=== Transform Command: {args.object}/{args.variant} ===")
 
     # Set up paths using root directory
     root_path = Path(args.root)
     migrations_dir = root_path / "migrations" / args.object / args.variant
-    
-    # Input files
-    raw_file = root_path / "data" / "04_raw" / f"raw_{args.object}_{args.variant}.xlsx"
+
+    # Input files (F04 spec: data/03_raw/{object}_{variant}.xlsx)
+    raw_file = root_path / "data" / "03_raw" / f"{args.object}_{args.variant}.xlsx"
     mapping_file = migrations_dir / "mapping.yaml"
     target_index_file = migrations_dir / "index_target.yaml"
-    
+
     # Optional config files
     transformations_file = root_path / "config" / "transformations.yaml"
     value_rules_file = root_path / "config" / "value_rules.yaml"
     validation_file = root_path / "config" / "validation.yaml"
-    central_mapping_file = root_path / "config" / "central_mapping_memory.yaml"
-    
+    root_path / "config" / "central_mapping_memory.yaml"
+
     # Output paths
     output_dir = root_path / "data" / "07_transformed"
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     rejects_dir = root_path / "data" / "06_rejected"
     rejects_dir.mkdir(parents=True, exist_ok=True)
-    
+
     raw_validation_dir = root_path / "data" / "05_raw_validation"
     raw_validation_dir.mkdir(parents=True, exist_ok=True)
-    
+
     transformed_validation_dir = root_path / "data" / "08_transformed_validation"
     transformed_validation_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Template glob pattern
-    template_glob = str(root_path / "data" / "03_templates" / f"S_{args.variant.upper()}#*.csv")
-    
+
+    # Template glob pattern  
+    template_glob = str(
+        root_path / "data" / "03_templates" / f"S_{args.variant.upper()}#*.csv"
+    )
+
     # Primary outputs
     sap_csv = output_dir / f"S_{args.variant.upper()}#{args.object}_Data.csv"
-    snapshot_csv = output_dir / f"S_{args.variant.upper()}#{args.object}_{timestamp}_output.csv"
+    snapshot_csv = (
+        output_dir / f"S_{args.variant.upper()}#{args.object}_{timestamp}_output.csv"
+    )
     rejects_csv = rejects_dir / f"rejected_{args.object}_{args.variant}_{timestamp}.csv"
-    
+
     # Check required files
     if not raw_file.exists():
         error_data = {
             "error": "missing_raw",
             "object": args.object,
             "variant": args.variant,
-            "expected_path": str(raw_file)
+            "expected_path": str(raw_file),
         }
         if args.json or not sys.stdout.isatty():
             print(json.dumps(error_data))
         else:
             logger.error(f"Raw XLSX file not found: {raw_file}")
         sys.exit(2)
-        
+
     if not mapping_file.exists():
         error_data = {
             "error": "missing_mapping",
             "object": args.object,
             "variant": args.variant,
-            "expected_path": str(mapping_file)
+            "expected_path": str(mapping_file),
         }
         if args.json or not sys.stdout.isatty():
             print(json.dumps(error_data))
         else:
             logger.error(f"Mapping file not found: {mapping_file}")
         sys.exit(3)
-        
+
     if not target_index_file.exists():
         error_data = {
             "error": "missing_target_index",
             "object": args.object,
             "variant": args.variant,
-            "expected_path": str(target_index_file)
+            "expected_path": str(target_index_file),
         }
         if args.json or not sys.stdout.isatty():
             print(json.dumps(error_data))
         else:
             logger.error(f"Target index file not found: {target_index_file}")
         sys.exit(4)
-    
+
     # Check overwrite policy
     if (sap_csv.exists() or rejects_csv.exists()) and not args.force:
         error_data = {
             "error": "would_overwrite",
             "object": args.object,
             "variant": args.variant,
-            "existing_files": [str(f) for f in [sap_csv, rejects_csv] if f.exists()]
+            "existing_files": [str(f) for f in [sap_csv, rejects_csv] if f.exists()],
         }
         if args.json or not sys.stdout.isatty():
             print(json.dumps(error_data))
         else:
-            logger.error(f"Output files exist. Use --force to overwrite.")
+            logger.error("Output files exist. Use --force to overwrite.")
         sys.exit(5)
-    
+
     try:
         # Load raw data
         logger.info("Loading raw XLSX data...")
@@ -2035,44 +2034,42 @@ def run_transform_command(args, config):
         raw_df = raw_df.fillna("").astype(str)
         for col in raw_df.columns:
             raw_df[col] = raw_df[col].str.strip()
-        
+
         rows_in = len(raw_df)
         logger.info(f"Loaded {rows_in} rows from raw data")
-        
+
         # Load mapping configuration
         with open(mapping_file, "r", encoding="utf-8") as f:
             mapping_data = yaml.safe_load(f)
-        
+
         # Load target index
         with open(target_index_file, "r", encoding="utf-8") as f:
             target_data = yaml.safe_load(f)
         target_fields = target_data.get("target_fields", [])
-        
+
         # Load optional configurations
-        transformations = {}
         if transformations_file.exists():
             with open(transformations_file, "r", encoding="utf-8") as f:
-                transformations = yaml.safe_load(f) or {}
-        
-        value_rules = {}
+                yaml.safe_load(f) or {}
+
         if value_rules_file.exists():
             with open(value_rules_file, "r", encoding="utf-8") as f:
-                value_rules = yaml.safe_load(f) or {}
-        
+                yaml.safe_load(f) or {}
+
         validation_config = {}
         if validation_file.exists():
             with open(validation_file, "r", encoding="utf-8") as f:
                 validation_config = yaml.safe_load(f) or {}
-        
+
         # Template processing
         template_path = None
         template_headers = None
         template_matches = glob.glob(template_glob)
-        
+
         if template_matches:
             template_path = template_matches[0]  # Use first match
             logger.info(f"Using template: {template_path}")
-            
+
             # Read template headers
             with open(template_path, "r", encoding="utf-8", newline="") as f:
                 reader = csv.reader(f)
@@ -2080,91 +2077,102 @@ def run_transform_command(args, config):
         else:
             logger.warning(f"Template missing for pattern: {template_glob}")
             warnings.append({"warning": "template_missing"})
-        
+
         # 2) Raw validation report
         logger.info("Generating raw validation report...")
-        raw_validation_file = raw_validation_dir / f"raw_validation_{args.object}_{args.variant}_{timestamp}.csv"
-        raw_validation_json = raw_validation_dir / f"raw_validation_{args.object}_{args.variant}_{timestamp}.json"
-        
+        raw_validation_file = (
+            raw_validation_dir
+            / f"raw_validation_{args.object}_{args.variant}_{timestamp}.csv"
+        )
+        raw_validation_json = (
+            raw_validation_dir
+            / f"raw_validation_{args.object}_{args.variant}_{timestamp}.json"
+        )
+
         raw_stats = []
         for col in raw_df.columns:
             total = len(raw_df)
             empty_count = int((raw_df[col] == "").sum())
             pct_empty = (empty_count / total * 100) if total > 0 else 0
-            raw_stats.append({
-                "source_header": col,
-                "total": int(total),
-                "empty_count": empty_count,
-                "pct_empty": round(float(pct_empty), 2)
-            })
-        
+            raw_stats.append(
+                {
+                    "source_header": col,
+                    "total": int(total),
+                    "empty_count": empty_count,
+                    "pct_empty": round(float(pct_empty), 2),
+                }
+            )
+
         # Add warnings for missing source columns referenced in mapping
         mapping_entries = mapping_data.get("mappings", [])
         for mapping in mapping_entries:
             source_header = mapping.get("source_header")
             if source_header and source_header not in raw_df.columns:
-                warnings.append({"warning": "missing_source_column", "column": source_header})
-                raw_stats.append({
-                    "source_header": source_header,
-                    "total": len(raw_df),
-                    "empty_count": len(raw_df),
-                    "pct_empty": 100.0
-                })
-        
+                warnings.append(
+                    {"warning": "missing_source_column", "column": source_header}
+                )
+                raw_stats.append(
+                    {
+                        "source_header": source_header,
+                        "total": len(raw_df),
+                        "empty_count": len(raw_df),
+                        "pct_empty": 100.0,
+                    }
+                )
+
         # Save raw validation
         raw_stats_df = pd.DataFrame(raw_stats)
         raw_stats_df.to_csv(raw_validation_file, index=False)
         with open(raw_validation_json, "w", encoding="utf-8") as f:
             json.dump(raw_stats, f, indent=2)
-        
+
         # 3) Create skeleton DataFrame with target field base names
         logger.info("Creating skeleton with target fields...")
         skeleton_columns = {}
         ignored_targets = []
-        
+
         for target in target_fields:
             sap_field = target.get("sap_field", "")
             base_name = sap_field.upper() if sap_field else ""
             if base_name:
                 skeleton_columns[base_name.lower()] = base_name
-        
+
         # Initialize skeleton with all target columns (lowercase keys, empty values)
         skeleton = pd.DataFrame(index=raw_df.index)
         for col_lower in skeleton_columns.keys():
             skeleton[col_lower] = ""
-        
+
         # 4) Fill skeleton from mapping
         logger.info("Filling skeleton from mapping...")
         for mapping in mapping_entries:
             target_field = mapping.get("target_field", "")
             source_header = mapping.get("source_header")
-            
+
             if target_field and source_header:
                 target_base = target_field.upper()
                 target_lower = target_base.lower()
-                
+
                 if target_lower in skeleton.columns:
                     if source_header in raw_df.columns:
                         skeleton[target_lower] = raw_df[source_header]
                     else:
                         # Already warned about missing source column
                         skeleton[target_lower] = ""
-        
+
         # 5) Apply transformations (basic implementation)
         logger.info("Applying transformations...")
         # TODO: Implement full transformation pipeline from transformations.yaml
-        
+
         # 6) Apply value rules (basic implementation)
         logger.info("Applying value rules...")
         # TODO: Implement value rules from value_rules.yaml
-        
+
         # 7) Validation and splitting
         logger.info("Validating data and splitting good/bad records...")
-        
+
         # Build validation rules from validation.yaml (with F02 fallback)
-        validation_rules = {}
         key_required_config = {}
-        
+
         # First, get key/required from F02 (index_target.yaml)
         for target in target_fields:
             sap_field = target.get("sap_field", "")
@@ -2172,9 +2180,9 @@ def run_transform_command(args, config):
                 base_name = sap_field.upper()
                 key_required_config[base_name] = {
                     "key": bool(target.get("key", False)),
-                    "required": bool(target.get("mandatory", False))
+                    "required": bool(target.get("mandatory", False)),
                 }
-        
+
         # Override with validation.yaml if present
         if validation_config:
             for field_name, rules in validation_config.items():
@@ -2185,68 +2193,78 @@ def run_transform_command(args, config):
                     if "key" in rules:
                         key_required_config[base_name]["key"] = bool(rules["key"])
                     if "required" in rules:
-                        key_required_config[base_name]["required"] = bool(rules["required"])
-                
+                        key_required_config[base_name]["required"] = bool(
+                            rules["required"]
+                        )
+
                 # Validate key=true implies required=true
                 config = key_required_config.get(base_name, {})
                 if config.get("key") and not config.get("required"):
                     error_data = {
                         "error": "invalid_validation_config",
                         "field": base_name,
-                        "issue": "key=true but required=false"
+                        "issue": "key=true but required=false",
                     }
                     if args.json or not sys.stdout.isatty():
                         print(json.dumps(error_data))
                     else:
-                        logger.error(f"Invalid validation config for {base_name}: key=true but required=false")
+                        logger.error(
+                            f"Invalid validation config for {base_name}: key=true but required=false"
+                        )
                     sys.exit(6)
-        
+
         # Apply validation rules
         rejected_rows = []
         error_stats = {}
-        
+
         for idx, row in skeleton.iterrows():
             row_errors = []
-            
+
             for col_lower, base_name in skeleton_columns.items():
                 value = row[col_lower]
                 config = key_required_config.get(base_name, {})
-                
+
                 # Required validation
                 if config.get("required", False) and value == "":
                     error_label = f"{base_name}.required"
                     row_errors.append(error_label)
                     error_stats[error_label] = error_stats.get(error_label, 0) + 1
-                
+
                 # TODO: Add other validation rules (regex, max_length, type, etc.)
-            
+
             if row_errors:
-                rejected_rows.append({
-                    "__rownum": idx + 1,
-                    "__errors": "|".join(row_errors),
-                    "__first_error": row_errors[0],
-                    "__timestamp": datetime.now().isoformat(),
-                    **{skeleton_columns[col]: row[col] for col in skeleton.columns}
-                })
-        
+                rejected_rows.append(
+                    {
+                        "__rownum": idx + 1,
+                        "__errors": "|".join(row_errors),
+                        "__first_error": row_errors[0],
+                        "__timestamp": datetime.now().isoformat(),
+                        **{skeleton_columns[col]: row[col] for col in skeleton.columns},
+                    }
+                )
+
         # Split into accepted and rejected
         rejected_indices = [r["__rownum"] - 1 for r in rejected_rows]
-        accepted_skeleton = skeleton.drop(index=rejected_indices) if rejected_indices else skeleton.copy()
-        
+        accepted_skeleton = (
+            skeleton.drop(index=rejected_indices)
+            if rejected_indices
+            else skeleton.copy()
+        )
+
         rows_out = len(accepted_skeleton)
         rows_rejected = len(rejected_rows)
-        
+
         # 8) Template processing and column annotation
         logger.info("Processing template and applying annotations...")
-        
+
         # Parse template headers to get base names and order
         template_map = {}  # base_name -> annotated_header
         final_column_order = []
-        
+
         if template_headers:
             for header in template_headers:
                 # Strip annotation to get base name
-                base_match = re.match(r'^([^()]+)', header.strip())
+                base_match = re.match(r"^([^()]+)", header.strip())
                 if base_match:
                     base_name = base_match.group(1).upper()
                     template_map[base_name] = header
@@ -2258,25 +2276,27 @@ def run_transform_command(args, config):
                 if sap_field:
                     base_name = sap_field.upper()
                     final_column_order.append(base_name)
-        
+
         # Check template vs targets reconciliation
         for base_name in skeleton_columns.values():
             if base_name not in template_map and template_headers:
-                warnings.append({"warning": "target_not_in_template", "field": base_name})
+                warnings.append(
+                    {"warning": "target_not_in_template", "field": base_name}
+                )
                 ignored_targets.append(base_name)
-        
+
         # Apply correct annotation based on validation config
         final_headers = []
         final_data = pd.DataFrame()
-        
+
         for base_name in final_column_order:
             if base_name in ignored_targets:
                 continue  # Skip fields not in template
-                
+
             config = key_required_config.get(base_name, {})
             key = config.get("key", False)
             required = config.get("required", False)
-            
+
             # Annotation rules
             if key and required:
                 annotated_header = f"{base_name}(k/*)"
@@ -2284,19 +2304,19 @@ def run_transform_command(args, config):
                 annotated_header = f"{base_name}(*)"
             else:
                 annotated_header = base_name
-            
+
             final_headers.append(annotated_header)
-            
+
             # Get data from skeleton
             col_lower = base_name.lower()
             if col_lower in accepted_skeleton.columns:
                 final_data[annotated_header] = accepted_skeleton[col_lower]
             else:
                 final_data[annotated_header] = ""
-        
+
         # 9) Write SAP CSV and Snapshot CSV
         logger.info("Writing SAP CSV and snapshot...")
-        
+
         def write_sap_csv(df, filepath):
             """Write CSV with SAP requirements: UTF-8, CRLF, proper quoting"""
             with open(filepath, "w", encoding="utf-8", newline="") as f:
@@ -2306,49 +2326,57 @@ def run_transform_command(args, config):
                     quotechar='"',
                     escapechar='"',
                     lineterminator="\r\n",
-                    quoting=csv.QUOTE_MINIMAL
+                    quoting=csv.QUOTE_MINIMAL,
                 )
                 # Write headers
                 writer.writerow(final_headers)
                 # Write data
                 for _, row in df.iterrows():
                     writer.writerow([row[col] for col in final_headers])
-        
+
         # Write primary SAP CSV
         write_sap_csv(final_data, sap_csv)
-        
+
         # Write snapshot CSV (same format)
         write_sap_csv(final_data, snapshot_csv)
-        
+
         # Write rejected records
         if rejected_rows:
             rejected_df = pd.DataFrame(rejected_rows)
             rejected_df.to_csv(rejects_csv, index=False)
-        
+
         # 10) Post-transform validation report
-        post_transform_file = transformed_validation_dir / f"post_transform_validation_{args.object}_{args.variant}_{timestamp}.csv"
-        post_transform_json = transformed_validation_dir / f"post_transform_validation_{args.object}_{args.variant}_{timestamp}.json"
-        
+        (
+            transformed_validation_dir
+            / f"post_transform_validation_{args.object}_{args.variant}_{timestamp}.csv"
+        )
+        post_transform_json = (
+            transformed_validation_dir
+            / f"post_transform_validation_{args.object}_{args.variant}_{timestamp}.json"
+        )
+
         post_stats = {
             "rows_in": rows_in,
             "rows_out": rows_out,
             "rows_rejected": rows_rejected,
             "errors_by_rule": error_stats,
-            "errors_by_field": {}
+            "errors_by_field": {},
         }
-        
+
         # Group errors by field
         for error_label in error_stats:
             field_name = error_label.split(".")[0]
-            post_stats["errors_by_field"][field_name] = post_stats["errors_by_field"].get(field_name, 0) + error_stats[error_label]
-        
+            post_stats["errors_by_field"][field_name] = (
+                post_stats["errors_by_field"].get(field_name, 0)
+                + error_stats[error_label]
+            )
+
         with open(post_transform_json, "w", encoding="utf-8") as f:
             json.dump(post_stats, f, indent=2)
-        
+
         # Calculate final metrics
         duration_ms = int((time.time() - start_time) * 1000)
-        
-        
+
         # Summary logging
         summary = {
             "step": "transform",
@@ -2367,13 +2395,15 @@ def run_transform_command(args, config):
             "rows_out": rows_out,
             "rows_rejected": rows_rejected,
             "duration_ms": duration_ms,
-            "warnings": warnings
+            "warnings": warnings,
         }
-        
+
         if args.json or not sys.stdout.isatty():
             print(json.dumps(summary))
         else:
-            print(f"✓ transform {args.object}/{args.variant}  in={rows_in}  out={rows_out}  rej={rows_rejected}")
+            print(
+                f"✓ transform {args.object}/{args.variant}  in={rows_in}  out={rows_out}  rej={rows_rejected}"
+            )
             print(f"sap:  {sap_csv}")
             print(f"snap: {snapshot_csv}")
             if rejected_rows:
@@ -2381,24 +2411,24 @@ def run_transform_command(args, config):
             print(f"template: {template_path or 'missing'}")
             print(f"time: {duration_ms}ms")
             print(f"warnings: {len(warnings)}")
-            
+
             # Preview: first 8 columns, 5 rows
             if not args.no_preview and len(final_data) > 0:
                 print("\nPreview:")
                 preview_cols = final_headers[:8]
                 preview_data = final_data[preview_cols].head(5)
-                
+
                 # Create a simple table view
                 for i, col in enumerate(preview_cols):
                     print(f"{i+1:2}. {col}")
-                
+
                 print()
                 for idx, row in preview_data.iterrows():
                     row_data = [str(row[col])[:15] for col in preview_cols]
                     print("   " + " | ".join(f"{val:<15}" for val in row_data))
-                    
+
         logger.info("✓ Transform command completed successfully!")
-        
+
     except Exception as e:
         error_data = {"error": "exception", "message": str(e)}
         if args.json or not sys.stdout.isatty():
