@@ -2544,10 +2544,11 @@ def run_transform_command(args, config):
                 for _, row in df.iterrows():
                     writer.writerow([row[col] for col in final_headers])
 
-        # Write primary SAP CSV (fixed name for SAP upload process)
+        # Write primary SAP CSV (fixed name format: S_{variant}#{object}_Data.csv)
         write_sap_csv(final_data, sap_csv)
 
-        # Write snapshot CSV (timestamped archive copy for audit/rollback)
+        # Write snapshot CSV (timestamped format: S_{variant}#{object}_{timestamp}_output.csv)
+        # Both formats are accepted by SAP Migrate Your Data as long as S_ prefix and # separator are used
         write_sap_csv(final_data, snapshot_csv)
 
         # Write rejected records
