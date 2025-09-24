@@ -705,6 +705,57 @@ def analyze_column_data(
         raise ValueError(f"Error analyzing column data: {e}")
 
 
+def apply_field_descriptions_from_central_memory(source_fields, central_memory, object_name, variant):
+    """
+    Apply field descriptions from central mapping memory for known fields.
+    
+    Args:
+        source_fields: List of source field dictionaries
+        central_memory: CentralMappingMemory instance
+        object_name: Object name for table-specific rules
+        variant: Variant name for table-specific rules
+        
+    Returns:
+        List of enhanced source_fields with descriptions from central mapping memory
+    """
+    if not central_memory:
+        return source_fields
+    
+    # Get effective rules for this table
+    skip_rules, manual_mappings = get_effective_rules_for_table(
+        central_memory, object_name, variant
+    )
+    
+    # Create lookup dictionaries for fast matching
+    skip_dict = {rule.source_field: rule for rule in skip_rules}
+    manual_dict = {mapping.source_field: mapping for mapping in manual_mappings}
+    
+    enhanced_fields = []
+    descriptions_applied = 0
+    
+    for field in source_fields:
+        enhanced_field = field.copy()
+        field_name = field.get("field_name", "")
+        
+        # Apply description from skip rules first (highest priority)
+        if field_name in skip_dict:
+            rule = skip_dict[field_name]
+            enhanced_field["field_description"] = rule.source_description
+            descriptions_applied += 1
+        # Apply description from manual mappings
+        elif field_name in manual_dict:
+            mapping = manual_dict[field_name]
+            enhanced_field["field_description"] = mapping.source_description
+            descriptions_applied += 1
+        
+        enhanced_fields.append(enhanced_field)
+    
+    if descriptions_applied > 0:
+        print(f"Applied {descriptions_applied} field descriptions from central mapping memory")
+    
+    return enhanced_fields
+
+
 def apply_field_name_fallback(source_fields, central_memory, object_name, variant, enhanced_logger):
     """
     Apply fallback mechanism for missing or unclear field_names using global mapping rules.
@@ -870,10 +921,14 @@ def run_index_source_command(args, config):
             logger.log_error(error_data)
             sys.exit(1)
 
-        # Load central mapping memory for field name fallbacks
+        # Load central mapping memory for field name fallbacks and descriptions
         central_memory = load_central_mapping_memory(root_path)
         if central_memory:
-            print("Loaded central mapping memory for field name fallbacks")
+            print("Loaded central mapping memory for field name fallbacks and descriptions")
+            # Apply field descriptions from central mapping memory first
+            source_fields = apply_field_descriptions_from_central_memory(
+                source_fields, central_memory, args.object, args.variant
+            )
             # Apply fallback mechanism for missing field_names
             source_fields = apply_field_name_fallback(
                 source_fields, central_memory, args.object, args.variant, logger
@@ -1605,6 +1660,76 @@ def update_object_list(object_name: str, variant: str, root_path: Path = None):
             yaml.dump(object_list_data, f, default_flow_style=False, allow_unicode=True)
 
 
+def apply_central_memory_to_unmapped_fields(mapping_result, central_memory, object_name, variant):
+    """
+    Post-process unmapped source fields to apply central mapping memory context.
+    
+    Args:
+        mapping_result: Result from process_f03_mapping
+        central_memory: CentralMappingMemory instance
+        object_name: Object name for table-specific rules
+        variant: Variant name for table-specific rules
+        
+    Returns:
+        Enhanced mapping_result with detailed unmapped field information
+    """
+    if not central_memory:
+        return mapping_result
+    
+    # Get effective rules for this table
+    skip_rules, manual_mappings = get_effective_rules_for_table(
+        central_memory, object_name, variant
+    )
+    
+    # Create lookup dictionaries
+    skip_dict = {rule.source_field: rule for rule in skip_rules if rule.skip}
+    manual_dict = {mapping.source_field: mapping for mapping in manual_mappings}
+    
+    # Transform simple unmapped field names to detailed objects
+    enhanced_unmapped_fields = []
+    
+    for field_name in mapping_result["unmapped_source_fields"]:
+        if field_name in skip_dict:
+            # This field is configured to be skipped
+            rule = skip_dict[field_name]
+            enhanced_unmapped_fields.append({
+                "confidence": 1.0,
+                "rationale": "Global skip field configured in central mapping memory",
+                "required": False,
+                "source_field_description": rule.source_description,
+                "source_field_name": field_name,
+                "source_header": None,
+                "status": "unmapped",
+                "target_field": None,
+                "target_table": None,
+                "comment": rule.comment
+            })
+        elif field_name in manual_dict:
+            # This field has a manual mapping but wasn't used (might be unmapped target)
+            mapping = manual_dict[field_name]
+            enhanced_unmapped_fields.append({
+                "confidence": 0.0,
+                "rationale": "Manual mapping configured but target not found",
+                "required": False,
+                "source_field_description": mapping.source_description,
+                "source_field_name": field_name,
+                "source_header": None,
+                "status": "unmapped",
+                "target_field": mapping.target,
+                "target_table": None,
+                "comment": mapping.comment
+            })
+        else:
+            # Regular unmapped field - keep as simple string for now
+            # Could be enhanced further if needed
+            enhanced_unmapped_fields.append(field_name)
+    
+    # Update the mapping result
+    mapping_result["unmapped_source_fields"] = enhanced_unmapped_fields
+    
+    return mapping_result
+
+
 def process_f03_mapping(source_fields, target_fields, synonyms, object_name, variant):
     """
     Process mapping according to F03 specification.
@@ -1984,9 +2109,12 @@ def run_map_command(args, config):
             logger.log_error(error_data)
             sys.exit(4)
 
-        # Load central mapping memory (synonyms) if available
+        # Load central mapping memory (full) if available
+        central_memory = load_central_mapping_memory(root_path)
         synonyms = {}
-        if central_mapping_file.exists():
+        if central_memory:
+            synonyms = central_memory.synonyms
+        elif central_mapping_file.exists():
             try:
                 with open(central_mapping_file, "r", encoding="utf-8") as f:
                     central_data = yaml.safe_load(f)
@@ -1998,6 +2126,12 @@ def run_map_command(args, config):
         mapping_result = process_f03_mapping(
             source_fields, target_fields, synonyms, args.object, args.variant
         )
+
+        # Post-process unmapped source fields with central mapping memory context
+        if central_memory:
+            mapping_result = apply_central_memory_to_unmapped_fields(
+                mapping_result, central_memory, args.object, args.variant
+            )
 
         # Calculate metrics for metadata
         mapped_count = len(
