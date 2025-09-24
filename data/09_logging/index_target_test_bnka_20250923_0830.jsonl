@@ -1,1 +1,0 @@
-{"step":"index_target","object":"test","variant":"bnka","input_file":"data/02_target/test_bnka.xml","output_file":"migrations/test/bnka/index_target.yaml","structure":"S_BNKA","total_fields":12,"validation_scaffold":"migrations/test/bnka/validation.yaml","rules_count":12,"warnings":[],"duration_ms":5}

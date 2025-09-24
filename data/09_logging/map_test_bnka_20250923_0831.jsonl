@@ -1,1 +1,0 @@
-{"step":"map","object":"test","variant":"bnka","source_index":"migrations/test/bnka/index_source.yaml","target_index":"migrations/test/bnka/index_target.yaml","output_file":"migrations/test/bnka/mapping.yaml","mapped":11,"unmapped":1,"to_audit":0,"unused_sources":26,"duration_ms":35,"warnings":[],"ruleset_sources":"config/central_mapping_memory.yaml"}

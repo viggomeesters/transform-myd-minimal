@@ -853,11 +853,11 @@ def run_index_source_command(args, config):
             
             timestamp = dt.now().strftime("%Y%m%d_%H%M")
             
-            # Determine report directory
+            # Determine report directory for F01 (index_source) reports
             if hasattr(args, 'html_dir') and args.html_dir:
                 reports_dir = Path(args.html_dir)
             else:
-                reports_dir = migrations_dir / "reports"
+                reports_dir = root_path / "data" / "03_index_source"
             
             # Generate enriched summary for HTML report
             html_summary = {
@@ -1368,11 +1368,11 @@ def run_index_target_command(args, config):
             
             timestamp = dt.now().strftime("%Y%m%d_%H%M")
             
-            # Determine report directory
+            # Determine report directory for F02 (index_target) reports
             if hasattr(args, 'html_dir') and args.html_dir:
                 reports_dir = Path(args.html_dir)
             else:
-                reports_dir = output_dir / "reports"
+                reports_dir = root_path / "data" / "04_index_target"
             
             # Count field groups for chart data
             field_groups = {}
@@ -2003,11 +2003,11 @@ def run_map_command(args, config):
             
             timestamp = dt.now().strftime("%Y%m%d_%H%M")
             
-            # Determine report directory
+            # Determine report directory for F03 (map) reports
             if hasattr(args, 'html_dir') and args.html_dir:
                 reports_dir = Path(args.html_dir)
             else:
-                reports_dir = Path(args.root) / "migrations" / args.object / args.variant / "reports"
+                reports_dir = root_path / "data" / "05_map"
             
             # Generate enriched summary for HTML report
             html_summary = {
@@ -2101,8 +2101,8 @@ def run_transform_command(args, config):
     root_path = Path(args.root)
     migrations_dir = root_path / "migrations" / args.object / args.variant
 
-    # Input files (F04 spec: data/04_raw/{object}_{variant}.xlsx)
-    raw_file = root_path / "data" / "04_raw" / f"{args.object}_{args.variant}.xlsx"
+    # Input files (F04 spec: data/07_raw/{object}_{variant}.xlsx)
+    raw_file = root_path / "data" / "07_raw" / f"{args.object}_{args.variant}.xlsx"
     mapping_file = migrations_dir / "mapping.yaml"
     target_index_file = migrations_dir / "index_target.yaml"
 
@@ -2113,21 +2113,21 @@ def run_transform_command(args, config):
     root_path / "config" / "central_mapping_memory.yaml"
 
     # Output paths
-    output_dir = root_path / "data" / "07_transformed"
+    output_dir = root_path / "data" / "10_transformed"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    rejects_dir = root_path / "data" / "06_rejected"
+    rejects_dir = root_path / "data" / "09_rejected"
     rejects_dir.mkdir(parents=True, exist_ok=True)
 
-    raw_validation_dir = root_path / "data" / "05_raw_validation"
+    raw_validation_dir = root_path / "data" / "08_raw_validation"
     raw_validation_dir.mkdir(parents=True, exist_ok=True)
 
-    transformed_validation_dir = root_path / "data" / "08_transformed_validation"
+    transformed_validation_dir = root_path / "data" / "11_transformed_validation"
     transformed_validation_dir.mkdir(parents=True, exist_ok=True)
 
     # Template glob pattern  
     template_glob = str(
-        root_path / "data" / "03_template" / f"S_{args.variant.upper()}#*.csv"
+        root_path / "data" / "06_template" / f"S_{args.variant.upper()}#*.csv"
     )
 
     # Primary outputs
@@ -2651,7 +2651,7 @@ def run_transform_command(args, config):
                 "rows_out": rows_out,
                 "rows_rejected": rows_rejected,
                 "mapped_coverage": mapped_coverage,
-                "template_used": template_path or f"data/03_template/S_{args.variant.upper()}#*.csv",
+                "template_used": template_path or f"data/06_template/S_{args.variant.upper()}#*.csv",
                 "ignored_targets": ignored_targets,
                 "errors_by_rule": error_stats,
                 "errors_by_field": post_stats["errors_by_field"],

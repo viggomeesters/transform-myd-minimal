@@ -85,10 +85,10 @@ class EnhancedLogger:
         if self.log_file_path:
             return Path(self.log_file_path)
 
-        # Default naming: data/09_logging/<step>_<object>_<variant>_<YYYYMMDD_HHmm>.jsonl
+        # Default naming: data/99_logging/<step>_<object>_<variant>_<YYYYMMDD_HHmm>.jsonl
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")
         filename = f"{self.step}_{self.object_name}_{self.variant}_{timestamp}.jsonl"
-        log_dir = self.root_path / "data" / "09_logging"
+        log_dir = self.root_path / "data" / "99_logging"
         log_dir.mkdir(parents=True, exist_ok=True)
         return log_dir / filename
 

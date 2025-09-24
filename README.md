@@ -87,15 +87,21 @@ data/
     m140_bnka.xlsx              # Source headers 
   02_target/                     # Target XML files (F02)
     m140_bnka.xml               # Target field definitions
-  03_templates/                  # CSV templates (F04)
+  03_index_source/               # F01 HTML/JSON reports
+    index_source_20240923_0423.{html,json}
+  04_index_target/               # F02 HTML/JSON reports  
+    index_target_20240923_0428.{html,json}
+  05_map/                        # F03 HTML/JSON reports
+    mapping_20240923_0430.{html,json}
+  06_template/                   # CSV templates (F04)
     S_BNKA#*.csv                # Template files for variant
-  03_raw/                        # Raw data for transformation (F04)
+  07_raw/                        # Raw data for transformation (F04)
     m140_bnka.xlsx              # Raw data input
-  05_raw_validation/             # Raw validation outputs
-  06_rejected/                   # Rejected records
-  07_transformed/                # Final CSV outputs (F04)
-  08_transformed_validation/     # Post-transform validation
-  09_logging/                    # Log files (all steps)
+  08_raw_validation/             # Raw validation outputs
+  09_rejected/                   # Rejected records
+  10_transformed/                # Final CSV outputs (F04)
+  11_transformed_validation/     # Post-transform validation
+  99_logging/                    # Log files (all steps)
 
 migrations/
   m140/                          # Per object
@@ -165,20 +171,24 @@ Elke workflow stap genereert automatisch zowel JSON als **self-contained HTML ra
 
 #### 📁 Rapportage Locaties
 
-**F01-F03 (per object/variant):**
+**F01-F03 (rapportage):**
 ```
-migrations/<object>/<variant>/reports/
+data/03_index_source/         # F01 HTML/JSON reports
 ├── index_source_YYYYMMDD_HHMM.{html,json}
+
+data/04_index_target/         # F02 HTML/JSON reports  
 ├── index_target_YYYYMMDD_HHMM.{html,json}
+
+data/05_map/                  # F03 HTML/JSON reports
 └── mapping_YYYYMMDD_HHMM.{html,json}
 ```
 
 **F04 (validatie):**
 ```
-data/05_raw_validation/      # RAW validatie
+data/08_raw_validation/      # RAW validatie
 ├── raw_validation_<object>_<variant>_<ts>.{html,json,jsonl}
 
-data/08_transformed_validation/  # POST-transform validatie  
+data/11_transformed_validation/  # POST-transform validatie  
 ├── post_transform_validation_<object>_<variant>_<ts>.{html,json,jsonl}
 ```
 
