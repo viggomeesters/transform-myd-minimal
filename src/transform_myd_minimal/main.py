@@ -2083,6 +2083,7 @@ def run_map_command(args, config):
 
 def run_transform_command(args, config):
     """Run the transform command - transforms raw data through ETL pipeline to SAP CSV."""
+    from .enhanced_logging import EnhancedLogger
     import csv
     import glob
     import re
@@ -2099,6 +2100,10 @@ def run_transform_command(args, config):
 
     # Set up paths using root directory
     root_path = Path(args.root)
+    
+    # Initialize enhanced logger
+    enhanced_logger = EnhancedLogger(args, "transform", args.object, args.variant, root_path)
+    
     migrations_dir = root_path / "migrations" / args.object / args.variant
 
     # Input files (F04 spec: data/07_raw/{object}_{variant}.xlsx)
@@ -2145,10 +2150,7 @@ def run_transform_command(args, config):
             "variant": args.variant,
             "expected_path": str(raw_file),
         }
-        if args.json or not sys.stdout.isatty():
-            print(json.dumps(error_data))
-        else:
-            logger.error(f"Raw XLSX file not found: {raw_file}")
+        enhanced_logger.log_error(error_data)
         sys.exit(2)
 
     if not mapping_file.exists():
@@ -2158,10 +2160,7 @@ def run_transform_command(args, config):
             "variant": args.variant,
             "expected_path": str(mapping_file),
         }
-        if args.json or not sys.stdout.isatty():
-            print(json.dumps(error_data))
-        else:
-            logger.error(f"Mapping file not found: {mapping_file}")
+        enhanced_logger.log_error(error_data)
         sys.exit(3)
 
     if not target_index_file.exists():
@@ -2171,10 +2170,7 @@ def run_transform_command(args, config):
             "variant": args.variant,
             "expected_path": str(target_index_file),
         }
-        if args.json or not sys.stdout.isatty():
-            print(json.dumps(error_data))
-        else:
-            logger.error(f"Target index file not found: {target_index_file}")
+        enhanced_logger.log_error(error_data)
         sys.exit(4)
 
     # Check overwrite policy
@@ -2185,10 +2181,7 @@ def run_transform_command(args, config):
             "variant": args.variant,
             "existing_files": [str(f) for f in [sap_csv, rejects_csv] if f.exists()],
         }
-        if args.json or not sys.stdout.isatty():
-            print(json.dumps(error_data))
-        else:
-            logger.error("Output files exist. Use --force to overwrite.")
+        enhanced_logger.log_error(error_data)
         sys.exit(5)
 
     try:
@@ -2551,10 +2544,11 @@ def run_transform_command(args, config):
                 for _, row in df.iterrows():
                     writer.writerow([row[col] for col in final_headers])
 
-        # Write primary SAP CSV
+        # Write primary SAP CSV (fixed name format: S_{variant}#{object}_Data.csv)
         write_sap_csv(final_data, sap_csv)
 
-        # Write snapshot CSV (same format)
+        # Write snapshot CSV (timestamped format: S_{variant}#{object}_{timestamp}_output.csv)
+        # Both formats are accepted by SAP Migrate Your Data as long as S_ prefix and # separator are used
         write_sap_csv(final_data, snapshot_csv)
 
         # Write rejected records
@@ -2704,43 +2698,26 @@ def run_transform_command(args, config):
             "warnings": warnings,
         }
 
-        if args.json or not sys.stdout.isatty():
-            print(json.dumps(summary))
-        else:
-            print(
-                f"✓ transform {args.object}/{args.variant}  in={rows_in}  out={rows_out}  rej={rows_rejected}"
-            )
-            print(f"sap:  {sap_csv}")
-            print(f"snap: {snapshot_csv}")
-            if rejected_rows:
-                print(f"rej:  {rejects_csv}")
-            print(f"template: {template_path or 'missing'}")
-            print(f"time: {duration_ms}ms")
-            print(f"warnings: {len(warnings)}")
+        # Prepare preview data for enhanced logger (first 8 columns, 5 rows)
+        preview_data = []
+        if len(final_data) > 0:
+            preview_cols = final_headers[:8]
+            preview_df = final_data[preview_cols].head(5)
+            
+            for idx, row in preview_df.iterrows():
+                row_dict = {}
+                for col in preview_cols:
+                    row_dict[col] = str(row[col])[:15] if pd.notna(row[col]) else ""
+                preview_data.append(row_dict)
 
-            # Preview: first 8 columns, 5 rows
-            if not args.no_preview and len(final_data) > 0:
-                print("\nPreview:")
-                preview_cols = final_headers[:8]
-                preview_data = final_data[preview_cols].head(5)
-
-                # Create a simple table view
-                for i, col in enumerate(preview_cols):
-                    print(f"{i+1:2}. {col}")
-
-                print()
-                for idx, row in preview_data.iterrows():
-                    row_data = [str(row[col])[:15] for col in preview_cols]
-                    print("   " + " | ".join(f"{val:<15}" for val in row_data))
+        # Log event using Enhanced Logger (this will handle both stdout and file logging)
+        enhanced_logger.log_event(summary, preview_data)
 
         logger.info("✓ Transform command completed successfully!")
 
     except Exception as e:
         error_data = {"error": "exception", "message": str(e)}
-        if args.json or not sys.stdout.isatty():
-            print(json.dumps(error_data))
-        else:
-            logger.error(f"Error during transformation: {e}")
+        enhanced_logger.log_error(error_data)
         sys.exit(1)
 
 

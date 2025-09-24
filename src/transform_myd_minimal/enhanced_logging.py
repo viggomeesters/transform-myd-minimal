@@ -134,6 +134,20 @@ class EnhancedLogger:
             self.console.print(
                 f"[{check_color}]{check_mark}[/{check_color}] {self.step}  {self.object_name}/{self.variant}  fields={fields_count}"
             )
+        elif self.step == "map":
+            mapped_count = event.get("mapped", 0)
+            unmapped_count = event.get("unmapped", 0) 
+            to_audit_count = event.get("to_audit", 0)
+            self.console.print(
+                f"[{check_color}]{check_mark}[/{check_color}] {self.step}  {self.object_name}/{self.variant}  mapped={mapped_count}  unmapped={unmapped_count}  to_audit={to_audit_count}"
+            )
+        elif self.step == "transform":
+            rows_in = event.get("rows_in", 0)
+            rows_out = event.get("rows_out", 0)
+            rows_rejected = event.get("rows_rejected", 0)
+            self.console.print(
+                f"[{check_color}]{check_mark}[/{check_color}] {self.step}  {self.object_name}/{self.variant}  in={rows_in}  out={rows_out}  rej={rows_rejected}"
+            )
 
         # Input/Output paths
         input_file = event.get("input_file", "")
@@ -142,6 +156,43 @@ class EnhancedLogger:
             self.console.print(f"  in:  {self.normalize_path(Path(input_file))}")
         if output_file:
             self.console.print(f"  out: {self.normalize_path(Path(output_file))}")
+
+        # Step-specific paths and information
+        if self.step == "map":
+            # Map-specific paths
+            source_index = event.get("source_index", "")
+            target_index = event.get("target_index", "")
+            if source_index:
+                self.console.print(f"  source: {self.normalize_path(Path(source_index))}")
+            if target_index:
+                self.console.print(f"  target: {self.normalize_path(Path(target_index))}")
+            
+            # Ruleset sources
+            ruleset_sources = event.get("ruleset_sources", "")
+            if ruleset_sources:
+                self.console.print(f"  ruleset: {self.normalize_path(Path(ruleset_sources))}")
+                
+        elif self.step == "transform":
+            # Transform-specific paths
+            input_raw = event.get("input_raw", "")
+            mapping = event.get("mapping", "")
+            sap_csv = event.get("sap_csv", "")
+            snapshot_csv = event.get("snapshot_csv", "")
+            rejects_csv = event.get("rejects_csv", "")
+            template_used = event.get("template_used", "")
+            
+            if input_raw:
+                self.console.print(f"  raw: {self.normalize_path(Path(input_raw))}")
+            if mapping:
+                self.console.print(f"  mapping: {self.normalize_path(Path(mapping))}")
+            if sap_csv:
+                self.console.print(f"  sap: {self.normalize_path(Path(sap_csv))}")
+            if snapshot_csv:
+                self.console.print(f"  snap: {self.normalize_path(Path(snapshot_csv))}")
+            if rejects_csv:
+                self.console.print(f"  rej: {self.normalize_path(Path(rejects_csv))}")
+            if template_used:
+                self.console.print(f"  template: {self.normalize_path(Path(template_used)) if template_used != 'missing' else 'missing'}")
 
         # Structure (for index_target)
         if self.step == "index_target":
@@ -177,6 +228,10 @@ class EnhancedLogger:
             self._output_source_preview_table(preview_data)
         elif self.step == "index_target":
             self._output_target_preview_table(preview_data)
+        elif self.step == "map":
+            self._output_map_preview_table(preview_data)
+        elif self.step == "transform":
+            self._output_transform_preview_table(preview_data)
 
     def _output_source_preview_table(self, preview_data: List[Dict]) -> None:
         """Output preview table for index_source with first 8 headers."""
@@ -223,6 +278,47 @@ class EnhancedLogger:
                 item.get("field_group", ""),
                 str(item.get("key", "")),
             )
+
+        self.console.print(table)
+
+    def _output_map_preview_table(self, preview_data: List[Dict]) -> None:
+        """Output preview table for map with first 8 mappings."""
+        table = Table(title="Mappings (sample)")
+        table.add_column("target_field")
+        table.add_column("source_header")
+        table.add_column("confidence")
+        table.add_column("status")
+
+        # Show first 8 items
+        for item in preview_data[:8]:
+            table.add_row(
+                item.get("target_field", ""),
+                item.get("source_header", ""),
+                item.get("confidence", ""),
+                item.get("status", ""),
+            )
+
+        self.console.print(table)
+
+    def _output_transform_preview_table(self, preview_data: List[Dict]) -> None:
+        """Output preview table for transform with first 8 columns of data."""
+        table = Table(title="Transformed data (sample)")
+        table.add_column("#", style="dim")
+        
+        # Get first 8 columns from preview data
+        if preview_data:
+            first_row = preview_data[0]
+            column_names = list(first_row.keys())[:8]
+            for col in column_names:
+                table.add_column(col)
+
+            # Show first 5 rows
+            for i, item in enumerate(preview_data[:5], 1):
+                row_data = [str(i)]
+                for col in column_names:
+                    value = str(item.get(col, ""))[:15]  # Truncate to 15 chars
+                    row_data.append(value)
+                table.add_row(*row_data)
 
         self.console.print(table)
 
@@ -274,6 +370,15 @@ class EnhancedLogger:
         if error_type == "missing_input":
             path = error_event.get("path", "unknown")
             return f"Input file not found: {path}"
+        elif error_type == "missing_raw":
+            expected_path = error_event.get("expected_path", "unknown")
+            return f"Raw XLSX file not found: {expected_path}"
+        elif error_type == "missing_mapping":
+            expected_path = error_event.get("expected_path", "unknown")
+            return f"Mapping file not found: {expected_path}"
+        elif error_type == "missing_target_index":
+            expected_path = error_event.get("expected_path", "unknown")
+            return f"Target index file not found: {expected_path}"
         elif error_type == "no_headers":
             return "No valid headers found in the input file"
         elif error_type == "structure_not_found":
@@ -283,8 +388,15 @@ class EnhancedLogger:
             message = error_event.get("message", "Unknown exception")
             return f"Unexpected error: {message}"
         elif error_type == "would_overwrite":
-            path = error_event.get("path", "unknown")
-            return f"Output file exists and --force not specified: {path}"
+            path = error_event.get("path")
+            existing_files = error_event.get("existing_files", [])
+            if existing_files:
+                files_str = ", ".join(existing_files)
+                return f"Output files exist and --force not specified: {files_str}"
+            elif path:
+                return f"Output file exists and --force not specified: {path}"
+            else:
+                return "Output files exist and --force not specified"
         elif error_type == "unsupported_format":
             path = error_event.get("path", "unknown")
             return f"Unsupported file format: {path}"

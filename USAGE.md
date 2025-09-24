@@ -195,8 +195,9 @@ python -m transform_myd_minimal transform --object m140 --variant bnka
 ```
 
 **Outputs:**
-- `data/07_transformed/S_BNKA#m140_Data.csv` - Primary SAP upload file
-- `data/07_transformed/S_BNKA#m140_20240922_1433_output.csv` - Timestamped snapshot
+- `data/07_transformed/S_BNKA#m140_Data.csv` - SAP CSV (fixed filename format)
+- `data/07_transformed/S_BNKA#m140_20240922_1433_output.csv` - SAP CSV (timestamped format)
+  Both formats are accepted by SAP Migrate Your Data
 - `data/06_rejected/rejected_m140_bnka_20240922_1433.csv` - Rejected records
 - `data/05_raw_validation/raw_validation_m140_bnka_20240922_1433.csv` - Pre-transform validation
 - `data/11_transformed_validation/post_transform_validation_m140_bnka_20240922_1433.csv` - Post-transform validation

@@ -143,10 +143,16 @@ def setup_cli():
         "--json", action="store_true", help="Force JSONL output to stdout"
     )
     map_parser.add_argument(
-        "--no-preview", action="store_true", help="Suppress preview table in human mode"
+        "--format", choices=["human", "jsonl"], help="Output format (overrides TTY detection)"
+    )
+    map_parser.add_argument(
+        "--log-file", type=str, help="Override log file path"
     )
     map_parser.add_argument(
         "--no-log-file", action="store_true", help="Do not write log file"
+    )
+    map_parser.add_argument(
+        "--no-preview", action="store_true", help="Suppress preview table in human mode"
     )
     map_parser.add_argument(
         "--quiet",
@@ -313,10 +319,16 @@ def setup_cli():
         "--json", action="store_true", help="Force JSONL output to stdout"
     )
     transform_parser.add_argument(
-        "--no-preview", action="store_true", help="Suppress preview table in human mode"
+        "--format", choices=["human", "jsonl"], help="Output format (overrides TTY detection)"
+    )
+    transform_parser.add_argument(
+        "--log-file", type=str, help="Override log file path"
     )
     transform_parser.add_argument(
         "--no-log-file", action="store_true", help="Do not write log file"
+    )
+    transform_parser.add_argument(
+        "--no-preview", action="store_true", help="Suppress preview table in human mode"
     )
     transform_parser.add_argument(
         "--quiet",
