@@ -14,20 +14,20 @@ synonyms:
 
 # Global skip fields - apply to all tables unless overridden
 global_skip_fields:
-  - source_field: "TEMP_FIELD"
-    source_description: "Temporary processing field"
+  - source_field: "MANDT"
+    source_description: "Client (Mandant)"
     skip: true
-    comment: "This field is only used during data processing and should not be mapped to target"
+    comment: "Audit field: Client is not relevant for data mapping"
+
+  - source_field: "ERDAT"
+    source_description: "Creation Date"
+    skip: true
+    comment: "Audit field: Creation date is not relevant for data mapping"
   
-  - source_field: "DEBUG_FLAG" 
-    source_description: "Debug flag for development"
+  - source_field: "ERNAM"
+    source_description: "Name of Person who Created the Object"
     skip: true
-    comment: "Development field, not needed in production mapping"
-  
-  - source_field: "SYSTEM_INTERNAL"
-    source_description: "System internal processing field"
-    skip: true
-    comment: "Global rule: System internal fields should never be mapped"
+    comment: "Audit field: Creator name is not relevant for data mapping"
 
 # Global manual mappings - apply to all tables unless overridden  
 global_manual_mappings:
