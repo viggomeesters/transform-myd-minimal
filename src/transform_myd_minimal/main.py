@@ -82,6 +82,7 @@ class CentralMappingMemory:
     global_skip_fields: List[SkipRule]
     global_manual_mappings: List[ManualMapping]
     table_specific: Dict[str, Dict[str, List]]
+    synonyms: Dict[str, List[str]]
 
 
 class AdvancedFieldMatcher:
@@ -504,8 +505,8 @@ def create_column_mapping(source_fields, target_fields):
 
 def load_central_mapping_memory(base_path: Path) -> Optional[CentralMappingMemory]:
     """Load central mapping memory from YAML file."""
-    # Look in configs directory first, fallback to root for backward compatibility
-    central_memory_path = base_path / "configs" / "central_mapping_memory.yaml"
+    # Look in config directory first, fallback to root for backward compatibility
+    central_memory_path = base_path / "config" / "central_mapping_memory.yaml"
     if not central_memory_path.exists():
         central_memory_path = base_path / "central_mapping_memory.yaml"
 
@@ -546,11 +547,15 @@ def load_central_mapping_memory(base_path: Path) -> Optional[CentralMappingMemor
 
         # Parse table-specific rules (keep as dict for flexible processing)
         table_specific = data.get("table_specific", {})
+        
+        # Parse synonyms
+        synonyms = data.get("synonyms", {})
 
         return CentralMappingMemory(
             global_skip_fields=global_skip_fields,
             global_manual_mappings=global_manual_mappings,
             table_specific=table_specific,
+            synonyms=synonyms,
         )
 
     except Exception as e:
@@ -700,6 +705,103 @@ def analyze_column_data(
         raise ValueError(f"Error analyzing column data: {e}")
 
 
+def apply_field_name_fallback(source_fields, central_memory, object_name, variant, logger):
+    """
+    Apply fallback mechanism for missing or unclear field_names using global mapping rules.
+    
+    Args:
+        source_fields: List of source field dictionaries
+        central_memory: CentralMappingMemory instance
+        object_name: Object name for table-specific rules
+        variant: Variant name for table-specific rules
+        logger: Logger for making fallback process visible
+        
+    Returns:
+        List of enhanced source_fields with fallback field_names applied
+    """
+    if not central_memory:
+        return source_fields
+    
+    # Get effective rules for this table
+    table_key = f"{object_name}_{variant}"
+    enhanced_fields = []
+    fallbacks_applied = 0
+    
+    for field in source_fields:
+        enhanced_field = field.copy()
+        original_name = field.get("field_name", "")
+        fallback_applied = False
+        fallback_source = ""
+        
+        # Check if field_name is missing, empty, or seems unclear
+        needs_fallback = (
+            not original_name or 
+            original_name.strip() == "" or
+            original_name.lower() in ["unknown", "unnamed", "column", "field"] or
+            original_name.startswith("Column") or
+            original_name.startswith("Unnamed")
+        )
+        
+        if needs_fallback:
+            # Try to find fallback from global manual mappings first
+            for mapping in central_memory.global_manual_mappings:
+                # Match by example value, field description, or position
+                field_example = str(field.get("example", "")).strip().upper()
+                if (field_example and 
+                    field_example in mapping.source_description.upper()):
+                    enhanced_field["field_name"] = mapping.target
+                    enhanced_field["field_description"] = f"Global fallback: {mapping.comment}"
+                    fallback_applied = True
+                    fallback_source = "global_manual_mapping"
+                    break
+            
+            # Try table-specific manual mappings
+            if not fallback_applied and table_key in central_memory.table_specific:
+                table_rules = central_memory.table_specific[table_key]
+                for mapping_data in table_rules.get("manual_mappings", []):
+                    field_example = str(field.get("example", "")).strip().upper()
+                    if (field_example and 
+                        field_example in mapping_data.get("source_description", "").upper()):
+                        enhanced_field["field_name"] = mapping_data["target"]
+                        enhanced_field["field_description"] = f"Table fallback: {mapping_data['comment']}"
+                        fallback_applied = True
+                        fallback_source = "table_specific_mapping"
+                        break
+            
+            # Try synonyms as fallback
+            if not fallback_applied:
+                field_example = str(field.get("example", "")).strip()
+                for target_field, synonym_list in central_memory.synonyms.items():
+                    for synonym in synonym_list:
+                        if (field_example and 
+                            synonym.lower() in field_example.lower()):
+                            enhanced_field["field_name"] = target_field
+                            enhanced_field["field_description"] = f"Synonym fallback: matched '{synonym}'"
+                            fallback_applied = True
+                            fallback_source = "synonyms"
+                            break
+                    if fallback_applied:
+                        break
+            
+            # Last resort: mark as unknown but keep original
+            if not fallback_applied:
+                enhanced_field["field_name"] = original_name or f"Unknown_Field_{field.get('field_count', '')}"
+                enhanced_field["field_description"] = "field_name onbekend - geen match in global mapping"
+                fallback_source = "unknown_fallback"
+        
+        if fallback_applied:
+            fallbacks_applied += 1
+            # Make fallback process visible in CLI output/logging
+            logger.info(f"Field fallback applied: '{original_name}' -> '{enhanced_field['field_name']}' (via {fallback_source})")
+        
+        enhanced_fields.append(enhanced_field)
+    
+    if fallbacks_applied > 0:
+        logger.info(f"Applied {fallbacks_applied} field name fallbacks using global mapping rules")
+    
+    return enhanced_fields
+
+
 def run_index_source_command(args, config):
     """Run the index_source command - parse headers from XLSX and create index_source.yaml."""
     from .enhanced_logging import EnhancedLogger
@@ -763,6 +865,15 @@ def run_index_source_command(args, config):
             error_data = {"error": "exception", "message": str(e)}
             logger.log_error(error_data)
             sys.exit(1)
+
+        # Load central mapping memory for field name fallbacks
+        central_memory = load_central_mapping_memory(root_path)
+        if central_memory:
+            logger.info("Loaded central mapping memory for field name fallbacks")
+            # Apply fallback mechanism for missing field_names
+            source_fields = apply_field_name_fallback(
+                source_fields, central_memory, args.object, args.variant, logger
+            )
 
         # Create output directory structure
         migrations_dir = root_path / "migrations" / args.object / args.variant
@@ -1547,9 +1658,12 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
         collapsed = re.sub(r"\s+", " ", spaces)
         return collapsed.strip()
 
-    # Extract verbatim and normalized headers
+    # Extract verbatim and normalized headers, creating a lookup map for field names
     verbatim_headers = [field.get("field_name", "") for field in source_fields]
     [norm(header) for header in verbatim_headers]
+    
+    # Create lookup map from header to source field for preserving field_name information
+    header_to_field = {field.get("field_name", ""): field for field in source_fields}
 
     # Create fuzzy matcher components
     normalizer = FieldNormalizer()
@@ -1653,12 +1767,17 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
         # Handle tiebreakers (tie when delta score <= 0.02)
         candidates.sort(key=lambda x: x[1], reverse=True)
         if len(candidates) > 1 and abs(candidates[0][1] - candidates[1][1]) <= 0.02:
-            # Tie detected - add to audit
+            # Tie detected - add to audit with field_name
+            tie_field_name = "field_name onbekend"
+            if best_match and best_match in header_to_field:
+                tie_field_name = header_to_field[best_match].get("field_name", "field_name onbekend")
+            
             to_audit.append(
                 {
                     "target_table": t_table,
                     "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
                     "source_header": best_match,
+                    "source_field_name": tie_field_name,
                     "confidence": best_confidence,
                     "reason": "tie_break",
                 }
@@ -1670,10 +1789,22 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
         if not best_match:
             best_rationale = "Added without source match, to comply with SAP template"
 
+        # Always include field_name - via input, global fallback, or explicit unknown
+        source_field_name = "field_name onbekend"
+        source_field_description = None
+        if best_match and best_match in header_to_field:
+            source_field = header_to_field[best_match]
+            source_field_name = source_field.get("field_name", "field_name onbekend")
+            source_field_description = source_field.get("field_description")
+        elif not best_match:
+            source_field_name = "field_name onbekend"
+
         mapping = {
             "target_table": t_table,
             "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
             "source_header": best_match,
+            "source_field_name": source_field_name,  # Always show field_name
+            "source_field_description": source_field_description,
             "required": required,
             "confidence": round(best_confidence, 2),
             "status": status,
@@ -1692,6 +1823,11 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
 
         # Add to audit based on conditions
         if best_match:
+            # Get field_name for audit entries
+            audit_field_name = "field_name onbekend"
+            if best_match in header_to_field:
+                audit_field_name = header_to_field[best_match].get("field_name", "field_name onbekend")
+            
             # Low confidence fuzzy
             if 0.80 <= best_confidence < 0.90:
                 to_audit.append(
@@ -1699,6 +1835,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
                         "target_table": t_table,
                         "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
                         "source_header": best_match,
+                        "source_field_name": audit_field_name,
                         "confidence": best_confidence,
                         "reason": "low_confidence_fuzzy",
                     }
@@ -1711,6 +1848,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
                         "target_table": t_table,
                         "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
                         "source_header": best_match,
+                        "source_field_name": audit_field_name,
                         "confidence": best_confidence,
                         "reason": "synonym_based",
                     }
@@ -1723,6 +1861,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
                         "target_table": t_table,
                         "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
                         "source_header": None,
+                        "source_field_name": "field_name onbekend",
                         "confidence": 0.00,
                         "reason": "required_unmapped",
                     }
@@ -1988,6 +2127,7 @@ def run_map_command(args, config):
             preview_data.append({
                 "target_field": mapping["target_field"],
                 "source_header": mapping["source_header"] or "null",
+                "source_field_name": mapping.get("source_field_name", "field_name onbekend"),  # Always show field_name
                 "confidence": f"{mapping['confidence']:.2f}",
                 "status": mapping["status"],
             })
@@ -2173,13 +2313,13 @@ def run_transform_command(args, config):
         enhanced_logger.log_error(error_data)
         sys.exit(4)
 
-    # Check overwrite policy
-    if (sap_csv.exists() or rejects_csv.exists()) and not args.force:
+    # Check overwrite policy (only check snapshot and rejects, no longer checking sap_csv)
+    if (snapshot_csv.exists() or rejects_csv.exists()) and not args.force:
         error_data = {
             "error": "would_overwrite",
             "object": args.object,
             "variant": args.variant,
-            "existing_files": [str(f) for f in [sap_csv, rejects_csv] if f.exists()],
+            "existing_files": [str(f) for f in [snapshot_csv, rejects_csv] if f.exists()],
         }
         enhanced_logger.log_error(error_data)
         sys.exit(5)
@@ -2525,8 +2665,8 @@ def run_transform_command(args, config):
             else:
                 final_data[annotated_header] = ""
 
-        # 9) Write SAP CSV and Snapshot CSV
-        logger.info("Writing SAP CSV and snapshot...")
+        # 9) Write Snapshot CSV only (removing SAP CSV generation as per requirement 4)
+        logger.info("Writing snapshot CSV...")
 
         def write_sap_csv(df, filepath):
             """Write CSV with SAP requirements: UTF-8, CRLF, proper quoting"""
@@ -2544,11 +2684,8 @@ def run_transform_command(args, config):
                 for _, row in df.iterrows():
                     writer.writerow([row[col] for col in final_headers])
 
-        # Write primary SAP CSV (fixed name format: S_{variant}#{object}_Data.csv)
-        write_sap_csv(final_data, sap_csv)
-
-        # Write snapshot CSV (timestamped format: S_{variant}#{object}_{timestamp}_output.csv)
-        # Both formats are accepted by SAP Migrate Your Data as long as S_ prefix and # separator are used
+        # Write only snapshot CSV (timestamped format: S_{variant}#{object}_{timestamp}_output.csv)
+        # This format is accepted by SAP Migrate Your Data as long as S_ prefix and # separator are used
         write_sap_csv(final_data, snapshot_csv)
 
         # Write rejected records
@@ -2677,7 +2814,7 @@ def run_transform_command(args, config):
         # Calculate final metrics
         duration_ms = int((time.time() - start_time) * 1000)
 
-        # Summary logging
+        # Summary logging (no longer including sap_csv)
         summary = {
             "step": "transform",
             "object": args.object,
@@ -2687,7 +2824,6 @@ def run_transform_command(args, config):
             "target_index": str(target_index_file),
             "template_glob": template_glob,
             "template_used": template_path,
-            "sap_csv": str(sap_csv),
             "snapshot_csv": str(snapshot_csv),
             "rejects_csv": str(rejects_csv) if rejected_rows else None,
             "ignored_targets": ignored_targets,
