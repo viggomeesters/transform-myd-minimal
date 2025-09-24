@@ -1,0 +1,159 @@
+{
+  "step": "map",
+  "object": "test",
+  "variant": "bnka",
+  "ts": "2025-09-24T08:28:41.107425",
+  "source_index": "migrations/test/bnka/index_source.yaml",
+  "target_index": "migrations/test/bnka/index_target.yaml",
+  "mapped": 11,
+  "unmapped": 1,
+  "to_audit": 0,
+  "unused_sources": 26,
+  "mappings": [
+    {
+      "target_table": "bnka",
+      "target_field": "BANKS",
+      "source_header": "BANKS",
+      "required": true,
+      "confidence": 1.0,
+      "status": "auto",
+      "rationale": "Exact field name match"
+    },
+    {
+      "target_table": "bnka",
+      "target_field": "BANKL",
+      "source_header": "BANKL",
+      "required": true,
+      "confidence": 1.0,
+      "status": "auto",
+      "rationale": "Exact field name match"
+    },
+    {
+      "target_table": "bnka",
+      "target_field": "BANKA",
+      "source_header": "BANKA",
+      "required": true,
+      "confidence": 1.0,
+      "status": "auto",
+      "rationale": "Exact field name match"
+    },
+    {
+      "target_table": "bnka",
+      "target_field": "PROVZ",
+      "source_header": "PROVZ",
+      "required": false,
+      "confidence": 1.0,
+      "status": "auto",
+      "rationale": "Exact field name match"
+    },
+    {
+      "target_table": "bnka",
+      "target_field": "STRAS",
+      "source_header": "STRAS",
+      "required": false,
+      "confidence": 1.0,
+      "status": "auto",
+      "rationale": "Exact field name match"
+    },
+    {
+      "target_table": "bnka",
+      "target_field": "ORT01",
+      "source_header": "ORT01",
+      "required": false,
+      "confidence": 1.0,
+      "status": "auto",
+      "rationale": "Exact field name match"
+    },
+    {
+      "target_table": "bnka",
+      "target_field": "BRNCH",
+      "source_header": "BRNCH",
+      "required": false,
+      "confidence": 1.0,
+      "status": "auto",
+      "rationale": "Exact field name match"
+    },
+    {
+      "target_table": "bnka",
+      "target_field": "SWIFT",
+      "source_header": "SWIFT",
+      "required": false,
+      "confidence": 1.0,
+      "status": "auto",
+      "rationale": "Exact field name match"
+    },
+    {
+      "target_table": "bnka",
+      "target_field": "XPGRO",
+      "source_header": "XPGRO",
+      "required": false,
+      "confidence": 1.0,
+      "status": "auto",
+      "rationale": "Exact field name match"
+    },
+    {
+      "target_table": "bnka",
+      "target_field": "BNKLZ",
+      "source_header": "BNKLZ",
+      "required": false,
+      "confidence": 1.0,
+      "status": "auto",
+      "rationale": "Exact field name match"
+    },
+    {
+      "target_table": "bnka",
+      "target_field": "BGRUP",
+      "source_header": "BGRUP",
+      "required": false,
+      "confidence": 1.0,
+      "status": "auto",
+      "rationale": "Exact field name match"
+    },
+    {
+      "target_table": "bnka",
+      "target_field": "ISNOTOVERWRITE",
+      "source_header": null,
+      "required": false,
+      "confidence": 0.0,
+      "status": "unmapped",
+      "rationale": "Added without source match, to comply with SAP template"
+    }
+  ],
+  "to_audit_rows": [],
+  "unmapped_source_fields": [
+    "MANDT",
+    "ERDAT",
+    "ERNAM",
+    "LOEVM",
+    "PSKTO",
+    "ADRNR",
+    "CHKME",
+    "VERS",
+    "IBAN_RULE",
+    "SDD_B2B",
+    "SDD_COR1",
+    "SDD_RTRANS",
+    "ZNOCHECK",
+    "ZACC_LEN",
+    "ZRES1",
+    "ZRES2",
+    "ZRES3",
+    "ZRES4",
+    "ZRES5",
+    "ZRES6",
+    "ZRES7",
+    "ZRES8",
+    "ZRES9",
+    "ZRES10",
+    "BICKY",
+    "RCCODE"
+  ],
+  "unmapped_target_fields": [
+    {
+      "target_table": "bnka",
+      "target_field": "ISNOTOVERWRITE",
+      "required": false
+    }
+  ],
+  "warnings": []
+}

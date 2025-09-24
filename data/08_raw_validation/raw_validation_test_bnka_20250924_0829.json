@@ -1,0 +1,224 @@
+[
+  {
+    "source_header": "MANDT",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "BANKS",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "BANKL",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "ERDAT",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "ERNAM",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "BANKA",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "PROVZ",
+    "total": 8,
+    "empty_count": 8,
+    "pct_empty": 100.0
+  },
+  {
+    "source_header": "STRAS",
+    "total": 8,
+    "empty_count": 7,
+    "pct_empty": 87.5
+  },
+  {
+    "source_header": "ORT01",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "SWIFT",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "BGRUP",
+    "total": 8,
+    "empty_count": 8,
+    "pct_empty": 100.0
+  },
+  {
+    "source_header": "XPGRO",
+    "total": 8,
+    "empty_count": 8,
+    "pct_empty": 100.0
+  },
+  {
+    "source_header": "LOEVM",
+    "total": 8,
+    "empty_count": 8,
+    "pct_empty": 100.0
+  },
+  {
+    "source_header": "BNKLZ",
+    "total": 8,
+    "empty_count": 1,
+    "pct_empty": 12.5
+  },
+  {
+    "source_header": "PSKTO",
+    "total": 8,
+    "empty_count": 8,
+    "pct_empty": 100.0
+  },
+  {
+    "source_header": "ADRNR",
+    "total": 8,
+    "empty_count": 8,
+    "pct_empty": 100.0
+  },
+  {
+    "source_header": "BRNCH",
+    "total": 8,
+    "empty_count": 8,
+    "pct_empty": 100.0
+  },
+  {
+    "source_header": "CHKME",
+    "total": 8,
+    "empty_count": 8,
+    "pct_empty": 100.0
+  },
+  {
+    "source_header": "VERS",
+    "total": 8,
+    "empty_count": 8,
+    "pct_empty": 100.0
+  },
+  {
+    "source_header": "IBAN_RULE",
+    "total": 8,
+    "empty_count": 8,
+    "pct_empty": 100.0
+  },
+  {
+    "source_header": "SDD_B2B",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "SDD_COR1",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "SDD_RTRANS",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "ZNOCHECK",
+    "total": 8,
+    "empty_count": 8,
+    "pct_empty": 100.0
+  },
+  {
+    "source_header": "ZACC_LEN",
+    "total": 8,
+    "empty_count": 8,
+    "pct_empty": 100.0
+  },
+  {
+    "source_header": "ZRES1",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "ZRES2",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "ZRES3",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "ZRES4",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "ZRES5",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "ZRES6",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "ZRES7",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "ZRES8",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "ZRES9",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "ZRES10",
+    "total": 8,
+    "empty_count": 0,
+    "pct_empty": 0.0
+  },
+  {
+    "source_header": "BICKY",
+    "total": 8,
+    "empty_count": 8,
+    "pct_empty": 100.0
+  },
+  {
+    "source_header": "RCCODE",
+    "total": 8,
+    "empty_count": 8,
+    "pct_empty": 100.0
+  }
+]
