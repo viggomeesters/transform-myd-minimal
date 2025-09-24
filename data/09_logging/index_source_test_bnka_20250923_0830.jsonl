@@ -1,1 +1,0 @@
-{"step":"index_source","object":"test","variant":"bnka","input_file":"data/01_source/test_bnka.xlsx","output_file":"migrations/test/bnka/index_source.yaml","total_columns":37,"warnings":[],"duration_ms":116}

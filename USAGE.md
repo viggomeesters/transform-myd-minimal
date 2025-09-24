@@ -20,15 +20,18 @@ project/
 │   │   └── m140_bnka.xlsx      # Source headers
 │   ├── 02_target/               # F02 inputs  
 │   │   └── m140_bnka.xml
-│   ├── 03_templates/            # F04 templates
+│   ├── 03_index_source/         # F01 HTML/JSON reports
+│   ├── 04_index_target/         # F02 HTML/JSON reports
+│   ├── 05_map/                  # F03 HTML/JSON reports
+│   ├── 06_template/             # F04 templates
 │   │   └── S_BNKA#template.csv 
-│   ├── 03_raw/                  # F04 inputs
+│   ├── 07_raw/                  # F04 inputs
 │   │   └── m140_bnka.xlsx       # Raw data
-│   ├── 05_raw_validation/       # F04 validation outputs
-│   ├── 06_rejected/             # F04 rejected records
-│   ├── 07_transformed/          # F04 final outputs
-│   ├── 08_transformed_validation/ # F04 post-transform validation
-│   └── 09_logging/              # All log files
+│   ├── 08_raw_validation/       # F04 validation outputs
+│   ├── 09_rejected/             # F04 rejected records
+│   ├── 10_transformed/          # F04 final outputs
+│   ├── 11_transformed_validation/ # F04 post-transform validation
+│   └── 99_logging/              # All log files
 └── migrations/
     └── m140/
         └── bnka/
@@ -57,7 +60,7 @@ python -m transform_myd_minimal index_source --object m140 --variant bnka
 
 **Outputs:**
 - `migrations/m140/bnka/index_source.yaml` - Parsed source fields
-- `data/09_logging/index_source_m140_bnka_20240922_1430.jsonl` - Operation log
+- `data/99_logging/index_source_m140_bnka_20240922_1430.jsonl` - Operation log
 
 **Example Output Structure:**
 ```yaml
@@ -97,7 +100,7 @@ python -m transform_myd_minimal index_target --object m140 --variant bnka
 **Outputs:**
 - `migrations/m140/bnka/index_target.yaml` - Parsed target fields
 - `migrations/m140/bnka/validation.yaml` - Generated validation rules (if not exists)
-- `data/09_logging/index_target_m140_bnka_20240922_1431.jsonl` - Operation log
+- `data/99_logging/index_target_m140_bnka_20240922_1431.jsonl` - Operation log
 
 **Example Output Structure:**
 ```yaml
@@ -135,7 +138,7 @@ python -m transform_myd_minimal map --object m140 --variant bnka
 
 **Outputs:**
 - `migrations/m140/bnka/mapping.yaml` - Field mappings with confidence scores
-- `data/09_logging/map_m140_bnka_20240922_1432.jsonl` - Operation log
+- `data/99_logging/map_m140_bnka_20240922_1432.jsonl` - Operation log
 
 **Example Output Structure:**
 ```yaml
@@ -196,8 +199,8 @@ python -m transform_myd_minimal transform --object m140 --variant bnka
 - `data/07_transformed/S_BNKA#m140_20240922_1433_output.csv` - Timestamped snapshot
 - `data/06_rejected/rejected_m140_bnka_20240922_1433.csv` - Rejected records
 - `data/05_raw_validation/raw_validation_m140_bnka_20240922_1433.csv` - Pre-transform validation
-- `data/08_transformed_validation/post_transform_validation_m140_bnka_20240922_1433.csv` - Post-transform validation
-- `data/09_logging/transform_m140_bnka_20240922_1433.jsonl` - Operation log
+- `data/11_transformed_validation/post_transform_validation_m140_bnka_20240922_1433.csv` - Post-transform validation
+- `data/99_logging/transform_m140_bnka_20240922_1433.jsonl` - Operation log
 
 ## CLI Options
 
@@ -223,7 +226,7 @@ python -m transform_myd_minimal transform --object m140 --variant bnka
 
 ### Default Behavior
 - **TTY Detection**: Human-readable output in terminal, JSONL when piped
-- **Log Files**: Always written to `data/09_logging/` unless `--no-log-file`
+- **Log Files**: Always written to `data/99_logging/` unless `--no-log-file`
 - **Path Format**: Forward slashes in all printed paths (Windows compatible)
 
 ### Examples
@@ -258,25 +261,29 @@ Transform MYD Minimal automatically generates interactive HTML reports for all F
 
 ### Report Locations
 
-**F01-F03 Reports** (per object/variant):
+**F01-F03 Reports**:
 ```
-migrations/<object>/<variant>/reports/
+data/03_index_source/
 ├── index_source_20240922_1432.html     # F01: Source headers analysis
-├── index_source_20240922_1432.json
+└── index_source_20240922_1432.json
+
+data/04_index_target/
 ├── index_target_20240922_1433.html     # F02: Target fields analysis  
-├── index_target_20240922_1433.json
+└── index_target_20240922_1433.json
+
+data/05_map/
 ├── mapping_20240922_1434.html          # F03: Mapping results
 └── mapping_20240922_1434.json
 ```
 
 **F04 Reports** (validation):
 ```
-data/05_raw_validation/
+data/08_raw_validation/
 ├── raw_validation_m140_bnka_20240922_1435.html     # Raw data validation
 ├── raw_validation_m140_bnka_20240922_1435.json
 └── raw_validation_m140_bnka_20240922_1435.jsonl
 
-data/08_transformed_validation/  
+data/11_transformed_validation/  
 ├── post_transform_validation_m140_bnka_20240922_1435.html  # Post-transform validation
 ├── post_transform_validation_m140_bnka_20240922_1435.json
 └── post_transform_validation_m140_bnka_20240922_1435.jsonl

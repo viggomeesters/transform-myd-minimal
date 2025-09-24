@@ -28,16 +28,16 @@ def test_template_directory_reference():
     args.no_html = True
     
     # The key test is that when we run the transform command,
-    # it should look for templates in "03_template" not "03_templates"
+    # it should look for templates in "06_template" not "03_template"
     # We can verify this by checking if the correct path is constructed
     
     # First, let's verify the path construction manually
     root_path = Path.cwd()
-    expected_template_glob = str(root_path / "data" / "03_template" / "S_BNKA#*.csv")
+    expected_template_glob = str(root_path / "data" / "06_template" / "S_BNKA#*.csv")
     
-    # The pattern should contain "03_template" not "03_templates"
-    assert "03_template" in expected_template_glob
-    assert "03_templates" not in expected_template_glob
+    # The pattern should contain "06_template" not "03_template"
+    assert "06_template" in expected_template_glob
+    assert "03_template" not in expected_template_glob
 
 
 def test_csv_writer_configuration():
