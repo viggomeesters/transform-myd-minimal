@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tests for CSV HTML reporting functionality.
+Tests for CSV HTML reporting functionality integrated with transform command.
 """
 
 import os
@@ -51,11 +51,11 @@ class TestCSVReporting(unittest.TestCase):
         shutil.rmtree(self.test_dir)
 
     def test_generate_csv_html_report_basic(self):
-        """Test basic HTML report generation from CSV."""
+        """Test basic HTML report generation from CSV for rejected records."""
         output_file = self.test_dir / 'output.html'
-        title = "Test CSV Report"
+        title = "Rejected Records Report · test/bnka"
         
-        # Generate the report
+        # Generate the report (this simulates what transform command does)
         generate_csv_html_report(self.csv_file, output_file, title)
         
         # Check that output file was created
@@ -68,7 +68,7 @@ class TestCSVReporting(unittest.TestCase):
         # Check basic HTML structure
         self.assertIn('<!DOCTYPE html>', content)
         self.assertIn('<html lang="en">', content)
-        self.assertIn('<title>Test CSV Report</title>', content)
+        self.assertIn('<title>Rejected Records Report · test/bnka</title>', content)
         self.assertIn(title, content)
         
         # Check that data is embedded as JSON
@@ -213,6 +213,21 @@ class TestCSVReporting(unittest.TestCase):
         json_data = json.loads(json_match.group(1))
         self.assertEqual(json_data['total_rows'], 5)
         self.assertEqual(json_data['total_columns'], 8)
+
+    def test_transform_integration_title_format(self):
+        """Test that the title format matches what transform command uses."""
+        output_file = self.test_dir / 'transform_format.html'
+        
+        # Test the title format that transform command uses
+        title = "Rejected Records Report · test/bnka"
+        generate_csv_html_report(self.csv_file, output_file, title)
+        
+        with open(output_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # Verify the title is properly embedded
+        self.assertIn(title, content)
+        self.assertIn('<title>Rejected Records Report · test/bnka</title>', content)
 
 
 if __name__ == '__main__':

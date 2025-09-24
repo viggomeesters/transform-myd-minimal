@@ -2696,6 +2696,20 @@ def run_transform_command(args, config):
         if rejected_rows:
             rejected_df = pd.DataFrame(rejected_rows)
             rejected_df.to_csv(rejects_csv, index=False)
+            
+            # Generate HTML report for rejected records
+            try:
+                from .csv_reporting import generate_csv_html_report
+                
+                rejects_html = rejects_csv.with_suffix('.html')
+                report_title = f"Rejected Records Report · {args.object}/{args.variant}"
+                
+                generate_csv_html_report(rejects_csv, rejects_html, report_title)
+                logger.info(f"Generated HTML rejects report: {rejects_html}")
+                
+            except Exception as e:
+                logger.warning(f"Failed to generate HTML rejects report: {e}")
+                # Don't fail the entire transform if HTML generation fails
 
         # 10) Post-transform validation report
         (
@@ -2861,34 +2875,6 @@ def run_transform_command(args, config):
         sys.exit(1)
 
 
-def run_csv_report_command(args, config):
-    """Run the csv_report command - generates interactive HTML report from CSV file."""
-    from .csv_reporting import generate_csv_html_report
-    
-    csv_file = Path(args.csv_file)
-    
-    # Validate CSV file exists
-    if not csv_file.exists():
-        logger.error(f"CSV file not found: {csv_file}")
-        sys.exit(1)
-    
-    # Determine output file path
-    if args.output:
-        output_file = Path(args.output)
-    else:
-        output_file = csv_file.with_suffix('.html')
-    
-    logger.info(f"Generating HTML report from {csv_file}")
-    logger.info(f"Output: {output_file}")
-    
-    try:
-        generate_csv_html_report(csv_file, output_file, args.title)
-        logger.info(f"Successfully generated HTML report: {output_file}")
-    except Exception as e:
-        logger.error(f"Failed to generate HTML report: {e}")
-        sys.exit(1)
-
-
 def main():
     """Main entry point for the application."""
     from .logging_config import setup_logging
@@ -2907,8 +2893,6 @@ def main():
         run_map_command(args, config)
     elif args.command == "transform":
         run_transform_command(args, config)
-    elif args.command == "csv_report":
-        run_csv_report_command(args, config)
     else:
         logger.error(f"Unknown command: {args.command}")
         sys.exit(1)

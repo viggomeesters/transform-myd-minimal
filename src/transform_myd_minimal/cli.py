@@ -33,7 +33,6 @@ def setup_cli():
         "index_source",
         "index_target",
         "transform",
-        "csv_report",
         "-h",
         "--help",
         "--version",
@@ -345,20 +344,6 @@ def setup_cli():
         "--html-dir", type=str, help="Custom directory for HTML and JSON reports"
     )
 
-    # CSV Report subcommand - Generate HTML report from CSV file
-    csv_report_parser = subparsers.add_parser(
-        "csv_report", help="Generate interactive HTML report from CSV file (rejects)"
-    )
-    csv_report_parser.add_argument(
-        "csv_file", help="Path to CSV file to generate report from"
-    )
-    csv_report_parser.add_argument(
-        "-o", "--output", help="Output HTML file path (optional, defaults to same name as CSV with .html extension)"
-    )
-    csv_report_parser.add_argument(
-        "--title", default="CSV Data Report", help="Report title (default: CSV Data Report)"
-    )
-
     # Parse arguments
     args = parser.parse_args()
 
@@ -368,7 +353,7 @@ def setup_cli():
         sys.exit(1)
 
     # Validate command
-    if args.command not in ["map", "index_source", "index_target", "transform", "csv_report"]:
+    if args.command not in ["map", "index_source", "index_target", "transform"]:
         parser.print_help()
         sys.exit(1)
 
@@ -377,10 +362,6 @@ def setup_cli():
     # For index_source, index_target and transform commands, we need object and variant
     if args.command in ["index_source", "index_target", "transform"]:
         # These commands always require object and variant from CLI args
-        return args, config, False
-
-    # For csv_report command, we don't need object/variant validation
-    if args.command == "csv_report":
         return args, config, False
 
     # Validate that we have object and variant after merging (for map command)
