@@ -1,8 +1,8 @@
 metadata:
   object: m140
   variant: bnka
-  source_file: data/01_source/m140_bnka.xlsx
-  generated_at: '2025-09-24T10:50:13.000340'
+  source_file: data\01_source\m140_bnka.xlsx
+  generated_at: '2025-09-24T16:22:46.626489'
   sheet: Sheet1
   source_fields_count: 37
 
@@ -11,42 +11,42 @@ metadata:
 source_fields:
 - field_name: MANDT
   field_description: None
-  example: '110'
+  example: '280'
   field_count: 1
   dtype: string
   nullable: false
 
 - field_name: BANKS
   field_description: None
-  example: 'NL'
+  example: 'nan'
   field_count: 2
   dtype: string
   nullable: false
 
 - field_name: BANKL
   field_description: None
-  example: '11000'
+  example: 'IBTFAEAS'
   field_count: 3
   dtype: string
   nullable: false
 
 - field_name: ERDAT
   field_description: None
-  example: '20220323'
+  example: '20150714'
   field_count: 4
   dtype: string
   nullable: false
 
 - field_name: ERNAM
   field_description: None
-  example: 'JOHNDOE'
+  example: 'VGOUW'
   field_count: 5
   dtype: string
   nullable: false
 
 - field_name: BANKA
   field_description: None
-  example: 'Paarden BANK'
+  example: 'Investbank'
   field_count: 6
   dtype: string
   nullable: false
@@ -67,14 +67,14 @@ source_fields:
 
 - field_name: ORT01
   field_description: None
-  example: 'Rotterdam'
+  example: 'Sharjah'
   field_count: 9
   dtype: string
   nullable: false
 
 - field_name: SWIFT
   field_description: None
-  example: 'EBILAEAD'
+  example: 'IBTFAEAS'
   field_count: 10
   dtype: string
   nullable: false

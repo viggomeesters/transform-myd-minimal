@@ -2,36 +2,24 @@ metadata:
   object: m140
   variant: bnka
   target_file: data/02_target/m140_bnka.xml
-  generated_at: '2025-09-23T04:28:26.375353'
+  generated_at: '2025-09-24T16:22:38.661212'
   structure: S_BNKA
-  target_fields_count: 10
+  target_fields_count: 12
 
 
 
 target_fields:
-- sap_field: bukrs
-  field_description: Company Code
+- sap_field: banks
+  field_description: Bank Country/Region Key
   sap_table: bnka
   mandatory: true
   field_group: key
   key: true
-  sheet_name: BNKA
+  sheet_name: Field List
   data_type: Text
-  length: 4
+  length: 80
   decimal: None
   field_count: 1
-
-- sap_field: banks
-  field_description: Bank Country
-  sap_table: bnka
-  mandatory: true
-  field_group: key
-  key: true
-  sheet_name: BNKA
-  data_type: Text
-  length: 3
-  decimal: None
-  field_count: 2
 
 - sap_field: bankl
   field_description: Bank Key
@@ -39,92 +27,128 @@ target_fields:
   mandatory: true
   field_group: key
   key: true
-  sheet_name: BNKA
+  sheet_name: Field List
   data_type: Text
-  length: 15
+  length: 80
+  decimal: None
+  field_count: 2
+
+- sap_field: banka
+  field_description: Name of Bank
+  sap_table: bnka
+  mandatory: true
+  field_group: address
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 60
   decimal: None
   field_count: 3
 
-- sap_field: banka
-  field_description: Bank Name
+- sap_field: provz
+  field_description: Region (State, Province, Country)
   sap_table: bnka
   mandatory: false
-  field_group: control data
+  field_group: address
   key: false
-  sheet_name: BNKA
+  sheet_name: Field List
   data_type: Text
-  length: 60
+  length: 80
   decimal: None
   field_count: 4
 
-- sap_field: swift
-  field_description: SWIFT Code
+- sap_field: stras
+  field_description: House Number and Street
   sap_table: bnka
   mandatory: false
-  field_group: control data
+  field_group: address
   key: false
-  sheet_name: BNKA
+  sheet_name: Field List
   data_type: Text
-  length: 11
+  length: 35
   decimal: None
   field_count: 5
 
-- sap_field: waers
-  field_description: Currency
+- sap_field: ort01
+  field_description: City
   sap_table: bnka
   mandatory: false
-  field_group: control data
+  field_group: address
   key: false
-  sheet_name: BNKA
+  sheet_name: Field List
   data_type: Text
-  length: 5
+  length: 35
   decimal: None
   field_count: 6
 
-- sap_field: koinh
-  field_description: Account Holder
+- sap_field: brnch
+  field_description: Bank Branch
+  sap_table: bnka
+  mandatory: false
+  field_group: address
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 40
+  decimal: None
+  field_count: 7
+
+- sap_field: swift
+  field_description: SWIFT Code for International Payments
   sap_table: bnka
   mandatory: false
   field_group: control data
   key: false
-  sheet_name: BNKA
+  sheet_name: Field List
   data_type: Text
-  length: 60
-  decimal: None
-  field_count: 7
-
-- sap_field: mandt
-  field_description: Client
-  sap_table: bnka
-  mandatory: true
-  field_group: key
-  key: true
-  sheet_name: BNKA
-  data_type: Text
-  length: 3
+  length: 11
   decimal: None
   field_count: 8
 
-- sap_field: rectype
-  field_description: Record Type
+- sap_field: xpgro
+  field_description: Post Office Bank Current Account
   sap_table: bnka
-  mandatory: true
-  field_group: key
-  key: true
-  sheet_name: BNKA
+  mandatory: false
+  field_group: control data
+  key: false
+  sheet_name: Field List
   data_type: Text
   length: 1
   decimal: None
   field_count: 9
 
-- sap_field: extract_date
-  field_description: Extract Date
+- sap_field: bnklz
+  field_description: Bank Number
   sap_table: bnka
-  mandatory: true
-  field_group: key
-  key: true
-  sheet_name: BNKA
-  data_type: Date
-  length: 8
+  mandatory: false
+  field_group: control data
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 15
   decimal: None
   field_count: 10
+
+- sap_field: bgrup
+  field_description: Bank Group (Bank Network)
+  sap_table: bnka
+  mandatory: false
+  field_group: control data
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 2
+  decimal: None
+  field_count: 11
+
+- sap_field: isnotoverwrite
+  field_description: Do Not Overwrite Existing Data
+  sap_table: bnka
+  mandatory: false
+  field_group: control indicator
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 1
+  decimal: None
+  field_count: 12
