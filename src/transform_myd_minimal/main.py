@@ -705,7 +705,7 @@ def analyze_column_data(
         raise ValueError(f"Error analyzing column data: {e}")
 
 
-def apply_field_name_fallback(source_fields, central_memory, object_name, variant, logger):
+def apply_field_name_fallback(source_fields, central_memory, object_name, variant, enhanced_logger):
     """
     Apply fallback mechanism for missing or unclear field_names using global mapping rules.
     
@@ -714,7 +714,7 @@ def apply_field_name_fallback(source_fields, central_memory, object_name, varian
         central_memory: CentralMappingMemory instance
         object_name: Object name for table-specific rules
         variant: Variant name for table-specific rules
-        logger: Logger for making fallback process visible
+        enhanced_logger: EnhancedLogger for making fallback process visible
         
     Returns:
         List of enhanced source_fields with fallback field_names applied
@@ -726,6 +726,7 @@ def apply_field_name_fallback(source_fields, central_memory, object_name, varian
     table_key = f"{object_name}_{variant}"
     enhanced_fields = []
     fallbacks_applied = 0
+    fallback_messages = []
     
     for field in source_fields:
         enhanced_field = field.copy()
@@ -791,13 +792,16 @@ def apply_field_name_fallback(source_fields, central_memory, object_name, varian
         
         if fallback_applied:
             fallbacks_applied += 1
-            # Make fallback process visible in CLI output/logging
-            logger.info(f"Field fallback applied: '{original_name}' -> '{enhanced_field['field_name']}' (via {fallback_source})")
+            # Make fallback process visible in CLI output/logging (using print for immediate visibility)
+            fallback_messages.append(f"Field fallback applied: '{original_name}' -> '{enhanced_field['field_name']}' (via {fallback_source})")
         
         enhanced_fields.append(enhanced_field)
     
+    # Make fallback process visible in CLI (explicit as requested)
     if fallbacks_applied > 0:
-        logger.info(f"Applied {fallbacks_applied} field name fallbacks using global mapping rules")
+        print(f"Applied {fallbacks_applied} field name fallbacks using global mapping rules")
+        for msg in fallback_messages:
+            print(f"  {msg}")
     
     return enhanced_fields
 
@@ -869,7 +873,7 @@ def run_index_source_command(args, config):
         # Load central mapping memory for field name fallbacks
         central_memory = load_central_mapping_memory(root_path)
         if central_memory:
-            logger.info("Loaded central mapping memory for field name fallbacks")
+            print("Loaded central mapping memory for field name fallbacks")
             # Apply fallback mechanism for missing field_names
             source_fields = apply_field_name_fallback(
                 source_fields, central_memory, args.object, args.variant, logger
