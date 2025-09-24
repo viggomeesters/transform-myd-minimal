@@ -2696,6 +2696,20 @@ def run_transform_command(args, config):
         if rejected_rows:
             rejected_df = pd.DataFrame(rejected_rows)
             rejected_df.to_csv(rejects_csv, index=False)
+            
+            # Generate HTML report for rejected records
+            try:
+                from .csv_reporting import generate_csv_html_report
+                
+                rejects_html = rejects_csv.with_suffix('.html')
+                report_title = f"Rejected Records Report · {args.object}/{args.variant}"
+                
+                generate_csv_html_report(rejects_csv, rejects_html, report_title)
+                logger.info(f"Generated HTML rejects report: {rejects_html}")
+                
+            except Exception as e:
+                logger.warning(f"Failed to generate HTML rejects report: {e}")
+                # Don't fail the entire transform if HTML generation fails
 
         # 10) Post-transform validation report
         (
