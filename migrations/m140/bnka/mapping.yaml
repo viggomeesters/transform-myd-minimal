@@ -1,7 +1,7 @@
 metadata:
   object: m140
   variant: bnka
-  generated_at: '2025-09-24T09:16:06.733866'
+  generated_at: '2025-09-24T09:17:55.953450'
   source_index: migrations/m140/bnka/index_source.yaml
   target_index: migrations/m140/bnka/index_target.yaml
   mapped_count: 6
