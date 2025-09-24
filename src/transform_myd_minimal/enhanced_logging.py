@@ -173,10 +173,9 @@ class EnhancedLogger:
                 self.console.print(f"  ruleset: {self.normalize_path(Path(ruleset_sources))}")
                 
         elif self.step == "transform":
-            # Transform-specific paths
+            # Transform-specific paths (no longer showing sap_csv as per requirement 4)
             input_raw = event.get("input_raw", "")
             mapping = event.get("mapping", "")
-            sap_csv = event.get("sap_csv", "")
             snapshot_csv = event.get("snapshot_csv", "")
             rejects_csv = event.get("rejects_csv", "")
             template_used = event.get("template_used", "")
@@ -185,8 +184,6 @@ class EnhancedLogger:
                 self.console.print(f"  raw: {self.normalize_path(Path(input_raw))}")
             if mapping:
                 self.console.print(f"  mapping: {self.normalize_path(Path(mapping))}")
-            if sap_csv:
-                self.console.print(f"  sap: {self.normalize_path(Path(sap_csv))}")
             if snapshot_csv:
                 self.console.print(f"  snap: {self.normalize_path(Path(snapshot_csv))}")
             if rejects_csv:
@@ -286,6 +283,7 @@ class EnhancedLogger:
         table = Table(title="Mappings (sample)")
         table.add_column("target_field")
         table.add_column("source_header")
+        table.add_column("source_field_name")  # Always show field_name
         table.add_column("confidence")
         table.add_column("status")
 
@@ -294,6 +292,7 @@ class EnhancedLogger:
             table.add_row(
                 item.get("target_field", ""),
                 item.get("source_header", ""),
+                item.get("source_field_name", "field_name onbekend"),  # Always show field_name
                 item.get("confidence", ""),
                 item.get("status", ""),
             )
