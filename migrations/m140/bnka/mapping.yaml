@@ -1,7 +1,7 @@
 metadata:
   object: m140
   variant: bnka
-  generated_at: '2025-09-24T16:35:54.749235'
+  generated_at: '2025-09-25T06:28:11.117741'
   source_index: migrations/m140/bnka/index_source.yaml
   target_index: migrations/m140/bnka/index_target.yaml
   mapped_count: 11
@@ -140,23 +140,87 @@ to_audit: []
 
 
 unmapped_source_fields:
-- MANDT
-- ERDAT
-- ERNAM
+- source_field_name: MANDT
+  source_field_description: Client (Mandant)
+  confidence: 1.0
+  rationale: Global skip field configured in central mapping memory
+  comment: 'Audit field: Client is not relevant for data mapping'
+  required: false
+  source_header: null
+  status: unmapped
+  target_field: null
+  target_table: null
+- source_field_name: ERDAT
+  source_field_description: Creation Date
+  confidence: 1.0
+  rationale: Global skip field configured in central mapping memory
+  comment: 'Audit field: Creation date is not relevant for data mapping'
+  required: false
+  source_header: null
+  status: unmapped
+  target_field: null
+  target_table: null
+- source_field_name: ERNAM
+  source_field_description: Name of Person who Created the Object
+  confidence: 1.0
+  rationale: Global skip field configured in central mapping memory
+  comment: 'Audit field: Creator name is not relevant for data mapping'
+  required: false
+  source_header: null
+  status: unmapped
+  target_field: null
+  target_table: null
 - LOEVM
 - PSKTO
 - ADRNR
 - CHKME
 - VERS
-- IBAN_RULE
+- source_field_name: IBAN_RULE
+  source_field_description: IBAN Validation Rule
+  confidence: 0.0
+  rationale: Manual mapping configured but target not found
+  comment: 'BNKA table specific: Map IBAN validation rule to SWIFT field for business
+    process alignment'
+  required: false
+  source_header: null
+  status: unmapped
+  target_field: SWIFT
+  target_table: null
 - SDD_B2B
 - SDD_COR1
 - SDD_RTRANS
 - ZNOCHECK
 - ZACC_LEN
-- ZRES1
-- ZRES2
-- ZRES3
+- source_field_name: ZRES1
+  source_field_description: Reserved field 1
+  confidence: 1.0
+  rationale: Global skip field configured in central mapping memory
+  comment: 'BNKA table specific: Reserved field not used in current implementation'
+  required: false
+  source_header: null
+  status: unmapped
+  target_field: null
+  target_table: null
+- source_field_name: ZRES2
+  source_field_description: Reserved field 2
+  confidence: 1.0
+  rationale: Global skip field configured in central mapping memory
+  comment: 'BNKA table specific: Reserved field not used in current implementation'
+  required: false
+  source_header: null
+  status: unmapped
+  target_field: null
+  target_table: null
+- source_field_name: ZRES3
+  source_field_description: Reserved field 3
+  confidence: 1.0
+  rationale: Global skip field configured in central mapping memory
+  comment: 'BNKA table specific: Future reserved field, skip for now'
+  required: false
+  source_header: null
+  status: unmapped
+  target_field: null
+  target_table: null
 - ZRES4
 - ZRES5
 - ZRES6
