@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<!-- This XML file contains both comments and control characters for testing -->
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:dt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+CONTROL_CHARS_FOR_TESTING
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Title>BANK_2</Title>
+  <!-- Comment in document properties -->
+  <Author>VMEESTERS</Author>
+  <Keywords>Standard Scope</Keywords>
+  <LastAuthor>VMEESTERS</LastAuthor>
+  <Created>2025-07-15T00:00:00Z</Created>
+  <Company>VMEESTERS</Company>
+  <Version>16.00</Version>
+ </DocumentProperties>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="11"
+    ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+ </Styles>
+ <!-- This is a worksheet comment -->
+ <Worksheet ss:Name="Field List">
+  <Names>
+   <NamedRange ss:Name="Print_Titles"
+    ss:RefersTo="='Field List'!R1:R1"/>
+  </Names>
+  <Table ss:ExpandedColumnCount="10" ss:ExpandedRowCount="4" x:FullColumns="1"
+   x:FullRows="1" ss:StyleID="ta1" ss:DefaultColumnWidth="54"
+   ss:DefaultRowHeight="12">
+   <Column ss:StyleID="s17" ss:AutoFitWidth="0" ss:Width="40"/>
+   <Column ss:StyleID="s17" ss:AutoFitWidth="0" ss:Width="80"/>
+   <Column ss:StyleID="s17" ss:AutoFitWidth="0" ss:Width="120"/>
+   <Column ss:StyleID="s17" ss:AutoFitWidth="0" ss:Width="200"/>
+   <Column ss:StyleID="s17" ss:AutoFitWidth="0" ss:Width="80"/>
+   <Column ss:StyleID="s17" ss:AutoFitWidth="0" ss:Width="60"/>
+   <Column ss:StyleID="s17" ss:AutoFitWidth="0" ss:Width="60"/>
+   <Column ss:StyleID="s17" ss:AutoFitWidth="0" ss:Width="60"/>
+   <Column ss:StyleID="s17" ss:AutoFitWidth="0" ss:Width="120"/>
+   <Column ss:StyleID="s17" ss:AutoFitWidth="0" ss:Width="120"/>
+   <!-- Header row comment -->
+   <Row>
+    <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">Sheet Name</Data></Cell>
+    <Cell><Data ss:Type="String">Group Name</Data></Cell>
+    <Cell><Data ss:Type="String">Field Description</Data></Cell>
+    <Cell><Data ss:Type="String">Importance</Data></Cell>
+    <Cell><Data ss:Type="String">Type</Data></Cell>
+    <Cell><Data ss:Type="String">Length</Data></Cell>
+    <Cell><Data ss:Type="String">Decimal</Data></Cell>
+    <Cell><Data ss:Type="String">SAP Structure</Data></Cell>
+    <Cell><Data ss:Type="String">SAP Field</Data></Cell>
+   </Row>
+   <!-- Data row comment -->
+   <Row>
+    <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">Field List</Data></Cell>
+    <Cell><Data ss:Type="String">key</Data></Cell>
+    <Cell><Data ss:Type="String">Bank Country/Region Key</Data></Cell>
+    <Cell><Data ss:Type="String">Mandatory</Data></Cell>
+    <Cell><Data ss:Type="String">Text</Data></Cell>
+    <Cell><Data ss:Type="Number">80</Data></Cell>
+    <Cell></Cell>
+    <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">banks</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">Field List</Data></Cell>
+    <Cell><Data ss:Type="String">key</Data></Cell>
+    <Cell><Data ss:Type="String">Bank Key</Data></Cell>
+    <Cell><Data ss:Type="String">Mandatory</Data></Cell>
+    <Cell><Data ss:Type="String">Text</Data></Cell>
+    <Cell><Data ss:Type="Number">80</Data></Cell>
+    <Cell></Cell>
+    <Cell><Data ss:Type="String">S_BNKA</Data></Cell>
+    <Cell><Data ss:Type="String">bankl</Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+ <!-- Final comment -->
+</Workbook>

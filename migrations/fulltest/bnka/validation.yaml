@@ -1,0 +1,21 @@
+metadata:
+  object: fulltest
+  variant: bnka
+  target_file: data/02_target/fulltest_bnka.xml
+  generated_at: '2025-09-25T11:00:15.988266'
+  structure: S_BNKA
+
+
+
+validation:
+- field: BANKS
+  key: true
+  required: true
+  type: string
+  max_length: 80
+
+- field: BANKL
+  key: true
+  required: true
+  type: string
+  max_length: 80

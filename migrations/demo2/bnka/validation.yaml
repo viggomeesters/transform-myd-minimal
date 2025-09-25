@@ -1,0 +1,15 @@
+metadata:
+  object: demo2
+  variant: bnka
+  target_file: data/02_target/demo2_bnka.xml
+  generated_at: '2025-09-25T11:02:22.759104'
+  structure: S_BNKA
+
+
+
+validation:
+- field: BANKL
+  key: true
+  required: true
+  type: string
+  max_length: 15
