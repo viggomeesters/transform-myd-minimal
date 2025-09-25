@@ -267,6 +267,9 @@ def setup_cli():
     index_target_parser.add_argument(
         "--force", action="store_true", help="Overwrite existing outputs"
     )
+    index_target_parser.add_argument(
+        "--prefer-xlsx", action="store_true", help="Prefer .xlsx file over .xml when both exist (F02 fallback feature)"
+    )
     # Logging flags
     index_target_parser.add_argument(
         "--json", action="store_true", help="Force JSONL output to stdout"

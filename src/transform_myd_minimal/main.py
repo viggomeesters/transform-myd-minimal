@@ -1389,22 +1389,36 @@ def run_index_target_command(args, config):
     input_file = xml_file
     xml_parse_error = None
     
-    # Check if XML file exists and can be parsed
-    if xml_file.exists():
-        try:
-            # Try to parse XML to validate it's readable
-            _parse_spreadsheetml_target_fields(xml_file, args.variant)
-            # If successful, use XML file
-            input_file = xml_file
-        except Exception as e:
-            # XML exists but has parsing errors - record for fallback
-            xml_parse_error = str(e)
-            print(f"Warning: XML parsing failed for {xml_file}: {xml_parse_error}")
+    # Check if --prefer-xlsx flag is set
+    prefer_xlsx = getattr(args, 'prefer_xlsx', False)
+    
+    # If prefer-xlsx is set, try xlsx first
+    if prefer_xlsx:
+        xlsx_file = (
+            root_path / f"data/02_target/{args.object}_{args.variant}.xlsx"
+        )
+        if xlsx_file.exists():
+            input_file = xlsx_file
+            print(f"Using {xlsx_file.name} as target definition (--prefer-xlsx enabled).")
+        else:
             input_file = None  # Force fallback search
     else:
-        input_file = None  # XML doesn't exist, search for fallbacks
+        # Check if XML file exists and can be parsed
+        if xml_file.exists():
+            try:
+                # Try to parse XML to validate it's readable
+                _parse_spreadsheetml_target_fields(xml_file, args.variant)
+                # If successful, use XML file
+                input_file = xml_file
+            except Exception as e:
+                # XML exists but has parsing errors - record for fallback
+                xml_parse_error = str(e)
+                print(f"Warning: XML parsing failed for {xml_file}: {xml_parse_error}")
+                input_file = None  # Force fallback search
+        else:
+            input_file = None  # XML doesn't exist, search for fallbacks
 
-    # Check for fallback files if XML doesn't exist or has parse errors
+    # Check for fallback files if XML doesn't exist or has parse errors or --prefer-xlsx was set but xlsx not found
     if input_file is None:
         xlsx_file = (
             root_path / f"data/02_target/{args.object}_{args.variant}.xlsx"
