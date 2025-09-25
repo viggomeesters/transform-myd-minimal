@@ -762,14 +762,14 @@ def generate_migration_mappings_yaml(
                     target_desc = target_row.iloc[0].get("field_description", "")
 
             mapping_entry = {
-                "source_field": match.source_field,
-                "source_description": match.source_description,
-                "target_field": match.target_field,
-                "target_description": target_desc,
-                "mapping_type": match.match_type,
-                "transformation": "copy",
-                "confidence": match.confidence_score,
-                "status": "mapped",
+                "target_field_name": match.target_field,
+                "source_field_name": match.source_field,
+                "target_field_description": target_desc,
+                "source_field_description": match.source_description if match.source_description else "none",
+                "target_table": "",  # Will be filled from target data
+                "map_status": "mapped",
+                "map_confidence": match.confidence_score,
+                "map_rationale": f"Exact field match",
             }
             mappings_data["mappings"].append(mapping_entry)
             processed_source_fields.add(match.source_field)
@@ -791,15 +791,14 @@ def generate_migration_mappings_yaml(
                     target_desc = target_row.iloc[0].get("field_description", "")
 
             mapping_entry = {
-                "source_field": match.source_field,
-                "source_description": match.source_description,
-                "target_field": match.target_field,
-                "target_description": target_desc,
-                "mapping_type": "manual",
-                "transformation": "copy",
-                "confidence": match.confidence_score,
-                "status": "mapped",
-                "reason": match.reason,
+                "target_field_name": match.target_field,
+                "source_field_name": match.source_field,
+                "target_field_description": target_desc,
+                "source_field_description": match.source_description if match.source_description else "none",
+                "target_table": "",  # Will be filled from target data
+                "map_status": "manual",
+                "map_confidence": match.confidence_score,
+                "map_rationale": "Manual mapping from central memory",
             }
             mappings_data["mappings"].append(mapping_entry)
             processed_source_fields.add(match.source_field)
@@ -807,15 +806,14 @@ def generate_migration_mappings_yaml(
         # Process skipped fields
         for match in central_skip_matches:
             mapping_entry = {
-                "source_field": match.source_field,
-                "source_description": match.source_description,
-                "target_field": "",
-                "target_description": "",
-                "mapping_type": "skip",
-                "transformation": "none",
-                "confidence": match.confidence_score,
-                "status": "skipped",
-                "reason": match.reason,
+                "target_field_name": "",
+                "source_field_name": match.source_field,
+                "target_field_description": "",
+                "source_field_description": match.source_description if match.source_description else "none",
+                "target_table": "",
+                "map_status": "skipped",
+                "map_confidence": match.confidence_score,
+                "map_rationale": match.reason,
             }
             mappings_data["mappings"].append(mapping_entry)
             processed_source_fields.add(match.source_field)
@@ -841,15 +839,14 @@ def generate_migration_mappings_yaml(
                     source_desc = source_row.iloc[0].get("field_description", "")
 
             mapping_entry = {
-                "source_field": source_field_name,
-                "source_description": source_desc,
-                "target_field": "",
-                "target_description": "",
-                "mapping_type": "unmapped",
-                "transformation": "none",
-                "confidence": 0.0,
-                "status": "pending",
-                "reason": "Geen geschikte match gevonden",
+                "target_field_name": "",
+                "source_field_name": source_field_name,
+                "target_field_description": "",
+                "source_field_description": source_desc if source_desc else "none",
+                "target_table": "",
+                "map_status": "pending",
+                "map_confidence": 0.0,
+                "map_rationale": "Geen geschikte match gevonden",
             }
             mappings_data["mappings"].append(mapping_entry)
 
@@ -859,14 +856,14 @@ def generate_migration_mappings_yaml(
 
         for _, source_row in source_fields.iterrows():
             mapping_entry = {
-                "source_field": source_row.get("field_name", ""),
-                "source_description": source_row.get("field_description", ""),
-                "target_field": "",
-                "target_description": "",
-                "mapping_type": "direct",
-                "transformation": "copy",
-                "confidence": 0.0,
-                "status": "pending",
+                "target_field_name": "",
+                "source_field_name": source_row.get("field_name", ""),
+                "target_field_description": "",
+                "source_field_description": source_row.get("field_description", "") or "none",
+                "target_table": "",
+                "map_status": "pending",
+                "map_confidence": 0.0,
+                "map_rationale": "No mapping performed yet",
             }
             mappings_data["mappings"].append(mapping_entry)
 

@@ -1,7 +1,7 @@
 metadata:
   object: m140
   variant: bnka
-  generated_at: '2025-09-25T06:28:11.117741'
+  generated_at: '2025-09-25T11:50:56.042353'
   source_index: migrations/m140/bnka/index_source.yaml
   target_index: migrations/m140/bnka/index_target.yaml
   mapped_count: 11
@@ -13,124 +13,112 @@ metadata:
 
 
 mappings:
-- confidence: 1.0
-  rationale: Exact field name match
-  required: true
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
   source_field_description: None
   source_field_name: BANKS
-  source_header: BANKS
-  status: auto
-  target_field: BANKS
+  target_field_description: Bank Country/Region Key
+  target_field_name: BANKS
   target_table: bnka
 
-- confidence: 1.0
-  rationale: Exact field name match
-  required: true
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
   source_field_description: None
   source_field_name: BANKL
-  source_header: BANKL
-  status: auto
-  target_field: BANKL
+  target_field_description: Bank Key
+  target_field_name: BANKL
   target_table: bnka
 
-- confidence: 1.0
-  rationale: Exact field name match
-  required: true
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
   source_field_description: None
   source_field_name: BANKA
-  source_header: BANKA
-  status: auto
-  target_field: BANKA
+  target_field_description: Name of Bank
+  target_field_name: BANKA
   target_table: bnka
 
-- confidence: 1.0
-  rationale: Exact field name match
-  required: false
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
   source_field_description: None
   source_field_name: PROVZ
-  source_header: PROVZ
-  status: auto
-  target_field: PROVZ
+  target_field_description: Region (State, Province, Country)
+  target_field_name: PROVZ
   target_table: bnka
 
-- confidence: 1.0
-  rationale: Exact field name match
-  required: false
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
   source_field_description: None
   source_field_name: STRAS
-  source_header: STRAS
-  status: auto
-  target_field: STRAS
+  target_field_description: House Number and Street
+  target_field_name: STRAS
   target_table: bnka
 
-- confidence: 1.0
-  rationale: Exact field name match
-  required: false
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
   source_field_description: None
   source_field_name: ORT01
-  source_header: ORT01
-  status: auto
-  target_field: ORT01
+  target_field_description: City
+  target_field_name: ORT01
   target_table: bnka
 
-- confidence: 1.0
-  rationale: Exact field name match
-  required: false
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
   source_field_description: None
   source_field_name: BRNCH
-  source_header: BRNCH
-  status: auto
-  target_field: BRNCH
+  target_field_description: Bank Branch
+  target_field_name: BRNCH
   target_table: bnka
 
-- confidence: 1.0
-  rationale: Exact field name match
-  required: false
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
   source_field_description: None
   source_field_name: SWIFT
-  source_header: SWIFT
-  status: auto
-  target_field: SWIFT
+  target_field_description: SWIFT Code for International Payments
+  target_field_name: SWIFT
   target_table: bnka
 
-- confidence: 1.0
-  rationale: Exact field name match
-  required: false
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
   source_field_description: None
   source_field_name: XPGRO
-  source_header: XPGRO
-  status: auto
-  target_field: XPGRO
+  target_field_description: Post Office Bank Current Account
+  target_field_name: XPGRO
   target_table: bnka
 
-- confidence: 1.0
-  rationale: Exact field name match
-  required: false
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
   source_field_description: None
   source_field_name: BNKLZ
-  source_header: BNKLZ
-  status: auto
-  target_field: BNKLZ
+  target_field_description: Bank Number
+  target_field_name: BNKLZ
   target_table: bnka
 
-- confidence: 1.0
-  rationale: Exact field name match
-  required: false
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
   source_field_description: None
   source_field_name: BGRUP
-  source_header: BGRUP
-  status: auto
-  target_field: BGRUP
+  target_field_description: Bank Group (Bank Network)
+  target_field_name: BGRUP
   target_table: bnka
 
-- confidence: 0.0
-  rationale: Added without source match, to comply with SAP template
-  required: false
-  source_field_description: null
+- map_confidence: 0.0
+  map_rationale: Added without source match, to comply with SAP template
+  map_status: unmapped
+  source_field_description: none
   source_field_name: field_name onbekend
-  source_header: null
-  status: unmapped
-  target_field: ISNOTOVERWRITE
+  target_field_description: Do Not Overwrite Existing Data
+  target_field_name: ISNOTOVERWRITE
   target_table: bnka
 
 
@@ -235,5 +223,5 @@ unmapped_source_fields:
 
 unmapped_target_fields:
 - target_table: bnka
-  target_field: ISNOTOVERWRITE
+  target_field_name: ISNOTOVERWRITE
   required: false
