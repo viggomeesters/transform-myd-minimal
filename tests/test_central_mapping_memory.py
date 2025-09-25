@@ -97,6 +97,14 @@ def test_apply_central_memory_to_unmapped_fields():
     assert mandt_field["rationale"] == "Global skip field configured in central mapping memory"
     assert mandt_field["comment"] == "Audit field: Client is not relevant for data mapping"
     
+    # Verify field order - source_field_name and source_field_description should come first
+    field_keys = list(mandt_field.keys())
+    assert field_keys[0] == "source_field_name"
+    assert field_keys[1] == "source_field_description"
+    assert field_keys[2] == "confidence"
+    assert field_keys[3] == "rationale"
+    assert field_keys[4] == "comment"
+    
     # Check that unknown field remains as string
     assert unmapped_fields[2] == "UNKNOWN_FIELD"
 

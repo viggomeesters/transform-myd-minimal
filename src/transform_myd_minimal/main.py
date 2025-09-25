@@ -1693,31 +1693,31 @@ def apply_central_memory_to_unmapped_fields(mapping_result, central_memory, obje
             # This field is configured to be skipped
             rule = skip_dict[field_name]
             enhanced_unmapped_fields.append({
+                "source_field_name": field_name,
+                "source_field_description": rule.source_description,
                 "confidence": 1.0,
                 "rationale": "Global skip field configured in central mapping memory",
+                "comment": rule.comment,
                 "required": False,
-                "source_field_description": rule.source_description,
-                "source_field_name": field_name,
                 "source_header": None,
                 "status": "unmapped",
                 "target_field": None,
-                "target_table": None,
-                "comment": rule.comment
+                "target_table": None
             })
         elif field_name in manual_dict:
             # This field has a manual mapping but wasn't used (might be unmapped target)
             mapping = manual_dict[field_name]
             enhanced_unmapped_fields.append({
+                "source_field_name": field_name,
+                "source_field_description": mapping.source_description,
                 "confidence": 0.0,
                 "rationale": "Manual mapping configured but target not found",
+                "comment": mapping.comment,
                 "required": False,
-                "source_field_description": mapping.source_description,
-                "source_field_name": field_name,
                 "source_header": None,
                 "status": "unmapped",
                 "target_field": mapping.target,
-                "target_table": None,
-                "comment": mapping.comment
+                "target_table": None
             })
         else:
             # Regular unmapped field - keep as simple string for now
