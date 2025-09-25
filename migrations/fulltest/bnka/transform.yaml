@@ -1,0 +1,42 @@
+metadata:
+  object: fulltest
+  variant: bnka
+  target_file: data/02_target/fulltest_bnka.xml
+  generated_at: '2025-09-25T12:05:59.243778'
+  structure: S_BNKA
+  description: 'Transformation rules for fulltest/bnka'
+
+
+
+transformations:
+- target_field: BANKS
+  transformation_type: direct
+  source_field: ''
+  description: 'Bank Country/Region Key'
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+    # - source_value: 'EMPTY'
+    #   target_value: 'DEFAULT'
+
+- target_field: BANKL
+  transformation_type: direct
+  source_field: ''
+  description: 'Bank Key'
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+    # - source_value: 'EMPTY'
+    #   target_value: 'DEFAULT'
+
+
+# General transformation settings
+transformation_settings:
+  null_handling: 'use_placeholder'  # Options: 'use_placeholder', 'skip', 'error'
+  empty_string_handling: 'use_placeholder'  # Options: 'use_placeholder', 'skip', 'keep'
+  case_sensitive_mappings: false
+  trim_whitespace: true
