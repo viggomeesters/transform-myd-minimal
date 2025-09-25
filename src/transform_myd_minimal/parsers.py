@@ -46,6 +46,122 @@ def read_excel_headers(
         raise Exception(f"Error reading Excel headers from {path}: {e}")
 
 
+def read_excel_target_fields(
+    path: Path,
+    variant: str,
+    sheet: str = "Field List",
+) -> List[Dict[str, Any]]:
+    """
+    Read target field definitions from Excel file for F02 fallback.
+    
+    Expected columns in Excel file:
+    - Sheet Name (or equivalent)
+    - Group Name (or Field Group)
+    - Field Description
+    - Importance (Mandatory/Optional)
+    - Type (Data Type)
+    - Length
+    - Decimal
+    - SAP Structure (Table name)
+    - SAP Field
+    
+    Args:
+        path: Path to XLSX file
+        variant: Variant name for table mapping
+        sheet: Sheet name to read (default: "Field List")
+    
+    Returns:
+        List of target field dictionaries with same structure as SpreadsheetML parser
+    """
+    try:
+        # Read the Excel file
+        df = pd.read_excel(path, sheet_name=sheet)
+        
+        # Column mapping for flexible header names
+        column_mapping = {
+            'sheet_name': ['Sheet Name', 'sheet_name', 'SheetName'],
+            'field_group': ['Group Name', 'field_group', 'Group', 'FieldGroup'],
+            'field_description': ['Field Description', 'field_description', 'Description'],
+            'importance': ['Importance', 'importance', 'Mandatory'],
+            'data_type': ['Type', 'data_type', 'DataType', 'Data Type'],
+            'length': ['Length', 'length'],
+            'decimal': ['Decimal', 'decimal', 'Decimals'],
+            'sap_table': ['SAP Structure', 'sap_table', 'sap_structure', 'Table'],
+            'sap_field': ['SAP Field', 'sap_field', 'Field']
+        }
+        
+        # Find actual column names in the DataFrame
+        actual_columns = {}
+        for field_name, possible_names in column_mapping.items():
+            for possible_name in possible_names:
+                if possible_name in df.columns:
+                    actual_columns[field_name] = possible_name
+                    break
+            
+            # If not found, try case-insensitive match
+            if field_name not in actual_columns:
+                for col in df.columns:
+                    if any(col.lower() == name.lower() for name in possible_names):
+                        actual_columns[field_name] = col
+                        break
+        
+        # Verify we have the essential columns
+        required_fields = ['field_description', 'sap_field']
+        for field in required_fields:
+            if field not in actual_columns:
+                raise ValueError(f"Required column not found for '{field}'. Available columns: {list(df.columns)}")
+        
+        # Convert DataFrame to target field format
+        target_fields = []
+        for index, row in df.iterrows():
+            # Extract importance/mandatory status
+            importance = row.get(actual_columns.get('importance', ''), '').strip()
+            mandatory = importance.lower() in ['mandatory', 'true', '1', 'yes']
+            
+            # Determine if field is a key (typically mandatory + in key group)
+            field_group = row.get(actual_columns.get('field_group', ''), '').strip().lower()
+            key = mandatory and field_group == 'key'
+            
+            # Handle decimal values
+            decimal_val = row.get(actual_columns.get('decimal', ''), '')
+            if pd.isna(decimal_val) or decimal_val == '' or decimal_val == 'None':
+                decimal_val = None
+            
+            # Handle length values
+            length_val = row.get(actual_columns.get('length', ''), '')
+            if pd.isna(length_val) or length_val == '':
+                length_val = ''
+            else:
+                try:
+                    length_val = str(int(float(length_val)))
+                except (ValueError, TypeError):
+                    length_val = str(length_val)
+            
+            # Create field dictionary matching XML parser output format
+            field_dict = {
+                'sap_field': str(row[actual_columns['sap_field']]).strip(),
+                'field_description': str(row[actual_columns['field_description']]).strip(),
+                'sap_table': str(row.get(actual_columns.get('sap_table', ''), variant)).strip(),
+                'mandatory': mandatory,
+                'field_group': field_group if field_group else 'default',
+                'key': key,
+                'sheet_name': str(row.get(actual_columns.get('sheet_name', ''), 'Field List')).strip(),
+                'data_type': str(row.get(actual_columns.get('data_type', ''), 'Text')).strip(),
+                'length': length_val,
+                'decimal': decimal_val,
+                'field_count': index + 1
+            }
+            
+            target_fields.append(field_dict)
+        
+        return target_fields
+        
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Excel file not found: {path}")
+    except Exception as e:
+        raise Exception(f"Error reading Excel target fields from {path}: {e}")
+
+
 class SpreadsheetMLParser:
     """Parser for SpreadsheetML (Excel 2003 XML) format with namespace support."""
 

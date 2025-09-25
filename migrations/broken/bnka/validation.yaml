@@ -2,20 +2,14 @@ metadata:
   object: broken
   variant: bnka
   target_file: data/02_target/broken_bnka.xml
-  generated_at: '2025-09-25T10:51:50.847420'
+  generated_at: '2025-09-25T11:18:12.006431'
   structure: S_BNKA
 
 
 
 validation:
-- field: BANKS
+- field: TESTFIELD
   key: true
   required: true
   type: string
-  max_length: 80
-
-- field: BANKL
-  key: true
-  required: true
-  type: string
-  max_length: 80
+  max_length: 50
