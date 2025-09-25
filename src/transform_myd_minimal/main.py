@@ -979,14 +979,22 @@ def run_index_source_command(args, config):
                 for i, field in enumerate(source_fields):
                     if i > 0:
                         f.write("\n")  # Add 1 empty line between records
-                    f.write(f"- field_name: {field['field_name']}\n")
-                    f.write(f"  field_description: {field['field_description']}\n")
+                    f.write(f"- source_field_name: {field['field_name']}\n")
+                    
+                    # Quote field descriptions to handle colons in text
+                    desc = field['field_description']
+                    if desc is None:
+                        desc = "None"
+                    else:
+                        desc = f'"{desc}"'
+                    f.write(f"  source_field_description: {desc}\n")
+                    
                     f.write(
-                        f"  example: {repr(field['example']) if field['example'] is not None else 'null'}\n"
+                        f"  source_example: {repr(field['example']) if field['example'] is not None else 'null'}\n"
                     )
-                    f.write(f"  field_count: {field['field_count']}\n")
-                    f.write(f"  dtype: {field['dtype']}\n")
-                    f.write(f"  nullable: {str(field['nullable']).lower()}\n")
+                    f.write(f"  source_field_count: {field['field_count']}\n")
+                    f.write(f"  source_dtype: {field['dtype']}\n")
+                    f.write(f"  source_nullable: {str(field['nullable']).lower()}\n")
 
         # Update global object list
         update_object_list(args.object, args.variant, root_path)
@@ -1513,17 +1521,25 @@ def run_index_target_command(args, config):
             for i, field in enumerate(target_fields):
                 if i > 0:
                     f.write("\n")  # Add 1 empty line between records
-                f.write(f"- sap_field: {field['sap_field']}\n")
-                f.write(f"  field_description: {field['field_description']}\n")
-                f.write(f"  sap_table: {field['sap_table']}\n")
-                f.write(f"  mandatory: {str(field['mandatory']).lower()}\n")
-                f.write(f"  field_group: {field['field_group']}\n")
-                f.write(f"  key: {str(field['key']).lower()}\n")
-                f.write(f"  sheet_name: {field['sheet_name']}\n")
-                f.write(f"  data_type: {field['data_type']}\n")
-                f.write(f"  length: {field['length']}\n")
-                f.write(f"  decimal: {field['decimal']}\n")
-                f.write(f"  field_count: {field['field_count']}\n")
+                f.write(f"- target_field_name: {field['sap_field'].upper()}\n")
+                
+                # Quote field descriptions to handle colons in text
+                desc = field['field_description']
+                if desc:
+                    desc = f'"{desc}"'
+                else:
+                    desc = '""'
+                f.write(f"  target_field_description: {desc}\n")
+                
+                f.write(f"  target_table: {field['sap_table']}\n")
+                f.write(f"  target_is_mandatory: {str(field['mandatory']).lower()}\n")
+                f.write(f"  target_field_group: {field['field_group']}\n")
+                f.write(f"  target_is_key: {str(field['key']).lower()}\n")
+                f.write(f"  target_sheet_name: {field['sheet_name']}\n")
+                f.write(f"  target_data_type: {field['data_type']}\n")
+                f.write(f"  target_length: {field['length']}\n")
+                f.write(f"  target_decimal: {field['decimal']}\n")
+                f.write(f"  target_field_count: {field['field_count']}\n")
 
         # Generate validation.yaml scaffold
         validation_file = output_dir / "validation.yaml"
@@ -2031,7 +2047,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             to_audit.append(
                 {
                     "target_table": t_table,
-                    "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
+                    "target_field_name": t_name.upper(),  # Make target_field uppercase for SAP compliance
                     "source_header": best_match,
                     "source_field_name": tie_field_name,
                     "confidence": best_confidence,
@@ -2056,15 +2072,14 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             source_field_name = "field_name onbekend"
 
         mapping = {
-            "target_table": t_table,
-            "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
-            "source_header": best_match,
+            "target_field_name": t_name.upper(),  # Make target_field uppercase for SAP compliance
             "source_field_name": source_field_name,  # Always show field_name
-            "source_field_description": source_field_description,
-            "required": required,
-            "confidence": round(best_confidence, 2),
-            "status": status,
-            "rationale": best_rationale,
+            "target_field_description": target.get("field_description", ""),
+            "source_field_description": source_field_description if source_field_description else "none",
+            "target_table": t_table,
+            "map_status": status,
+            "map_confidence": round(best_confidence, 2),
+            "map_rationale": best_rationale,
         }
         mappings.append(mapping)
 
@@ -2089,7 +2104,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
                 to_audit.append(
                     {
                         "target_table": t_table,
-                        "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
+                        "target_field_name": t_name.upper(),  # Make target_field uppercase for SAP compliance
                         "source_header": best_match,
                         "source_field_name": audit_field_name,
                         "confidence": best_confidence,
@@ -2102,7 +2117,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
                 to_audit.append(
                     {
                         "target_table": t_table,
-                        "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
+                        "target_field_name": t_name.upper(),  # Make target_field uppercase for SAP compliance
                         "source_header": best_match,
                         "source_field_name": audit_field_name,
                         "confidence": best_confidence,
@@ -2115,7 +2130,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
                 to_audit.append(
                     {
                         "target_table": t_table,
-                        "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
+                        "target_field_name": t_name.upper(),  # Make target_field uppercase for SAP compliance
                         "source_header": None,
                         "source_field_name": "field_name onbekend",
                         "confidence": 0.00,
@@ -2127,7 +2142,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             unmapped_target_fields.append(
                 {
                     "target_table": t_table,
-                    "target_field": t_name.upper(),  # Make target_field uppercase for SAP compliance
+                    "target_field_name": t_name.upper(),  # Make target_field uppercase for SAP compliance
                     "required": required,
                 }
             )
@@ -2262,7 +2277,7 @@ def run_map_command(args, config):
 
         # Calculate metrics for metadata
         mapped_count = len(
-            [m for m in mapping_result["mappings"] if m["status"] == "auto"]
+            [m for m in mapping_result["mappings"] if m["map_status"] == "auto"]
         )
         unmapped_count = len(mapping_result["unmapped_target_fields"])
         to_audit_count = len(mapping_result["to_audit"])
@@ -2390,11 +2405,11 @@ def run_map_command(args, config):
         preview_data = []
         for mapping in mapping_result["mappings"][:12]:
             preview_data.append({
-                "target_field": mapping["target_field"],
-                "source_header": mapping["source_header"] or "null",
+                "target_field": mapping["target_field_name"],
+                "source_header": mapping.get("source_header", "null") or "null", 
                 "source_field_name": mapping.get("source_field_name", "field_name onbekend"),  # Always show field_name
-                "confidence": f"{mapping['confidence']:.2f}",
-                "status": mapping["status"],
+                "confidence": f"{mapping['map_confidence']:.2f}",
+                "status": mapping["map_status"],
             })
 
         # Log event using Enhanced Logger (this will handle both stdout and file logging)
@@ -2429,19 +2444,19 @@ def run_map_command(args, config):
                 "mappings": [
                     {
                         "target_table": mapping.get("target_table", ""),
-                        "target_field": mapping["target_field"],
-                        "source_header": mapping["source_header"],
+                        "target_field": mapping["target_field_name"],
+                        "source_header": mapping.get("source_header", ""),
                         "required": mapping.get("required", False),
-                        "confidence": mapping["confidence"],
-                        "status": mapping["status"],
-                        "rationale": mapping["rationale"]
+                        "confidence": mapping["map_confidence"],
+                        "status": mapping["map_status"],
+                        "rationale": mapping["map_rationale"]
                     }
                     for mapping in mapping_result["mappings"]
                 ],
                 "to_audit_rows": [
                     {
                         "target_table": audit.get("target_table", ""),
-                        "target_field": audit["target_field"],
+                        "target_field": audit["target_field_name"],
                         "source_header": audit.get("source_header"),
                         "confidence": audit.get("confidence", 0.0),
                         "reason": audit.get("reason", "")
