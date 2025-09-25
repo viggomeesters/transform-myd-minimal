@@ -1,0 +1,374 @@
+metadata:
+  object: m120
+  variant: cepc
+  source_file: data\01_source\m120_cepc.xlsx
+  generated_at: '2025-09-25T13:41:59.553175'
+  sheet: Sheet1
+  source_fields_count: 52
+
+
+
+source_fields:
+- field_name: PRCTR
+  field_description: None
+  example: '0000000101'
+  field_count: 1
+  dtype: string
+  nullable: false
+
+- field_name: DATBI
+  field_description: None
+  example: '2013-12-31 00:00:00'
+  field_count: 2
+  dtype: string
+  nullable: false
+
+- field_name: KOKRS
+  field_description: None
+  example: '0100'
+  field_count: 3
+  dtype: string
+  nullable: false
+
+- field_name: DATAB
+  field_description: None
+  example: '2012-01-01 00:00:00'
+  field_count: 4
+  dtype: string
+  nullable: false
+
+- field_name: ERSDA
+  field_description: None
+  example: '2012-12-18 00:00:00'
+  field_count: 5
+  dtype: string
+  nullable: false
+
+- field_name: USNAM
+  field_description: None
+  example: 'HSCHAAP'
+  field_count: 6
+  dtype: string
+  nullable: false
+
+- field_name: MERKMAL
+  field_description: None
+  example: 'nan'
+  field_count: 7
+  dtype: string
+  nullable: false
+
+- field_name: ABTEI
+  field_description: None
+  example: 'nan'
+  field_count: 8
+  dtype: string
+  nullable: false
+
+- field_name: VERAK
+  field_description: None
+  example: 'nvt'
+  field_count: 9
+  dtype: string
+  nullable: false
+
+- field_name: VERAK_USER
+  field_description: None
+  example: 'nan'
+  field_count: 10
+  dtype: string
+  nullable: false
+
+- field_name: WAERS
+  field_description: None
+  example: 'nan'
+  field_count: 11
+  dtype: string
+  nullable: false
+
+- field_name: NPRCTR
+  field_description: None
+  example: 'nan'
+  field_count: 12
+  dtype: string
+  nullable: false
+
+- field_name: LAND1
+  field_description: None
+  example: 'nan'
+  field_count: 13
+  dtype: string
+  nullable: false
+
+- field_name: ANRED
+  field_description: None
+  example: 'nan'
+  field_count: 14
+  dtype: string
+  nullable: false
+
+- field_name: NAME1
+  field_description: None
+  example: 'nan'
+  field_count: 15
+  dtype: string
+  nullable: false
+
+- field_name: NAME2
+  field_description: None
+  example: 'nan'
+  field_count: 16
+  dtype: string
+  nullable: false
+
+- field_name: NAME3
+  field_description: None
+  example: 'nan'
+  field_count: 17
+  dtype: string
+  nullable: false
+
+- field_name: NAME4
+  field_description: None
+  example: 'nan'
+  field_count: 18
+  dtype: string
+  nullable: false
+
+- field_name: ORT01
+  field_description: None
+  example: 'nan'
+  field_count: 19
+  dtype: string
+  nullable: false
+
+- field_name: ORT02
+  field_description: None
+  example: 'nan'
+  field_count: 20
+  dtype: string
+  nullable: false
+
+- field_name: STRAS
+  field_description: None
+  example: 'nan'
+  field_count: 21
+  dtype: string
+  nullable: false
+
+- field_name: PFACH
+  field_description: None
+  example: 'nan'
+  field_count: 22
+  dtype: string
+  nullable: false
+
+- field_name: PSTLZ
+  field_description: None
+  example: 'nan'
+  field_count: 23
+  dtype: string
+  nullable: false
+
+- field_name: PSTL2
+  field_description: None
+  example: 'nan'
+  field_count: 24
+  dtype: string
+  nullable: false
+
+- field_name: SPRAS
+  field_description: None
+  example: 'E'
+  field_count: 25
+  dtype: string
+  nullable: false
+
+- field_name: TELBX
+  field_description: None
+  example: 'nan'
+  field_count: 26
+  dtype: string
+  nullable: false
+
+- field_name: TELF1
+  field_description: None
+  example: 'nan'
+  field_count: 27
+  dtype: string
+  nullable: false
+
+- field_name: TELF2
+  field_description: None
+  example: 'nan'
+  field_count: 28
+  dtype: string
+  nullable: false
+
+- field_name: TELFX
+  field_description: None
+  example: 'nan'
+  field_count: 29
+  dtype: string
+  nullable: false
+
+- field_name: TELTX
+  field_description: None
+  example: 'nan'
+  field_count: 30
+  dtype: string
+  nullable: false
+
+- field_name: TELX1
+  field_description: None
+  example: 'nan'
+  field_count: 31
+  dtype: string
+  nullable: false
+
+- field_name: DATLT
+  field_description: None
+  example: 'nan'
+  field_count: 32
+  dtype: string
+  nullable: false
+
+- field_name: DRNAM
+  field_description: None
+  example: 'nan'
+  field_count: 33
+  dtype: string
+  nullable: false
+
+- field_name: KHINR
+  field_description: None
+  example: '0100'
+  field_count: 34
+  dtype: string
+  nullable: false
+
+- field_name: BUKRS
+  field_description: None
+  example: 'nan'
+  field_count: 35
+  dtype: string
+  nullable: false
+
+- field_name: VNAME
+  field_description: None
+  example: 'nan'
+  field_count: 36
+  dtype: string
+  nullable: false
+
+- field_name: RECID
+  field_description: None
+  example: 'nan'
+  field_count: 37
+  dtype: string
+  nullable: false
+
+- field_name: ETYPE
+  field_description: None
+  example: 'nan'
+  field_count: 38
+  dtype: string
+  nullable: false
+
+- field_name: TXJCD
+  field_description: None
+  example: 'nan'
+  field_count: 39
+  dtype: string
+  nullable: false
+
+- field_name: REGIO
+  field_description: None
+  example: 'nan'
+  field_count: 40
+  dtype: string
+  nullable: false
+
+- field_name: KVEWE
+  field_description: None
+  example: 'nan'
+  field_count: 41
+  dtype: string
+  nullable: false
+
+- field_name: KAPPL
+  field_description: None
+  example: 'nan'
+  field_count: 42
+  dtype: string
+  nullable: false
+
+- field_name: KALSM
+  field_description: None
+  example: 'nan'
+  field_count: 43
+  dtype: string
+  nullable: false
+
+- field_name: LOGSYSTEM
+  field_description: None
+  example: 'nan'
+  field_count: 44
+  dtype: string
+  nullable: false
+
+- field_name: LOCK_IND
+  field_description: None
+  example: 'X'
+  field_count: 45
+  dtype: string
+  nullable: false
+
+- field_name: PCA_TEMPLATE
+  field_description: None
+  example: 'nan'
+  field_count: 46
+  dtype: string
+  nullable: false
+
+- field_name: SEGMENT
+  field_description: None
+  example: 'nan'
+  field_count: 47
+  dtype: string
+  nullable: false
+
+- field_name: EEW_CEPC_PS_DUMMY
+  field_description: None
+  example: 'nan'
+  field_count: 48
+  dtype: string
+  nullable: false
+
+- field_name: Name
+  field_description: None
+  example: 'IR Bigbags'
+  field_count: 49
+  dtype: string
+  nullable: false
+
+- field_name: Long Text
+  field_description: None
+  example: 'IR Bigbags'
+  field_count: 50
+  dtype: string
+  nullable: false
+
+- field_name: Profit center short text for matchcode
+  field_description: None
+  example: 'IR BIGBAGS'
+  field_count: 51
+  dtype: string
+  nullable: false
+
+- field_name: Sort Field
+  field_description: None
+  example: 'nan'
+  field_count: 52
+  dtype: string
+  nullable: false

@@ -1,0 +1,80 @@
+metadata:
+  object: m120
+  variant: cepc_bukrs
+  source_file: data\01_source\m120_cepc_bukrs.xlsx
+  generated_at: '2025-09-25T13:46:25.402159'
+  sheet: Sheet1
+  source_fields_count: 10
+
+
+
+source_fields:
+- field_name: MANDT
+  field_description: Client (Mandant)
+  example: '280'
+  field_count: 1
+  dtype: string
+  nullable: false
+
+- field_name: KOKRS
+  field_description: None
+  example: '0010'
+  field_count: 2
+  dtype: string
+  nullable: false
+
+- field_name: PRCTR
+  field_description: None
+  example: '0000001000'
+  field_count: 3
+  dtype: string
+  nullable: false
+
+- field_name: BUKRS
+  field_description: None
+  example: '0010'
+  field_count: 4
+  dtype: string
+  nullable: false
+
+- field_name: VNAME
+  field_description: None
+  example: 'nan'
+  field_count: 5
+  dtype: string
+  nullable: false
+
+- field_name: RECID
+  field_description: None
+  example: 'nan'
+  field_count: 6
+  dtype: string
+  nullable: false
+
+- field_name: ETYPE
+  field_description: None
+  example: 'nan'
+  field_count: 7
+  dtype: string
+  nullable: false
+
+- field_name: JV_OTYPE
+  field_description: None
+  example: 'nan'
+  field_count: 8
+  dtype: string
+  nullable: false
+
+- field_name: JV_JIBCL
+  field_description: None
+  example: 'nan'
+  field_count: 9
+  dtype: string
+  nullable: false
+
+- field_name: JV_JIBSA
+  field_description: None
+  example: 'nan'
+  field_count: 10
+  dtype: string
+  nullable: false

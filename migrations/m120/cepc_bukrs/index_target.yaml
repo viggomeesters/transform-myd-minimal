@@ -1,0 +1,70 @@
+metadata:
+  object: m120
+  variant: cepc_bukrs
+  target_file: data\02_target\m120_cepc_bukrs.xml
+  generated_at: '2025-09-25T13:46:41.739453'
+  structure: S_CEPC_BUKRS
+  target_fields_count: 5
+
+
+
+target_fields:
+- sap_field: kokrs
+  field_description: Controlling Area
+  sap_table: cepc_bukrs
+  mandatory: true
+  field_group: key
+  key: true
+  sheet_name: Field List
+  data_type: Text
+  length: 80
+  decimal: None
+  field_count: 1
+
+- sap_field: prctr
+  field_description: Profit Center
+  sap_table: cepc_bukrs
+  mandatory: true
+  field_group: key
+  key: true
+  sheet_name: Field List
+  data_type: Text
+  length: 80
+  decimal: None
+  field_count: 2
+
+- sap_field: datab
+  field_description: Valid From
+  sap_table: cepc_bukrs
+  mandatory: true
+  field_group: key
+  key: true
+  sheet_name: Field List
+  data_type: Date
+  length: None
+  decimal: None
+  field_count: 3
+
+- sap_field: datbi
+  field_description: Valid To
+  sap_table: cepc_bukrs
+  mandatory: true
+  field_group: key
+  key: true
+  sheet_name: Field List
+  data_type: Date
+  length: None
+  decimal: None
+  field_count: 4
+
+- sap_field: bukrs
+  field_description: Company Code
+  sap_table: cepc_bukrs
+  mandatory: true
+  field_group: key
+  key: true
+  sheet_name: Field List
+  data_type: Text
+  length: 40
+  decimal: None
+  field_count: 5

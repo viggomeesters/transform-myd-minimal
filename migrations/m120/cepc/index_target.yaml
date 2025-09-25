@@ -1,0 +1,442 @@
+metadata:
+  object: m120
+  variant: cepc
+  target_file: data\02_target\m120_cepc.xml
+  generated_at: '2025-09-25T13:41:43.634938'
+  structure: S_CEPC
+  target_fields_count: 36
+
+
+
+target_fields:
+- sap_field: kokrs
+  field_description: Controlling Area
+  sap_table: cepc
+  mandatory: true
+  field_group: key
+  key: true
+  sheet_name: Field List
+  data_type: Text
+  length: 80
+  decimal: None
+  field_count: 1
+
+- sap_field: prctr
+  field_description: Profit Center
+  sap_table: cepc
+  mandatory: true
+  field_group: key
+  key: true
+  sheet_name: Field List
+  data_type: Text
+  length: 80
+  decimal: None
+  field_count: 2
+
+- sap_field: datab
+  field_description: Valid From
+  sap_table: cepc
+  mandatory: true
+  field_group: key
+  key: true
+  sheet_name: Field List
+  data_type: Date
+  length: None
+  decimal: None
+  field_count: 3
+
+- sap_field: datbi
+  field_description: Valid To
+  sap_table: cepc
+  mandatory: true
+  field_group: key
+  key: true
+  sheet_name: Field List
+  data_type: Date
+  length: None
+  decimal: None
+  field_count: 4
+
+- sap_field: langu
+  field_description: Language in Which Texts Are Saved
+  sap_table: cepc
+  mandatory: false
+  field_group: general information
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 80
+  decimal: None
+  field_count: 5
+
+- sap_field: ktext
+  field_description: Profit Center Name
+  sap_table: cepc
+  mandatory: true
+  field_group: general information
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 20
+  decimal: None
+  field_count: 6
+
+- sap_field: ltext
+  field_description: Description
+  sap_table: cepc
+  mandatory: false
+  field_group: general information
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 40
+  decimal: None
+  field_count: 7
+
+- sap_field: verak
+  field_description: Person Responsible
+  sap_table: cepc
+  mandatory: true
+  field_group: general information
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 20
+  decimal: None
+  field_count: 8
+
+- sap_field: verak_user
+  field_description: User Responsible
+  sap_table: cepc
+  mandatory: false
+  field_group: general information
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 80
+  decimal: None
+  field_count: 9
+
+- sap_field: khinr
+  field_description: Standard Hierarchy Node/Profit Cntr Grp
+  sap_table: cepc
+  mandatory: true
+  field_group: organizational unit
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 12
+  decimal: None
+  field_count: 10
+
+- sap_field: abtei
+  field_description: Department
+  sap_table: cepc
+  mandatory: false
+  field_group: organizational unit
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 12
+  decimal: None
+  field_count: 11
+
+- sap_field: segment
+  field_description: Segment
+  sap_table: cepc
+  mandatory: false
+  field_group: organizational unit
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 10
+  decimal: None
+  field_count: 12
+
+- sap_field: anred
+  field_description: Title
+  sap_table: cepc
+  mandatory: false
+  field_group: address
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 15
+  decimal: None
+  field_count: 13
+
+- sap_field: name1
+  field_description: Name 1
+  sap_table: cepc
+  mandatory: false
+  field_group: address
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 35
+  decimal: None
+  field_count: 14
+
+- sap_field: name2
+  field_description: Name 2
+  sap_table: cepc
+  mandatory: false
+  field_group: address
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 35
+  decimal: None
+  field_count: 15
+
+- sap_field: name3
+  field_description: Name 3
+  sap_table: cepc
+  mandatory: false
+  field_group: address
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 35
+  decimal: None
+  field_count: 16
+
+- sap_field: name4
+  field_description: Name 4
+  sap_table: cepc
+  mandatory: false
+  field_group: address
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 35
+  decimal: None
+  field_count: 17
+
+- sap_field: stras
+  field_description: Street
+  sap_table: cepc
+  mandatory: false
+  field_group: address
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 35
+  decimal: None
+  field_count: 18
+
+- sap_field: ort01
+  field_description: City
+  sap_table: cepc
+  mandatory: false
+  field_group: address
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 35
+  decimal: None
+  field_count: 19
+
+- sap_field: ort02
+  field_description: District
+  sap_table: cepc
+  mandatory: false
+  field_group: address
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 35
+  decimal: None
+  field_count: 20
+
+- sap_field: land1
+  field_description: Country/Region
+  sap_table: cepc
+  mandatory: false
+  field_group: address
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 80
+  decimal: None
+  field_count: 21
+
+- sap_field: telbx
+  field_description: Telebox Number
+  sap_table: cepc
+  mandatory: false
+  field_group: communication
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 15
+  decimal: None
+  field_count: 22
+
+- sap_field: telf1
+  field_description: Telephone Number
+  sap_table: cepc
+  mandatory: false
+  field_group: communication
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 16
+  decimal: None
+  field_count: 23
+
+- sap_field: telf2
+  field_description: Second Telephone Number
+  sap_table: cepc
+  mandatory: false
+  field_group: communication
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 16
+  decimal: None
+  field_count: 24
+
+- sap_field: telfx
+  field_description: Fax
+  sap_table: cepc
+  mandatory: false
+  field_group: communication
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 31
+  decimal: None
+  field_count: 25
+
+- sap_field: teltx
+  field_description: Teletex Number
+  sap_table: cepc
+  mandatory: false
+  field_group: communication
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 30
+  decimal: None
+  field_count: 26
+
+- sap_field: telx1
+  field_description: Telex Number
+  sap_table: cepc
+  mandatory: false
+  field_group: communication
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 30
+  decimal: None
+  field_count: 27
+
+- sap_field: datlt
+  field_description: Data Line
+  sap_table: cepc
+  mandatory: false
+  field_group: communication
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 14
+  decimal: None
+  field_count: 28
+
+- sap_field: drnam
+  field_description: Printer
+  sap_table: cepc
+  mandatory: false
+  field_group: communication
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 4
+  decimal: None
+  field_count: 29
+
+- sap_field: txjcd
+  field_description: Tax Jurisdiction
+  sap_table: cepc
+  mandatory: false
+  field_group: address
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 15
+  decimal: None
+  field_count: 30
+
+- sap_field: pfach
+  field_description: PO Box
+  sap_table: cepc
+  mandatory: false
+  field_group: address
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 10
+  decimal: None
+  field_count: 31
+
+- sap_field: pstlz
+  field_description: Postal Code
+  sap_table: cepc
+  mandatory: false
+  field_group: address
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 10
+  decimal: None
+  field_count: 32
+
+- sap_field: pstl2
+  field_description: P.O. Box Postal Code
+  sap_table: cepc
+  mandatory: false
+  field_group: address
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 10
+  decimal: None
+  field_count: 33
+
+- sap_field: regio
+  field_description: Region
+  sap_table: cepc
+  mandatory: false
+  field_group: address
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 80
+  decimal: None
+  field_count: 34
+
+- sap_field: lock_ind
+  field_description: "Indicator: Profit Center Locked"
+  sap_table: cepc
+  mandatory: false
+  field_group: indicators
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 1
+  decimal: None
+  field_count: 35
+
+- sap_field: pca_template
+  field_description: Planning Template
+  sap_table: cepc
+  mandatory: false
+  field_group: indicators
+  key: false
+  sheet_name: Field List
+  data_type: Text
+  length: 10
+  decimal: None
+  field_count: 36

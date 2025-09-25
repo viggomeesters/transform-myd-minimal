@@ -1,0 +1,418 @@
+metadata:
+  object: m120
+  variant: cepc
+  generated_at: '2025-09-25T13:42:31.112958'
+  source_index: migrations/m120/cepc/index_source.yaml
+  target_index: migrations/m120/cepc/index_target.yaml
+  mapped_count: 35
+  unmapped_count: 1
+  to_audit: 2
+  unused_sources: 17
+  unused_targets: 0
+
+
+
+mappings:
+- confidence: 1.0
+  rationale: Exact field name match
+  required: true
+  source_field_description: None
+  source_field_name: KOKRS
+  source_header: KOKRS
+  status: auto
+  target_field: KOKRS
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: true
+  source_field_description: None
+  source_field_name: PRCTR
+  source_header: PRCTR
+  status: auto
+  target_field: PRCTR
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: true
+  source_field_description: None
+  source_field_name: DATAB
+  source_header: DATAB
+  status: auto
+  target_field: DATAB
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: true
+  source_field_description: None
+  source_field_name: DATBI
+  source_header: DATBI
+  status: auto
+  target_field: DATBI
+  target_table: cepc
+
+- confidence: 0.0
+  rationale: Added without source match, to comply with SAP template
+  required: false
+  source_field_description: null
+  source_field_name: field_name onbekend
+  source_header: null
+  status: unmapped
+  target_field: LANGU
+  target_table: cepc
+
+- confidence: 0.87
+  rationale: Fuzzy match with 87% confidence
+  required: true
+  source_field_description: None
+  source_field_name: Profit center short text for matchcode
+  source_header: Profit center short text for matchcode
+  status: auto
+  target_field: KTEXT
+  target_table: cepc
+
+- confidence: 0.89
+  rationale: Fuzzy match with 89% confidence
+  required: false
+  source_field_description: None
+  source_field_name: Long Text
+  source_header: Long Text
+  status: auto
+  target_field: LTEXT
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: true
+  source_field_description: None
+  source_field_name: VERAK
+  source_header: VERAK
+  status: auto
+  target_field: VERAK
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Fuzzy match with 100% confidence
+  required: false
+  source_field_description: None
+  source_field_name: VERAK_USER
+  source_header: VERAK_USER
+  status: auto
+  target_field: VERAK_USER
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: true
+  source_field_description: None
+  source_field_name: KHINR
+  source_header: KHINR
+  status: auto
+  target_field: KHINR
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: ABTEI
+  source_header: ABTEI
+  status: auto
+  target_field: ABTEI
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: SEGMENT
+  source_header: SEGMENT
+  status: auto
+  target_field: SEGMENT
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: ANRED
+  source_header: ANRED
+  status: auto
+  target_field: ANRED
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: NAME1
+  source_header: NAME1
+  status: auto
+  target_field: NAME1
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: NAME2
+  source_header: NAME2
+  status: auto
+  target_field: NAME2
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: NAME3
+  source_header: NAME3
+  status: auto
+  target_field: NAME3
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: NAME4
+  source_header: NAME4
+  status: auto
+  target_field: NAME4
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: STRAS
+  source_header: STRAS
+  status: auto
+  target_field: STRAS
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: ORT01
+  source_header: ORT01
+  status: auto
+  target_field: ORT01
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: ORT02
+  source_header: ORT02
+  status: auto
+  target_field: ORT02
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: LAND1
+  source_header: LAND1
+  status: auto
+  target_field: LAND1
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: TELBX
+  source_header: TELBX
+  status: auto
+  target_field: TELBX
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: TELF1
+  source_header: TELF1
+  status: auto
+  target_field: TELF1
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: TELF2
+  source_header: TELF2
+  status: auto
+  target_field: TELF2
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: TELFX
+  source_header: TELFX
+  status: auto
+  target_field: TELFX
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: TELTX
+  source_header: TELTX
+  status: auto
+  target_field: TELTX
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: TELX1
+  source_header: TELX1
+  status: auto
+  target_field: TELX1
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: DATLT
+  source_header: DATLT
+  status: auto
+  target_field: DATLT
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: DRNAM
+  source_header: DRNAM
+  status: auto
+  target_field: DRNAM
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: TXJCD
+  source_header: TXJCD
+  status: auto
+  target_field: TXJCD
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: PFACH
+  source_header: PFACH
+  status: auto
+  target_field: PFACH
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: PSTLZ
+  source_header: PSTLZ
+  status: auto
+  target_field: PSTLZ
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: PSTL2
+  source_header: PSTL2
+  status: auto
+  target_field: PSTL2
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Exact field name match
+  required: false
+  source_field_description: None
+  source_field_name: REGIO
+  source_header: REGIO
+  status: auto
+  target_field: REGIO
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Fuzzy match with 100% confidence
+  required: false
+  source_field_description: None
+  source_field_name: LOCK_IND
+  source_header: LOCK_IND
+  status: auto
+  target_field: LOCK_IND
+  target_table: cepc
+
+- confidence: 1.0
+  rationale: Fuzzy match with 100% confidence
+  required: false
+  source_field_description: None
+  source_field_name: PCA_TEMPLATE
+  source_header: PCA_TEMPLATE
+  status: auto
+  target_field: PCA_TEMPLATE
+  target_table: cepc
+
+
+
+to_audit:
+- target_table: cepc
+  target_field: KTEXT
+  source_header: Profit center short text for matchcode
+  source_field_name: Profit center short text for matchcode
+  confidence: 0.8650757575757576
+  reason: low_confidence_fuzzy
+- target_table: cepc
+  target_field: LTEXT
+  source_header: Long Text
+  source_field_name: Long Text
+  confidence: 0.8875
+  reason: low_confidence_fuzzy
+
+
+
+unmapped_source_fields:
+- ERSDA
+- USNAM
+- MERKMAL
+- WAERS
+- NPRCTR
+- SPRAS
+- BUKRS
+- VNAME
+- RECID
+- ETYPE
+- KVEWE
+- KAPPL
+- KALSM
+- LOGSYSTEM
+- EEW_CEPC_PS_DUMMY
+- Name
+- Sort Field
+
+
+
+unmapped_target_fields:
+- target_table: cepc
+  target_field: LANGU
+  required: false

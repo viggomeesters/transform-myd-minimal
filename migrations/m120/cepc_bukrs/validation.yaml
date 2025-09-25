@@ -1,0 +1,37 @@
+metadata:
+  object: m120
+  variant: cepc_bukrs
+  target_file: data/02_target/m120_cepc_bukrs.xml
+  generated_at: '2025-09-25T13:46:41.740015'
+  structure: S_CEPC_BUKRS
+
+
+
+validation:
+- field: KOKRS
+  key: true
+  required: true
+  type: string
+  max_length: 80
+
+- field: PRCTR
+  key: true
+  required: true
+  type: string
+  max_length: 80
+
+- field: DATAB
+  key: true
+  required: true
+  type: date
+
+- field: DATBI
+  key: true
+  required: true
+  type: date
+
+- field: BUKRS
+  key: true
+  required: true
+  type: string
+  max_length: 40

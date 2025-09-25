@@ -1,0 +1,223 @@
+metadata:
+  object: m120
+  variant: cepc
+  target_file: data/02_target/m120_cepc.xml
+  generated_at: '2025-09-25T13:41:43.635452'
+  structure: S_CEPC
+
+
+
+validation:
+- field: KOKRS
+  key: true
+  required: true
+  type: string
+  max_length: 80
+
+- field: PRCTR
+  key: true
+  required: true
+  type: string
+  max_length: 80
+
+- field: DATAB
+  key: true
+  required: true
+  type: date
+
+- field: DATBI
+  key: true
+  required: true
+  type: date
+
+- field: LANGU
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: KTEXT
+  key: false
+  required: true
+  type: string
+  max_length: 20
+
+- field: LTEXT
+  key: false
+  required: false
+  type: string
+  max_length: 40
+
+- field: VERAK
+  key: false
+  required: true
+  type: string
+  max_length: 20
+
+- field: VERAK_USER
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: KHINR
+  key: false
+  required: true
+  type: string
+  max_length: 12
+
+- field: ABTEI
+  key: false
+  required: false
+  type: string
+  max_length: 12
+
+- field: SEGMENT
+  key: false
+  required: false
+  type: string
+  max_length: 10
+
+- field: ANRED
+  key: false
+  required: false
+  type: string
+  max_length: 15
+
+- field: NAME1
+  key: false
+  required: false
+  type: string
+  max_length: 35
+
+- field: NAME2
+  key: false
+  required: false
+  type: string
+  max_length: 35
+
+- field: NAME3
+  key: false
+  required: false
+  type: string
+  max_length: 35
+
+- field: NAME4
+  key: false
+  required: false
+  type: string
+  max_length: 35
+
+- field: STRAS
+  key: false
+  required: false
+  type: string
+  max_length: 35
+
+- field: ORT01
+  key: false
+  required: false
+  type: string
+  max_length: 35
+
+- field: ORT02
+  key: false
+  required: false
+  type: string
+  max_length: 35
+
+- field: LAND1
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: TELBX
+  key: false
+  required: false
+  type: string
+  max_length: 15
+
+- field: TELF1
+  key: false
+  required: false
+  type: string
+  max_length: 16
+
+- field: TELF2
+  key: false
+  required: false
+  type: string
+  max_length: 16
+
+- field: TELFX
+  key: false
+  required: false
+  type: string
+  max_length: 31
+
+- field: TELTX
+  key: false
+  required: false
+  type: string
+  max_length: 30
+
+- field: TELX1
+  key: false
+  required: false
+  type: string
+  max_length: 30
+
+- field: DATLT
+  key: false
+  required: false
+  type: string
+  max_length: 14
+
+- field: DRNAM
+  key: false
+  required: false
+  type: string
+  max_length: 4
+
+- field: TXJCD
+  key: false
+  required: false
+  type: string
+  max_length: 15
+
+- field: PFACH
+  key: false
+  required: false
+  type: string
+  max_length: 10
+
+- field: PSTLZ
+  key: false
+  required: false
+  type: string
+  max_length: 10
+
+- field: PSTL2
+  key: false
+  required: false
+  type: string
+  max_length: 10
+
+- field: REGIO
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: LOCK_IND
+  key: false
+  required: false
+  type: string
+  max_length: 1
+
+- field: PCA_TEMPLATE
+  key: false
+  required: false
+  type: string
+  max_length: 10
