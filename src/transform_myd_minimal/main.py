@@ -1641,6 +1641,85 @@ def run_index_target_command(args, config):
                     f.write('  decimal_separator: "."\n')
                     f.write('  thousands_separator: ""\n')
 
+        # Generate transform.yaml scaffold
+        transform_file = output_dir / "transform.yaml"
+        transform_warnings = []
+
+        # Check overwrite policy for transform.yaml
+        transform_created = "created"
+        if transform_file.exists() and not args.force:
+            transform_created = "skipped:exists"
+            transform_warnings.append(
+                {
+                    "warning": "transform_exists",
+                    "message": f"transform.yaml exists, use --force to overwrite: {transform_file}",
+                }
+            )
+        else:
+            # Generate transform scaffold
+            transform_rules = []
+
+            for field in target_fields:
+                base_field = field["sap_field"].upper()
+                data_type = field.get("data_type", "")
+                field_desc = field.get("field_description", "")
+                
+                # Create a basic transformation rule for each field
+                transform_rule = {
+                    "target_field": base_field,
+                    "transformation_type": "direct",  # default transformation type
+                    "source_field": "",  # to be filled by user
+                    "description": field_desc if field_desc else f"Transform data for {base_field}",
+                }
+                
+                # Add value mappings section for fields that might need it
+                # Users can customize these mappings as needed
+                transform_rule["value_mappings"] = []
+                
+                # Add placeholder value option
+                transform_rule["placeholder_value"] = ""
+                
+                transform_rules.append(transform_rule)
+
+            # Write transform.yaml with custom formatting
+            with open(transform_file, "w", encoding="utf-8") as f:
+                # Write metadata section
+                f.write("metadata:\n")
+                f.write(f"  object: {args.object}\n")
+                f.write(f"  variant: {args.variant}\n")
+                f.write(
+                    f"  target_file: data/02_target/{args.object}_{args.variant}.xml\n"
+                )
+                f.write(f"  generated_at: '{datetime.now().isoformat()}'\n")
+                f.write(f"  structure: S_{args.variant.upper()}\n")
+                f.write(f"  description: 'Transformation rules for {args.object}/{args.variant}'\n")
+                f.write("\n\n\n")  # Add 3 blank lines after metadata
+
+                # Write transformations section
+                f.write("transformations:\n")
+                for i, rule in enumerate(transform_rules):
+                    if i > 0:
+                        f.write("\n")  # Add blank line between transformation records
+                    f.write(f"- target_field: {rule['target_field']}\n")
+                    f.write(f"  transformation_type: {rule['transformation_type']}\n")
+                    f.write(f"  source_field: '{rule['source_field']}'\n")
+                    f.write(f"  description: '{rule['description']}'\n")
+                    f.write(f"  placeholder_value: '{rule['placeholder_value']}'\n")
+                    f.write("  value_mappings:\n")
+                    f.write("    # Example: map source values to target values\n")
+                    f.write("    # - source_value: 'OLD_VALUE'\n")
+                    f.write("    #   target_value: 'NEW_VALUE'\n")
+                    f.write("    # - source_value: 'EMPTY'\n")
+                    f.write("    #   target_value: 'DEFAULT'\n")
+
+                # Add general transformation settings
+                f.write("\n\n# General transformation settings\n")
+                f.write("transformation_settings:\n")
+                f.write("  null_handling: 'use_placeholder'  # Options: 'use_placeholder', 'skip', 'error'\n")
+                f.write("  empty_string_handling: 'use_placeholder'  # Options: 'use_placeholder', 'skip', 'keep'\n")
+                f.write("  case_sensitive_mappings: false\n")
+                f.write("  trim_whitespace: true\n")
+
         # Prepare preview data for human output (first 8 fields)
         preview_data = []
         for field in target_fields[:8]:
@@ -1657,7 +1736,7 @@ def run_index_target_command(args, config):
                 }
             )
 
-        # Log summary with validation scaffold info
+        # Log summary with validation and transform scaffold info
         summary_data = {
             "step": "index_target",
             "object": args.object,
@@ -1667,10 +1746,14 @@ def run_index_target_command(args, config):
             "structure": f"S_{args.variant.upper()}",
             "total_fields": len(target_fields),
             "validation_scaffold": f"migrations/{args.object}/{args.variant}/validation.yaml",
+            "transform_scaffold": f"migrations/{args.object}/{args.variant}/transform.yaml",
             "rules_count": (
                 len(validation_rules) if validation_created == "created" else 0
             ),
-            "warnings": validation_warnings,
+            "transform_rules_count": (
+                len(transform_rules) if transform_created == "created" else 0
+            ),
+            "warnings": validation_warnings + transform_warnings,
         }
         
         # Generate HTML report if enabled

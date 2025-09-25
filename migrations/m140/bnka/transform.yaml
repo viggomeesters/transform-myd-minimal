@@ -1,0 +1,162 @@
+metadata:
+  object: m140
+  variant: bnka
+  target_file: data/02_target/m140_bnka.xml
+  generated_at: '2025-09-25T12:02:32.758887'
+  structure: S_BNKA
+  description: 'Transformation rules for m140/bnka'
+
+
+
+transformations:
+- target_field: BANKS
+  transformation_type: direct
+  source_field: ''
+  description: 'Bank Country/Region Key'
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+    # - source_value: 'EMPTY'
+    #   target_value: 'DEFAULT'
+
+- target_field: BANKL
+  transformation_type: direct
+  source_field: ''
+  description: 'Bank Key'
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+    # - source_value: 'EMPTY'
+    #   target_value: 'DEFAULT'
+
+- target_field: BANKA
+  transformation_type: direct
+  source_field: ''
+  description: 'Name of Bank'
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+    # - source_value: 'EMPTY'
+    #   target_value: 'DEFAULT'
+
+- target_field: PROVZ
+  transformation_type: direct
+  source_field: ''
+  description: 'Region (State, Province, Country)'
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+    # - source_value: 'EMPTY'
+    #   target_value: 'DEFAULT'
+
+- target_field: STRAS
+  transformation_type: direct
+  source_field: ''
+  description: 'House Number and Street'
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+    # - source_value: 'EMPTY'
+    #   target_value: 'DEFAULT'
+
+- target_field: ORT01
+  transformation_type: direct
+  source_field: ''
+  description: 'City'
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+    # - source_value: 'EMPTY'
+    #   target_value: 'DEFAULT'
+
+- target_field: BRNCH
+  transformation_type: direct
+  source_field: ''
+  description: 'Bank Branch'
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+    # - source_value: 'EMPTY'
+    #   target_value: 'DEFAULT'
+
+- target_field: SWIFT
+  transformation_type: direct
+  source_field: ''
+  description: 'SWIFT Code for International Payments'
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+    # - source_value: 'EMPTY'
+    #   target_value: 'DEFAULT'
+
+- target_field: XPGRO
+  transformation_type: direct
+  source_field: ''
+  description: 'Post Office Bank Current Account'
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+    # - source_value: 'EMPTY'
+    #   target_value: 'DEFAULT'
+
+- target_field: BNKLZ
+  transformation_type: direct
+  source_field: ''
+  description: 'Bank Number'
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+    # - source_value: 'EMPTY'
+    #   target_value: 'DEFAULT'
+
+- target_field: BGRUP
+  transformation_type: direct
+  source_field: ''
+  description: 'Bank Group (Bank Network)'
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+    # - source_value: 'EMPTY'
+    #   target_value: 'DEFAULT'
+
+- target_field: ISNOTOVERWRITE
+  transformation_type: direct
+  source_field: ''
+  description: 'Do Not Overwrite Existing Data'
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+    # - source_value: 'EMPTY'
+    #   target_value: 'DEFAULT'
+
+
+# General transformation settings
+transformation_settings:
+  null_handling: 'use_placeholder'  # Options: 'use_placeholder', 'skip', 'error'
+  empty_string_handling: 'use_placeholder'  # Options: 'use_placeholder', 'skip', 'keep'
+  case_sensitive_mappings: false
+  trim_whitespace: true
