@@ -1,0 +1,34 @@
+metadata:
+  object: broken
+  variant: bnka
+  target_file: data/02_target/broken_bnka.xml
+  generated_at: '2025-09-25T10:51:50.847303'
+  structure: S_BNKA
+  target_fields_count: 2
+
+
+
+target_fields:
+- sap_field: banks
+  field_description: Bank Country/Region Key
+  sap_table: bnka
+  mandatory: true
+  field_group: key
+  key: true
+  sheet_name: Field List
+  data_type: Text
+  length: 80
+  decimal: None
+  field_count: 1
+
+- sap_field: bankl
+  field_description: Bank Key
+  sap_table: bnka
+  mandatory: true
+  field_group: key
+  key: true
+  sheet_name: Field List
+  data_type: Text
+  length: 80
+  decimal: None
+  field_count: 2

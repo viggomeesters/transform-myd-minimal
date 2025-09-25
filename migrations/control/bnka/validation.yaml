@@ -1,0 +1,81 @@
+metadata:
+  object: control
+  variant: bnka
+  target_file: data/02_target/control_bnka.xml
+  generated_at: '2025-09-25T10:58:25.706989'
+  structure: S_BNKA
+
+
+
+validation:
+- field: BANKS
+  key: true
+  required: true
+  type: string
+  max_length: 80
+
+- field: BANKL
+  key: true
+  required: true
+  type: string
+  max_length: 80
+
+- field: BANKA
+  key: false
+  required: true
+  type: string
+  max_length: 60
+
+- field: PROVZ
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: STRAS
+  key: false
+  required: false
+  type: string
+  max_length: 35
+
+- field: ORT01
+  key: false
+  required: false
+  type: string
+  max_length: 35
+
+- field: BRNCH
+  key: false
+  required: false
+  type: string
+  max_length: 40
+
+- field: SWIFT
+  key: false
+  required: false
+  type: string
+  max_length: 11
+
+- field: XPGRO
+  key: false
+  required: false
+  type: string
+  max_length: 1
+
+- field: BNKLZ
+  key: false
+  required: false
+  type: string
+  max_length: 15
+
+- field: BGRUP
+  key: false
+  required: false
+  type: string
+  max_length: 2
+
+- field: ISNOTOVERWRITE
+  key: false
+  required: false
+  type: string
+  max_length: 1
