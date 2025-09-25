@@ -1,8 +1,8 @@
 metadata:
   object: m140
   variant: bnka
-  source_file: data\01_source\m140_bnka.xlsx
-  generated_at: '2025-09-24T16:37:42.481399'
+  source_file: data/01_source/m140_bnka.xlsx
+  generated_at: '2025-09-24T14:57:20.353560'
   sheet: Sheet1
   source_fields_count: 37
 
@@ -10,43 +10,43 @@ metadata:
 
 source_fields:
 - field_name: MANDT
-  field_description: None
-  example: '280'
+  field_description: Client (Mandant)
+  example: '110'
   field_count: 1
   dtype: string
   nullable: false
 
 - field_name: BANKS
   field_description: None
-  example: 'nan'
+  example: 'NL'
   field_count: 2
   dtype: string
   nullable: false
 
 - field_name: BANKL
   field_description: None
-  example: 'IBTFAEAS'
+  example: '11000'
   field_count: 3
   dtype: string
   nullable: false
 
 - field_name: ERDAT
-  field_description: None
-  example: '20150714'
+  field_description: Creation Date
+  example: '20220323'
   field_count: 4
   dtype: string
   nullable: false
 
 - field_name: ERNAM
-  field_description: None
-  example: 'VGOUW'
+  field_description: Name of Person who Created the Object
+  example: 'JOHNDOE'
   field_count: 5
   dtype: string
   nullable: false
 
 - field_name: BANKA
   field_description: None
-  example: 'Investbank'
+  example: 'Paarden BANK'
   field_count: 6
   dtype: string
   nullable: false
@@ -67,14 +67,14 @@ source_fields:
 
 - field_name: ORT01
   field_description: None
-  example: 'Sharjah'
+  example: 'Rotterdam'
   field_count: 9
   dtype: string
   nullable: false
 
 - field_name: SWIFT
   field_description: None
-  example: 'IBTFAEAS'
+  example: 'EBILAEAD'
   field_count: 10
   dtype: string
   nullable: false
@@ -143,7 +143,7 @@ source_fields:
   nullable: false
 
 - field_name: IBAN_RULE
-  field_description: None
+  field_description: IBAN Validation Rule
   example: 'nan'
   field_count: 20
   dtype: string
@@ -185,21 +185,21 @@ source_fields:
   nullable: false
 
 - field_name: ZRES1
-  field_description: None
+  field_description: Reserved field 1
   example: '000'
   field_count: 26
   dtype: string
   nullable: false
 
 - field_name: ZRES2
-  field_description: None
+  field_description: Reserved field 2
   example: '000'
   field_count: 27
   dtype: string
   nullable: false
 
 - field_name: ZRES3
-  field_description: None
+  field_description: Reserved field 3
   example: '000'
   field_count: 28
   dtype: string
