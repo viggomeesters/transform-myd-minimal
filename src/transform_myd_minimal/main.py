@@ -1081,20 +1081,98 @@ def run_index_source_command(args, config):
         sys.exit(1)
 
 
+def _clean_xml_file(xml_path: Path) -> Path:
+    """
+    Clean XML file by removing comments and control characters.
+    
+    Args:
+        xml_path: Path to original XML file
+        
+    Returns:
+        Path to cleaned XML file (same path, with original backed up)
+    """
+    import re
+    from lxml import etree
+    
+    # Create backup of original file
+    backup_path = xml_path.with_name(f"{xml_path.stem}_original{xml_path.suffix}")
+    xml_path.rename(backup_path)
+    
+    # Read original content
+    with open(backup_path, 'r', encoding='utf-8', errors='ignore') as f:
+        content = f.read()
+    
+    # Remove XML comments
+    content = re.sub(r'<!--.*?-->', '', content, flags=re.DOTALL)
+    
+    # Remove control characters (except tabs, newlines, carriage returns)
+    content = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]', '', content)
+    
+    # Remove invalid attribute patterns like '&invalid;' and unclosed tags
+    content = re.sub(r'&[a-zA-Z0-9]*;', '', content)
+    content = re.sub(r'<[^/>]*\s+&[^>]*>', lambda m: m.group(0).split('&')[0] + '>', content)
+    
+    # Fix unclosed tags and invalid syntax
+    content = re.sub(r'<([^/>]+)\s+&[^>]*>', r'<\1>', content)
+    content = re.sub(r'</invalid>', '', content)
+    content = re.sub(r'<invalid[^>]*>', '', content)
+    
+    # Write cleaned content to original path
+    with open(xml_path, 'w', encoding='utf-8') as f:
+        f.write(content)
+    
+    return xml_path
+
+
 def _parse_spreadsheetml_target_fields(
     xml_path: Path, variant: str
 ) -> List[Dict[str, Any]]:
     """
-    Parse SpreadsheetML XML file according to F02 specification.
+    Parse SpreadsheetML XML file according to F02 specification with robust error handling.
 
     Returns list of target field dictionaries with exact key ordering:
     ["sap_field","field_description","sap_table","mandatory","field_group","key","sheet_name","data_type","length","decimal"]
     """
     import xml.etree.ElementTree as ET
+    from lxml import etree
 
-    # Parse XML
-    tree = ET.parse(xml_path)
-    root = tree.getroot()
+    # Check if file contains comments or control characters that might cause issues
+    with open(xml_path, 'r', encoding='utf-8', errors='ignore') as f:
+        content = f.read()
+    
+    has_comments = '<!--' in content
+    has_control_chars = any(ord(c) < 32 and c not in '\t\n\r' for c in content)
+    
+    # Try parsing with standard library first
+    try:
+        tree = ET.parse(xml_path)
+        root = tree.getroot()
+        
+        # If parsing succeeded but we detected comments/control chars, proactively clean
+        if has_comments or has_control_chars:
+            print("XML file contains comments or illegal characters. Old file is backed-up and cleaned.")
+            _clean_xml_file(xml_path)
+            # Re-parse the cleaned file
+            tree = ET.parse(xml_path)
+            root = tree.getroot()
+            
+    except ET.ParseError as e:
+        # If parsing fails, try with lxml's recovery parser
+        try:
+            parser = etree.XMLParser(recover=True)
+            with open(xml_path, 'rb') as f:
+                lxml_tree = etree.parse(f, parser)
+            
+            # Convert lxml tree to ElementTree for compatibility
+            xml_string = etree.tostring(lxml_tree, encoding='unicode')
+            root = ET.fromstring(xml_string)
+            tree = None  # We don't need the tree object, just the root
+        except Exception:
+            # Last resort: clean the file and try again
+            print("XML file contains comments or illegal characters. Old file is backed-up and cleaned.")
+            cleaned_path = _clean_xml_file(xml_path)
+            tree = ET.parse(cleaned_path)
+            root = tree.getroot()
 
     # Define namespace
     ns = {"ss": "urn:schemas-microsoft-com:office:spreadsheet"}

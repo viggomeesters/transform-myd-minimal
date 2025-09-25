@@ -1,0 +1,22 @@
+metadata:
+  object: demo2
+  variant: bnka
+  target_file: data/02_target/demo2_bnka.xml
+  generated_at: '2025-09-25T11:02:22.759011'
+  structure: S_BNKA
+  target_fields_count: 1
+
+
+
+target_fields:
+- sap_field: bankl
+  field_description: Bank Key
+  sap_table: bnka
+  mandatory: true
+  field_group: key
+  key: true
+  sheet_name: Field List
+  data_type: Text
+  length: 15
+  decimal: None
+  field_count: 1
