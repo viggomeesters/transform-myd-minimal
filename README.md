@@ -58,10 +58,16 @@ python -m transform_myd_minimal index_target --object {object} --variant {varian
 
 **Werking:**  
 - Zoekt naar het bestand: `data/02_target/{object}_{variant}.xml`
+- **Automatische fallback**: Als XML niet bestaat of niet leesbaar is, zoekt naar `{object}_{variant}.xlsx` 
 - Parseert XML en filtert target fields behorend bij deze variant
 - Bijvoorbeeld: Zoek velden die beginnen met `S_{variant}` zoals `S_BNKA` als variant=`bnka`
 - Zet de target fields om naar YAML (`index_target.yaml`)
 - Schrijft het resultaat naar: `migrations/{object}/{variant}/index_target.yaml`
+
+**Xlsx Fallback (F02):**
+- Automatische fallback naar `.xlsx` als `.xml` niet beschikbaar/leesbaar is
+- Duidelijke melding welk bestand gebruikt wordt: "Fallback: file.xml niet gevonden, file.xlsx gebruikt"
+- Optioneel: `--prefer-xlsx` om xlsx te prefereren boven xml
 
 #### 3. map - Genereer mapping
 

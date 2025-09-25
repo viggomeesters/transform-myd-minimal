@@ -1382,12 +1382,47 @@ def run_index_target_command(args, config):
     logger = EnhancedLogger(args, "index_target", args.object, args.variant, root_path)
 
     # Construct input file path - check both .xml and fallback formats (F02 spec: data/02_target/{object}_{variant}.xml)
-    input_file = (
+    xml_file = (
         root_path / f"data/02_target/{args.object}_{args.variant}.xml"
     )
+    
+    input_file = xml_file
+    xml_parse_error = None
+    
+    # Check if --prefer-xlsx flag is set
+    prefer_xlsx = getattr(args, 'prefer_xlsx', False)
+    
+    # If prefer-xlsx is set, try xlsx first
+    if prefer_xlsx:
+        xlsx_file = (
+            root_path / f"data/02_target/{args.object}_{args.variant}.xlsx"
+        )
+        if xlsx_file.exists():
+            input_file = xlsx_file
+            print(f"Using {xlsx_file.name} as target definition (--prefer-xlsx enabled).")
+        else:
+            input_file = None  # Force fallback search
+    else:
+        # Check if XML file exists and can be parsed
+        if xml_file.exists():
+            try:
+                # Try to parse XML to validate it's readable
+                _parse_spreadsheetml_target_fields(xml_file, args.variant)
+                # If successful, use XML file
+                input_file = xml_file
+            except Exception as e:
+                # XML exists but has parsing errors - record for fallback
+                xml_parse_error = str(e)
+                print(f"Warning: XML parsing failed for {xml_file}: {xml_parse_error}")
+                input_file = None  # Force fallback search
+        else:
+            input_file = None  # XML doesn't exist, search for fallbacks
 
-    # Check for fallback files if XML doesn't exist
-    if not input_file.exists():
+    # Check for fallback files if XML doesn't exist or has parse errors or --prefer-xlsx was set but xlsx not found
+    if input_file is None:
+        xlsx_file = (
+            root_path / f"data/02_target/{args.object}_{args.variant}.xlsx"
+        )
         json_file = (
             root_path / f"data/02_target/{args.object}_{args.variant}.json"
         )
@@ -1395,12 +1430,22 @@ def run_index_target_command(args, config):
             root_path / f"data/02_target/{args.object}_{args.variant}.yaml"
         )
 
-        if json_file.exists():
+        if xlsx_file.exists():
+            input_file = xlsx_file
+            if xml_file.exists():
+                print(f"Fallback: {xml_file.name} parsing failed, using {xlsx_file.name} as target definition.")
+            else:
+                print(f"Fallback: {xml_file.name} not found, using {xlsx_file.name} as target definition.")
+        elif json_file.exists():
             input_file = json_file
         elif yaml_file.exists():
             input_file = yaml_file
         else:
-            error_data = {"error": "missing_input", "path": str(input_file)}
+            error_msg = f"No usable input files found. Searched for: {xml_file.name}"
+            if xml_parse_error:
+                error_msg += f" (parse error: {xml_parse_error})"
+            error_msg += f", {xlsx_file.name}, {json_file.name}, {yaml_file.name}"
+            error_data = {"error": "missing_input", "path": str(xml_file), "message": error_msg}
             logger.log_error(error_data)
             sys.exit(2)
 
@@ -1419,6 +1464,10 @@ def run_index_target_command(args, config):
     try:
         if input_file.suffix == ".xml":
             target_fields = _parse_spreadsheetml_target_fields(input_file, args.variant)
+        elif input_file.suffix == ".xlsx":
+            # Import xlsx parser
+            from .parsers import read_excel_target_fields
+            target_fields = read_excel_target_fields(input_file, args.variant)
         else:
             # Handle JSON/YAML fallback (simplified for now)
             error_data = {"error": "unsupported_format", "path": str(input_file)}
@@ -1450,7 +1499,7 @@ def run_index_target_command(args, config):
             f.write(f"  object: {args.object}\n")
             f.write(f"  variant: {args.variant}\n")
             f.write(
-                f"  target_file: data/02_target/{args.object}_{args.variant}.xml\n"
+                f"  target_file: {input_file.relative_to(root_path)}\n"
             )
             f.write(f"  generated_at: '{datetime.now().isoformat()}'\n")
             f.write(f"  structure: S_{args.variant.upper()}\n")
