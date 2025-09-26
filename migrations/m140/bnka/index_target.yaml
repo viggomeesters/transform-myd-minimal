@@ -2,153 +2,153 @@ metadata:
   object: m140
   variant: bnka
   target_file: data/02_target/m140_bnka.xml
-  generated_at: '2025-09-25T11:21:55.216555'
+  generated_at: '2025-09-26T06:53:38.214005'
   structure: S_BNKA
   target_fields_count: 12
 
 
 
 target_fields:
-- sap_field: banks
-  field_description: Bank Country/Region Key
-  sap_table: bnka
-  mandatory: true
-  field_group: key
-  key: true
-  sheet_name: Field List
-  data_type: Text
-  length: 80
-  decimal: None
-  field_count: 1
+- target_field_name: BANKS
+  target_field_description: "Bank Country/Region Key"
+  target_table: bnka
+  target_is_mandatory: true
+  target_field_group: key
+  target_is_key: true
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 1
 
-- sap_field: bankl
-  field_description: Bank Key
-  sap_table: bnka
-  mandatory: true
-  field_group: key
-  key: true
-  sheet_name: Field List
-  data_type: Text
-  length: 80
-  decimal: None
-  field_count: 2
+- target_field_name: BANKL
+  target_field_description: "Bank Key"
+  target_table: bnka
+  target_is_mandatory: true
+  target_field_group: key
+  target_is_key: true
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 2
 
-- sap_field: banka
-  field_description: Name of Bank
-  sap_table: bnka
-  mandatory: true
-  field_group: address
-  key: false
-  sheet_name: Field List
-  data_type: Text
-  length: 60
-  decimal: None
-  field_count: 3
+- target_field_name: BANKA
+  target_field_description: "Name of Bank"
+  target_table: bnka
+  target_is_mandatory: true
+  target_field_group: address
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 60
+  target_decimal: None
+  target_field_count: 3
 
-- sap_field: provz
-  field_description: Region (State, Province, Country)
-  sap_table: bnka
-  mandatory: false
-  field_group: address
-  key: false
-  sheet_name: Field List
-  data_type: Text
-  length: 80
-  decimal: None
-  field_count: 4
+- target_field_name: PROVZ
+  target_field_description: "Region (State, Province, Country)"
+  target_table: bnka
+  target_is_mandatory: false
+  target_field_group: address
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 4
 
-- sap_field: stras
-  field_description: House Number and Street
-  sap_table: bnka
-  mandatory: false
-  field_group: address
-  key: false
-  sheet_name: Field List
-  data_type: Text
-  length: 35
-  decimal: None
-  field_count: 5
+- target_field_name: STRAS
+  target_field_description: "House Number and Street"
+  target_table: bnka
+  target_is_mandatory: false
+  target_field_group: address
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 35
+  target_decimal: None
+  target_field_count: 5
 
-- sap_field: ort01
-  field_description: City
-  sap_table: bnka
-  mandatory: false
-  field_group: address
-  key: false
-  sheet_name: Field List
-  data_type: Text
-  length: 35
-  decimal: None
-  field_count: 6
+- target_field_name: ORT01
+  target_field_description: "City"
+  target_table: bnka
+  target_is_mandatory: false
+  target_field_group: address
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 35
+  target_decimal: None
+  target_field_count: 6
 
-- sap_field: brnch
-  field_description: Bank Branch
-  sap_table: bnka
-  mandatory: false
-  field_group: address
-  key: false
-  sheet_name: Field List
-  data_type: Text
-  length: 40
-  decimal: None
-  field_count: 7
+- target_field_name: BRNCH
+  target_field_description: "Bank Branch"
+  target_table: bnka
+  target_is_mandatory: false
+  target_field_group: address
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 40
+  target_decimal: None
+  target_field_count: 7
 
-- sap_field: swift
-  field_description: SWIFT Code for International Payments
-  sap_table: bnka
-  mandatory: false
-  field_group: control data
-  key: false
-  sheet_name: Field List
-  data_type: Text
-  length: 11
-  decimal: None
-  field_count: 8
+- target_field_name: SWIFT
+  target_field_description: "SWIFT Code for International Payments"
+  target_table: bnka
+  target_is_mandatory: false
+  target_field_group: control data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 11
+  target_decimal: None
+  target_field_count: 8
 
-- sap_field: xpgro
-  field_description: Post Office Bank Current Account
-  sap_table: bnka
-  mandatory: false
-  field_group: control data
-  key: false
-  sheet_name: Field List
-  data_type: Text
-  length: 1
-  decimal: None
-  field_count: 9
+- target_field_name: XPGRO
+  target_field_description: "Post Office Bank Current Account"
+  target_table: bnka
+  target_is_mandatory: false
+  target_field_group: control data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 1
+  target_decimal: None
+  target_field_count: 9
 
-- sap_field: bnklz
-  field_description: Bank Number
-  sap_table: bnka
-  mandatory: false
-  field_group: control data
-  key: false
-  sheet_name: Field List
-  data_type: Text
-  length: 15
-  decimal: None
-  field_count: 10
+- target_field_name: BNKLZ
+  target_field_description: "Bank Number"
+  target_table: bnka
+  target_is_mandatory: false
+  target_field_group: control data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 15
+  target_decimal: None
+  target_field_count: 10
 
-- sap_field: bgrup
-  field_description: Bank Group (Bank Network)
-  sap_table: bnka
-  mandatory: false
-  field_group: control data
-  key: false
-  sheet_name: Field List
-  data_type: Text
-  length: 2
-  decimal: None
-  field_count: 11
+- target_field_name: BGRUP
+  target_field_description: "Bank Group (Bank Network)"
+  target_table: bnka
+  target_is_mandatory: false
+  target_field_group: control data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 2
+  target_decimal: None
+  target_field_count: 11
 
-- sap_field: isnotoverwrite
-  field_description: Do Not Overwrite Existing Data
-  sap_table: bnka
-  mandatory: false
-  field_group: control indicator
-  key: false
-  sheet_name: Field List
-  data_type: Text
-  length: 1
-  decimal: None
-  field_count: 12
+- target_field_name: ISNOTOVERWRITE
+  target_field_description: "Do Not Overwrite Existing Data"
+  target_table: bnka
+  target_is_mandatory: false
+  target_field_group: control indicator
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 1
+  target_decimal: None
+  target_field_count: 12

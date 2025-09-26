@@ -2,33 +2,33 @@ metadata:
   object: fulltest
   variant: bnka
   target_file: data/02_target/fulltest_bnka.xml
-  generated_at: '2025-09-25T11:00:15.988143'
+  generated_at: '2025-09-25T12:05:59.243469'
   structure: S_BNKA
   target_fields_count: 2
 
 
 
 target_fields:
-- sap_field: banks
-  field_description: Bank Country/Region Key
-  sap_table: bnka
-  mandatory: true
-  field_group: key
-  key: true
-  sheet_name: Field List
-  data_type: Text
-  length: 80
-  decimal: None
-  field_count: 1
+- target_field_name: BANKS
+  target_field_description: "Bank Country/Region Key"
+  target_table: bnka
+  target_is_mandatory: true
+  target_field_group: key
+  target_is_key: true
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 1
 
-- sap_field: bankl
-  field_description: Bank Key
-  sap_table: bnka
-  mandatory: true
-  field_group: key
-  key: true
-  sheet_name: Field List
-  data_type: Text
-  length: 80
-  decimal: None
-  field_count: 2
+- target_field_name: BANKL
+  target_field_description: "Bank Key"
+  target_table: bnka
+  target_is_mandatory: true
+  target_field_group: key
+  target_is_key: true
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 2

@@ -207,6 +207,16 @@ class EnhancedLogger:
                     f"  validation: rules={rules_count} → {validation_scaffold} ({validation_status})"
                 )
 
+            # Transform scaffold line
+            transform_scaffold = event.get("transform_scaffold", "")
+            transform_rules_count = event.get("transform_rules_count", 0)
+            if transform_scaffold:
+                # Determine status based on transform_rules_count
+                transform_status = "created" if transform_rules_count > 0 else "skipped:exists"
+                self.console.print(
+                    f"  transform: rules={transform_rules_count} → {transform_scaffold} ({transform_status})"
+                )
+
         # Duration and warnings
         duration_ms = event.get("duration_ms", 0)
         self.console.print(f"  time: {duration_ms}ms")
