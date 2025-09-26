@@ -1,0 +1,3 @@
+Table Name,Field Name,Data Type,Field Text,Length,Is Key,# Of Occ,From Total
+TEST_TABLE,TEST_FIELD,Character,Test Description,000010,X,100,100
+TEST_TABLE,FIELD2,Numeric,Another Field,000005,,100,100

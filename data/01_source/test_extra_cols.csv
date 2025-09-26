@@ -1,0 +1,3 @@
+table name,field name,data type,field text,length,is key,# of occ,from total,extra_col1,extra_col2
+TEST_TABLE,FIELD1,Character,First Field,000010,X,100,100,ignored1,ignored2
+TEST_TABLE,FIELD2,Numeric,Second Field,005,,100,100,ignored3,ignored4

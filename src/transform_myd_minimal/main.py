@@ -857,6 +857,113 @@ def apply_field_name_fallback(source_fields, central_memory, object_name, varian
     return enhanced_fields
 
 
+def parse_csv_field_definitions(csv_path: Path) -> List[Dict]:
+    """
+    Parse CSV file containing field definitions with headers:
+    table name, field name, data type, field text, length, is key, # of occ, from total
+    
+    Args:
+        csv_path: Path to CSV file containing field definitions
+        
+    Returns:
+        List of field dictionaries compatible with analyze_column_data output
+    """
+    import csv
+    
+    try:
+        source_fields = []
+        field_count = 1
+        
+        with open(csv_path, 'r', encoding='utf-8') as f:
+            # Create CSV reader and detect headers
+            reader = csv.DictReader(f)
+            
+            # Expected headers (case-insensitive matching)
+            expected_headers = {
+                'table name': 'table_name',
+                'field name': 'field_name', 
+                'data type': 'data_type',
+                'field text': 'field_text',
+                'length': 'length',
+                'is key': 'is_key',
+                '# of occ': 'num_occ',
+                'from total': 'from_total'
+            }
+            
+            # Map actual headers to expected ones (case-insensitive)
+            header_mapping = {}
+            for actual_header in reader.fieldnames:
+                actual_lower = actual_header.lower().strip()
+                for expected, key in expected_headers.items():
+                    if actual_lower == expected:
+                        header_mapping[actual_header] = key
+                        break
+            
+            # Process each row as a field definition
+            for row in reader:
+                # Skip empty rows
+                if not any(row.values()):
+                    continue
+                    
+                # Extract field information using header mapping
+                field_name = ""
+                field_description = ""
+                field_length = None
+                is_key = False
+                
+                for actual_header, value in row.items():
+                    if not value:
+                        continue
+                        
+                    mapped_key = header_mapping.get(actual_header)
+                    if mapped_key == 'field_name':
+                        field_name = str(value).strip()
+                    elif mapped_key == 'data_type':
+                        field_description = str(value).strip()
+                    elif mapped_key == 'field_text':
+                        # Use field_text as additional description if available
+                        field_text = str(value).strip()
+                        if field_text and field_text != field_description:
+                            field_description = f"{field_description} ({field_text})" if field_description else field_text
+                    elif mapped_key == 'length':
+                        # Parse length, stripping leading zeros
+                        length_str = str(value).strip()
+                        if length_str and length_str.isdigit():
+                            field_length = int(length_str.lstrip('0') or '0')
+                    elif mapped_key == 'is_key':
+                        is_key = str(value).strip().upper() == 'X'
+                
+                # Skip rows without field names
+                if not field_name:
+                    continue
+                
+                # Create field definition compatible with analyze_column_data output
+                field_def = {
+                    "field_name": field_name,
+                    "field_description": field_description if field_description else None,
+                    "example": None,  # CSV format doesn't include examples
+                    "field_count": field_count,
+                    "dtype": "string",  # Default to string, could be enhanced based on data_type
+                    "nullable": not is_key,  # Key fields are typically not nullable
+                }
+                
+                # Add length information if available
+                if field_length is not None:
+                    field_def["length"] = field_length
+                    
+                # Add key information
+                if is_key:
+                    field_def["is_key"] = True
+                
+                source_fields.append(field_def)
+                field_count += 1
+        
+        return source_fields
+        
+    except Exception as e:
+        raise ValueError(f"Error parsing CSV field definitions from {csv_path}: {e}")
+
+
 def run_index_source_command(args, config):
     """Run the index_source command - parse headers from XLSX and create index_source.yaml."""
     from .enhanced_logging import EnhancedLogger
@@ -869,57 +976,91 @@ def run_index_source_command(args, config):
 
     try:
         # Construct input file path for index_source command (F01 spec: data/01_source/<object>_<variant>.xlsx)
-        input_file = (
+        xlsx_input_file = (
             root_path
             / config.input_dir
             / f"{args.object}_{args.variant}.xlsx"
         )
+        
+        # CSV fallback file path (F01 spec: data/01_source/<object>_<variant>.csv)
+        csv_input_file = (
+            root_path
+            / config.input_dir
+            / f"{args.object}_{args.variant}.csv"
+        )
 
-        # Check if input file exists
-        if not input_file.exists():
-            error_data = {"error": "missing_input", "path": str(input_file)}
+        # Check if XLSX input file exists, fallback to CSV if not
+        input_file = None
+        sheet_name = None
+        is_csv_fallback = False
+        
+        if xlsx_input_file.exists():
+            input_file = xlsx_input_file
+            print(f"Using XLSX source: {input_file.relative_to(root_path)}")
+        elif csv_input_file.exists():
+            input_file = csv_input_file
+            is_csv_fallback = True
+            print(f"XLSX not found, using CSV fallback: {input_file.relative_to(root_path)}")
+        else:
+            error_data = {
+                "error": "missing_input", 
+                "xlsx_path": str(xlsx_input_file),
+                "csv_path": str(csv_input_file)
+            }
             logger.log_error(error_data)
             sys.exit(2)
 
-        # Find first non-empty worksheet
-        try:
-            sheet_name = find_first_non_empty_worksheet(input_file)
-        except ValueError:
-            error_data = {"error": "no_headers"}
-            logger.log_error(error_data)
-            sys.exit(3)
+        # Process file based on format
+        if is_csv_fallback:
+            # Parse CSV field definitions
+            try:
+                source_fields = parse_csv_field_definitions(input_file)
+                print(f"Parsed {len(source_fields)} field definitions from CSV")
+            except ValueError as e:
+                error_data = {"error": "exception", "message": str(e)}
+                logger.log_error(error_data)
+                sys.exit(1)
+        else:
+            # Process XLSX file (existing logic)
+            # Find first non-empty worksheet
+            try:
+                sheet_name = find_first_non_empty_worksheet(input_file)
+            except ValueError:
+                error_data = {"error": "no_headers"}
+                logger.log_error(error_data)
+                sys.exit(3)
 
-        # Find header row
-        try:
-            header_row_idx, headers = find_header_row(input_file, sheet_name)
-        except ValueError:
-            error_data = {"error": "no_headers"}
-            logger.log_error(error_data)
-            sys.exit(3)
+            # Find header row
+            try:
+                header_row_idx, headers = find_header_row(input_file, sheet_name)
+            except ValueError:
+                error_data = {"error": "no_headers"}
+                logger.log_error(error_data)
+                sys.exit(3)
 
-        # Reject only if ALL headers are empty
-        if all(h == "" for h in headers):
-            error_data = {"error": "no_headers"}
-            logger.log_error(error_data)
-            sys.exit(3)
+            # Reject only if ALL headers are empty
+            if all(h == "" for h in headers):
+                error_data = {"error": "no_headers"}
+                logger.log_error(error_data)
+                sys.exit(3)
 
-        # Filter out empty headers and warn about them
-        processed_headers = []
-        for i, header in enumerate(headers):
-            if header.strip():
-                processed_headers.append(header)
-            elif header == "":
-                warnings.append(f"Empty header found at column {i+1}")
+            # Filter out empty headers and warn about them
+            processed_headers = []
+            for i, header in enumerate(headers):
+                if header.strip():
+                    processed_headers.append(header)
+                elif header == "":
+                    warnings.append(f"Empty header found at column {i+1}")
 
-        # Analyze column data
-        try:
-            source_fields = analyze_column_data(
-                input_file, sheet_name, header_row_idx, processed_headers
-            )
-        except ValueError as e:
-            error_data = {"error": "exception", "message": str(e)}
-            logger.log_error(error_data)
-            sys.exit(1)
+            # Analyze column data
+            try:
+                source_fields = analyze_column_data(
+                    input_file, sheet_name, header_row_idx, processed_headers
+                )
+            except ValueError as e:
+                error_data = {"error": "exception", "message": str(e)}
+                logger.log_error(error_data)
+                sys.exit(1)
 
         # Load central mapping memory for field name fallbacks and descriptions
         central_memory = load_central_mapping_memory(root_path)
@@ -968,7 +1109,13 @@ def run_index_source_command(args, config):
                 f.write(f"  variant: {args.variant}\n")
                 f.write(f"  source_file: {input_file.relative_to(root_path)}\n")
                 f.write(f"  generated_at: '{datetime.now().isoformat()}'\n")
-                f.write(f"  sheet: {sheet_name}\n")
+                
+                # Only include sheet for XLSX files
+                if not is_csv_fallback and sheet_name:
+                    f.write(f"  sheet: {sheet_name}\n")
+                elif is_csv_fallback:
+                    f.write("  format: csv_field_definitions\n")
+                    
                 f.write(f"  source_fields_count: {len(source_fields)}\n")
 
                 # Add 3 empty lines between large blocks
@@ -1012,7 +1159,11 @@ def run_index_source_command(args, config):
             )
 
         # Log summary
-        total_columns = len([h for h in headers if h != ""])
+        if is_csv_fallback:
+            total_columns = len(source_fields)
+        else:
+            total_columns = len([h for h in headers if h != ""])
+            
         summary_data = {
             "step": "index_source",
             "object": args.object,
@@ -1020,6 +1171,7 @@ def run_index_source_command(args, config):
             "input_file": str(input_file),
             "output_file": str(output_file),
             "total_columns": total_columns,
+            "is_csv_fallback": is_csv_fallback,
             "warnings": warnings,
         }
         
@@ -1044,9 +1196,31 @@ def run_index_source_command(args, config):
                 "variant": args.variant,
                 "ts": dt.now().isoformat(),
                 "input_file": str(input_file.relative_to(root_path)),
-                "sheet": sheet_name,
                 "total_columns": total_columns,
-                "headers": [
+                "is_csv_fallback": is_csv_fallback,
+                "warnings": warnings
+            }
+            
+            # Add sheet info for XLSX, format info for CSV
+            if is_csv_fallback:
+                html_summary["format"] = "csv_field_definitions"
+                html_summary["headers"] = [
+                    {
+                        "index": i + 1,
+                        "field_name": field.get("field_name", ""),
+                        "dtype": field.get("dtype", "string"),
+                        "nullable": field.get("nullable", True),
+                        "example": field.get("example", None),
+                        "is_key": field.get("is_key", False),
+                        "length": field.get("length", None)
+                    }
+                    for i, field in enumerate(source_fields)
+                ]
+                html_summary["duplicates"] = []
+                html_summary["empty_headers"] = 0
+            else:
+                html_summary["sheet"] = sheet_name
+                html_summary["headers"] = [
                     {
                         "index": i + 1,
                         "field_name": header,
@@ -1055,11 +1229,9 @@ def run_index_source_command(args, config):
                         "example": None     # Could be enhanced with sample data
                     }
                     for i, header in enumerate([h for h in headers if h != ""])
-                ],
-                "duplicates": [h for h in headers if headers.count(h) > 1 and h != ""],
-                "empty_headers": len([h for h in headers if h == ""]),
-                "warnings": warnings
-            }
+                ]
+                html_summary["duplicates"] = [h for h in headers if headers.count(h) > 1 and h != ""]
+                html_summary["empty_headers"] = len([h for h in headers if h == ""])
             
             # Write JSON summary
             json_filename = f"index_source_{timestamp}.json"

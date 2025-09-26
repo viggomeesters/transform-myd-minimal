@@ -1,0 +1,6 @@
+table name,field name,data type,field text,length,is key,# of occ,from total
+TEST_TABLE,FIELD1,Character,First Field,000010,X,N/a,50
+TEST_TABLE,FIELD2,Numeric,Second Field,005,,100,100
+TEST_TABLE,FIELD3,Date,Third Field,8,,,100
+TEST_TABLE,FIELD4,Flag,Fourth Field,1,X,Some text,100
+TEST_TABLE,FIELD5,Text,Fifth Field,000000,,N/a,100
