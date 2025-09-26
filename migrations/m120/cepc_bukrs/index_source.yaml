@@ -1,80 +1,66 @@
 metadata:
   object: m120
   variant: cepc_bukrs
-  source_file: data\01_source\m120_cepc_bukrs.xlsx
-  generated_at: '2025-09-25T13:46:25.402159'
-  sheet: Sheet1
-  source_fields_count: 10
+  source_file: data/01_source/m120_cepc_bukrs.csv
+  generated_at: '2025-09-26T09:28:46.206629'
+  format: csv_field_definitions
+  source_fields_count: 8
 
 
 
 source_fields:
-- field_name: MANDT
-  field_description: Client (Mandant)
-  example: '280'
-  field_count: 1
-  dtype: string
-  nullable: false
+- source_field_name: MANDT
+  source_field_description: "Client (Mandant)"
+  source_example: null
+  source_field_count: 1
+  source_dtype: string
+  source_nullable: false
 
-- field_name: KOKRS
-  field_description: None
-  example: '0010'
-  field_count: 2
-  dtype: string
-  nullable: false
+- source_field_name: KOKRS
+  source_field_description: "Controlling Area (COKR)"
+  source_example: null
+  source_field_count: 2
+  source_dtype: string
+  source_nullable: false
 
-- field_name: PRCTR
-  field_description: None
-  example: '0000001000'
-  field_count: 3
-  dtype: string
-  nullable: false
+- source_field_name: BUKRS
+  source_field_description: "Company Code (COMP)"
+  source_example: null
+  source_field_count: 3
+  source_dtype: string
+  source_nullable: false
 
-- field_name: BUKRS
-  field_description: None
-  example: '0010'
-  field_count: 4
-  dtype: string
-  nullable: false
+- source_field_name: KHINR
+  source_field_description: "Hierarchy Area (HIER)"
+  source_example: null
+  source_field_count: 4
+  source_dtype: string
+  source_nullable: true
 
-- field_name: VNAME
-  field_description: None
-  example: 'nan'
-  field_count: 5
-  dtype: string
-  nullable: false
+- source_field_name: VARGR
+  source_field_description: "Partner Object (POBJ)"
+  source_example: null
+  source_field_count: 5
+  source_dtype: string
+  source_nullable: true
 
-- field_name: RECID
-  field_description: None
-  example: 'nan'
-  field_count: 6
-  dtype: string
-  nullable: false
+- source_field_name: AKTIV
+  source_field_description: "Active on Date (ACTV)"
+  source_example: null
+  source_field_count: 6
+  source_dtype: string
+  source_nullable: true
 
-- field_name: ETYPE
-  field_description: None
-  example: 'nan'
-  field_count: 7
-  dtype: string
-  nullable: false
+- source_field_name: DATAB
+  source_field_description: "Valid From (VALFR)"
+  source_example: null
+  source_field_count: 7
+  source_dtype: string
+  source_nullable: true
 
-- field_name: JV_OTYPE
-  field_description: None
-  example: 'nan'
-  field_count: 8
-  dtype: string
-  nullable: false
-
-- field_name: JV_JIBCL
-  field_description: None
-  example: 'nan'
-  field_count: 9
-  dtype: string
-  nullable: false
-
-- field_name: JV_JIBSA
-  field_description: None
-  example: 'nan'
-  field_count: 10
-  dtype: string
-  nullable: false
+- source_field_name: DATBI
+  source_field_description: "Valid To (VALTO)"
+  source_example: null
+  source_field_count: 8
+  source_dtype: string
+  source_nullable: true
