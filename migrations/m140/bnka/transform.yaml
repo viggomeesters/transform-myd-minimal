@@ -2,7 +2,7 @@ metadata:
   object: m140
   variant: bnka
   target_file: data/02_target/m140_bnka.xml
-  generated_at: '2025-09-25T12:02:32.758887'
+  generated_at: '2025-09-26T06:53:38.214429'
   structure: S_BNKA
   description: 'Transformation rules for m140/bnka'
 
@@ -10,148 +10,112 @@ metadata:
 
 transformations:
 - target_field: BANKS
+  target_field_description: 'Bank Country/Region Key'
   transformation_type: direct
-  source_field: ''
-  description: 'Bank Country/Region Key'
   placeholder_value: ''
   value_mappings:
     # Example: map source values to target values
     # - source_value: 'OLD_VALUE'
     #   target_value: 'NEW_VALUE'
-    # - source_value: 'EMPTY'
-    #   target_value: 'DEFAULT'
 
 - target_field: BANKL
+  target_field_description: 'Bank Key'
   transformation_type: direct
-  source_field: ''
-  description: 'Bank Key'
   placeholder_value: ''
   value_mappings:
     # Example: map source values to target values
     # - source_value: 'OLD_VALUE'
     #   target_value: 'NEW_VALUE'
-    # - source_value: 'EMPTY'
-    #   target_value: 'DEFAULT'
 
 - target_field: BANKA
+  target_field_description: 'Name of Bank'
   transformation_type: direct
-  source_field: ''
-  description: 'Name of Bank'
   placeholder_value: ''
   value_mappings:
     # Example: map source values to target values
     # - source_value: 'OLD_VALUE'
     #   target_value: 'NEW_VALUE'
-    # - source_value: 'EMPTY'
-    #   target_value: 'DEFAULT'
 
 - target_field: PROVZ
+  target_field_description: 'Region (State, Province, Country)'
   transformation_type: direct
-  source_field: ''
-  description: 'Region (State, Province, Country)'
   placeholder_value: ''
   value_mappings:
     # Example: map source values to target values
     # - source_value: 'OLD_VALUE'
     #   target_value: 'NEW_VALUE'
-    # - source_value: 'EMPTY'
-    #   target_value: 'DEFAULT'
 
 - target_field: STRAS
+  target_field_description: 'House Number and Street'
   transformation_type: direct
-  source_field: ''
-  description: 'House Number and Street'
   placeholder_value: ''
   value_mappings:
     # Example: map source values to target values
     # - source_value: 'OLD_VALUE'
     #   target_value: 'NEW_VALUE'
-    # - source_value: 'EMPTY'
-    #   target_value: 'DEFAULT'
 
 - target_field: ORT01
+  target_field_description: 'City'
   transformation_type: direct
-  source_field: ''
-  description: 'City'
   placeholder_value: ''
   value_mappings:
     # Example: map source values to target values
     # - source_value: 'OLD_VALUE'
     #   target_value: 'NEW_VALUE'
-    # - source_value: 'EMPTY'
-    #   target_value: 'DEFAULT'
 
 - target_field: BRNCH
+  target_field_description: 'Bank Branch'
   transformation_type: direct
-  source_field: ''
-  description: 'Bank Branch'
   placeholder_value: ''
   value_mappings:
     # Example: map source values to target values
     # - source_value: 'OLD_VALUE'
     #   target_value: 'NEW_VALUE'
-    # - source_value: 'EMPTY'
-    #   target_value: 'DEFAULT'
 
 - target_field: SWIFT
+  target_field_description: 'SWIFT Code for International Payments'
   transformation_type: direct
-  source_field: ''
-  description: 'SWIFT Code for International Payments'
   placeholder_value: ''
   value_mappings:
     # Example: map source values to target values
     # - source_value: 'OLD_VALUE'
     #   target_value: 'NEW_VALUE'
-    # - source_value: 'EMPTY'
-    #   target_value: 'DEFAULT'
 
 - target_field: XPGRO
+  target_field_description: 'Post Office Bank Current Account'
   transformation_type: direct
-  source_field: ''
-  description: 'Post Office Bank Current Account'
   placeholder_value: ''
   value_mappings:
     # Example: map source values to target values
     # - source_value: 'OLD_VALUE'
     #   target_value: 'NEW_VALUE'
-    # - source_value: 'EMPTY'
-    #   target_value: 'DEFAULT'
 
 - target_field: BNKLZ
+  target_field_description: 'Bank Number'
   transformation_type: direct
-  source_field: ''
-  description: 'Bank Number'
   placeholder_value: ''
   value_mappings:
     # Example: map source values to target values
     # - source_value: 'OLD_VALUE'
     #   target_value: 'NEW_VALUE'
-    # - source_value: 'EMPTY'
-    #   target_value: 'DEFAULT'
 
 - target_field: BGRUP
+  target_field_description: 'Bank Group (Bank Network)'
   transformation_type: direct
-  source_field: ''
-  description: 'Bank Group (Bank Network)'
   placeholder_value: ''
   value_mappings:
     # Example: map source values to target values
     # - source_value: 'OLD_VALUE'
     #   target_value: 'NEW_VALUE'
-    # - source_value: 'EMPTY'
-    #   target_value: 'DEFAULT'
 
 - target_field: ISNOTOVERWRITE
+  target_field_description: 'Do Not Overwrite Existing Data'
   transformation_type: direct
-  source_field: ''
-  description: 'Do Not Overwrite Existing Data'
   placeholder_value: ''
   value_mappings:
     # Example: map source values to target values
     # - source_value: 'OLD_VALUE'
     #   target_value: 'NEW_VALUE'
-    # - source_value: 'EMPTY'
-    #   target_value: 'DEFAULT'
 
 
 # General transformation settings

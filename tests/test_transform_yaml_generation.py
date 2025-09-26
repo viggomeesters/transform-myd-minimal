@@ -68,9 +68,8 @@ def test_transform_yaml_generation():
     # Check first transformation has required fields
     first_transform = transformations[0]
     assert 'target_field' in first_transform
+    assert 'target_field_description' in first_transform
     assert 'transformation_type' in first_transform
-    assert 'source_field' in first_transform
-    assert 'description' in first_transform
     assert 'placeholder_value' in first_transform
     assert 'value_mappings' in first_transform
     
@@ -114,8 +113,7 @@ def test_transform_yaml_structure_requirements():
     for transform in transformations:
         assert transform['target_field'], "Target field should not be empty"
         assert 'transformation_type' in transform, "Should have transformation type"
-        assert 'source_field' in transform, "Should have source field (can be empty for user to fill)"
-        assert 'description' in transform, "Should have description"
+        assert 'target_field_description' in transform, "Should have target field description"
     
     print(f"✓ All requirements met: target fields list, value mappings, and placeholder values")
 

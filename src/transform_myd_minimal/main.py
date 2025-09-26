@@ -1667,17 +1667,11 @@ def run_index_target_command(args, config):
                 # Create a basic transformation rule for each field
                 transform_rule = {
                     "target_field": base_field,
+                    "target_field_description": field_desc if field_desc else f"Transform data for {base_field}",
                     "transformation_type": "direct",  # default transformation type
-                    "source_field": "",  # to be filled by user
-                    "description": field_desc if field_desc else f"Transform data for {base_field}",
+                    "placeholder_value": "",
+                    "value_mappings": [],
                 }
-                
-                # Add value mappings section for fields that might need it
-                # Users can customize these mappings as needed
-                transform_rule["value_mappings"] = []
-                
-                # Add placeholder value option
-                transform_rule["placeholder_value"] = ""
                 
                 transform_rules.append(transform_rule)
 
@@ -1701,16 +1695,13 @@ def run_index_target_command(args, config):
                     if i > 0:
                         f.write("\n")  # Add blank line between transformation records
                     f.write(f"- target_field: {rule['target_field']}\n")
+                    f.write(f"  target_field_description: '{rule['target_field_description']}'\n")
                     f.write(f"  transformation_type: {rule['transformation_type']}\n")
-                    f.write(f"  source_field: '{rule['source_field']}'\n")
-                    f.write(f"  description: '{rule['description']}'\n")
                     f.write(f"  placeholder_value: '{rule['placeholder_value']}'\n")
                     f.write("  value_mappings:\n")
                     f.write("    # Example: map source values to target values\n")
                     f.write("    # - source_value: 'OLD_VALUE'\n")
                     f.write("    #   target_value: 'NEW_VALUE'\n")
-                    f.write("    # - source_value: 'EMPTY'\n")
-                    f.write("    #   target_value: 'DEFAULT'\n")
 
                 # Add general transformation settings
                 f.write("\n\n# General transformation settings\n")
