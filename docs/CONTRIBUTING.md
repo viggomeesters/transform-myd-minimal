@@ -107,15 +107,20 @@ Use conventional commits format:
 
 ```
 src/transform_myd_minimal/
-├── __init__.py          # Package initialization
+├── __init__.py          # Package initialization and version info
 ├── __main__.py          # Module entry point
-├── cli.py               # CLI argument parsing
+├── cli.py               # CLI argument parsing and subcommands
 ├── main.py              # Core command implementations
 ├── config_loader.py     # Configuration management
-├── enhanced_logging.py  # Rich logging system
+├── enhanced_logging.py  # Rich logging system for F01/F02
+├── logging_config.py    # Logging configuration utilities
 ├── fuzzy.py            # Fuzzy matching algorithms
-├── generator.py        # YAML generation
-└── source_mapping.py   # Mapping logic
+├── generator.py        # YAML generation logic
+├── source_mapping.py   # Mapping logic
+├── synonym.py          # Synonym matching utilities
+├── parsers.py          # Excel/XML parsing utilities
+├── reporting.py        # HTML report generation
+└── csv_reporting.py    # CSV data profiling and reporting
 ```
 
 ## Architecture Guidelines
@@ -133,7 +138,7 @@ src/transform_myd_minimal/
 - Use enhanced logging system for F01/F02 commands
 - Support both human and JSONL output formats
 - Default to TTY-aware output
-- Log to `data/09_logging/` by default
+- Log to `data/99_logging/` by default
 
 ### Path Handling
 - Always use `pathlib.Path` objects

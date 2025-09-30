@@ -51,7 +51,7 @@ python -m transform_myd_minimal index_source --object {object} --variant {varian
 - Maakt (indien nodig) de folder: `migrations/{object}/{variant}/`
 - Schrijft het resultaat naar: `migrations/{object}/{variant}/index_source.yaml`
 - Voegt het object/variant toe aan de globale lijst: `migrations/object_list.yaml`
-- Automatic log files: `data/09_logging/index_source_{object}_{variant}_{YYYYMMDD_HHmm}.jsonl`
+- Automatic log files: `data/99_logging/index_source_{object}_{variant}_{YYYYMMDD_HHmm}.jsonl`
 
 #### 2. index_target - Indexeer doelvelden
 
@@ -861,7 +861,7 @@ Het script scant automatisch de bestaande Excel-bestanden in `data/01_source/fie
 
 ## Versie Informatie
 
-**Huidige versie: 3.0.0 - Integrated Workflow**
+**Huidige versie: 4.1.0 - Step-by-Step Object+Variant Pipeline with HTML Reporting**
 
 ```bash
 # Bekijk versie informatie
@@ -869,6 +869,8 @@ Het script scant automatisch de bestaande Excel-bestanden in `data/01_source/fie
 ```
 
 ### Versie Geschiedenis
+- **v4.1** - HTML reporting voor alle F01-F04 stappen
+- **v4.0** - Step-by-Step Object+Variant Pipeline met F01-F04 commands
 - **v3.0** - Geïntegreerde YAML workflow met `map` subcommand
 - **v2.0** - Advanced matching algoritmen (fuzzy, synonym)
 - **v1.0** - Basis exact matching functionaliteit

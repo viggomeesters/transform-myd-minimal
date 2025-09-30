@@ -180,10 +180,10 @@ unmapped_target_fields:
 #### Step 4: F04 - Transform Data
 
 **Inputs Required:**
-- `data/03_raw/m140_bnka.xlsx` - Raw data to transform
+- `data/07_raw/m140_bnka.xlsx` - Raw data to transform
 - `migrations/m140/bnka/mapping.yaml` (from Step 3)
 - `migrations/m140/bnka/index_target.yaml` (from Step 2)
-- `data/03_templates/S_BNKA#*.csv` - CSV template files
+- `data/06_template/S_BNKA#*.csv` - CSV template files
 
 **Commands:**
 ```bash
@@ -195,11 +195,11 @@ python -m transform_myd_minimal transform --object m140 --variant bnka
 ```
 
 **Outputs:**
-- `data/07_transformed/S_BNKA#m140_Data.csv` - SAP CSV (fixed filename format)
-- `data/07_transformed/S_BNKA#m140_20240922_1433_output.csv` - SAP CSV (timestamped format)
+- `data/10_transformed/S_BNKA#m140_Data.csv` - SAP CSV (fixed filename format)
+- `data/10_transformed/S_BNKA#m140_20240922_1433_output.csv` - SAP CSV (timestamped format)
   Both formats are accepted by SAP Migrate Your Data
-- `data/06_rejected/rejected_m140_bnka_20240922_1433.csv` - Rejected records
-- `data/05_raw_validation/raw_validation_m140_bnka_20240922_1433.csv` - Pre-transform validation
+- `data/09_rejected/rejected_m140_bnka_20240922_1433.csv` - Rejected records
+- `data/08_raw_validation/raw_validation_m140_bnka_20240922_1433.csv` - Pre-transform validation
 - `data/11_transformed_validation/post_transform_validation_m140_bnka_20240922_1433.csv` - Post-transform validation
 - `data/99_logging/transform_m140_bnka_20240922_1433.jsonl` - Operation log
 

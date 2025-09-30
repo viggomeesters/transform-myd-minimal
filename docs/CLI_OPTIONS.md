@@ -9,6 +9,7 @@
 | `index_source` | Parse and index source fields from XLSX file | Step 1: Process source headers |
 | `index_target` | Parse and index target fields from XML file | Step 2: Process target field definitions |
 | `map` | Generate column mapping from indexed files | Step 3: Create source-to-target mappings |
+| `transform` | Transform raw data through ETL pipeline to SAP CSV | Step 4: Execute data transformation |
 
 ### Command-Specific Options
 
@@ -36,11 +37,31 @@
 - `--max-suggestions`: Maximum fuzzy match suggestions (default: 3)
 - `--disable-fuzzy`: Disable fuzzy matching completely
 
+#### transform (F04 - Data Transformation)
+```bash
+./transform-myd-minimal transform --object OBJECT --variant VARIANT [OPTIONS]
+```
+- `--object`: Object name (e.g., m140) **[Required]**
+- `--variant`: Variant name (e.g., bnka) **[Required]**
+- `--force`: Overwrite existing output files
+- `--no-html`: Skip HTML report generation
+- `--html-dir DIR`: Custom directory for HTML and JSON reports
+
+### Common Options (All Commands)
+
+Available across all commands for logging and output control:
+- `--json`: Force JSONL output to stdout
+- `--format {human,jsonl}`: Override TTY detection for output format
+- `--log-file PATH`: Override default log file path
+- `--no-log-file`: Disable writing to log file
+- `--quiet`: No stdout output; still writes file unless --no-log-file
+- `--no-preview`: Suppress preview table in human mode
+
 ### File Path Patterns (v4.0)
 
 #### Input Files
-- **Source XLSX**: `data/01_source/fields_{object}_{variant}.xlsx`
-- **Target XML**: `data/02_target/index_target_{object}_{variant}.xml`
+- **Source XLSX**: `data/01_source/{object}_{variant}.xlsx`
+- **Target XML**: `data/02_target/{object}_{variant}.xml`
 
 #### Output Files
 - **Object List**: `migrations/object_list.yaml` (global registry)
@@ -176,7 +197,7 @@ All examples in this document use the new wrapper script format.
 #### `--object`
 - **Purpose**: Specifies the object name for the transformation
 - **Format**: String, typically alphanumeric (e.g., "m140", "p100")
-- **Usage**: Determines the input Excel file path: `data/01_source/fields_{object}_{variant}.xlsx`
+- **Usage**: Determines the input Excel file path: `data/01_source/{object}_{variant}.xlsx`
 - **Example**: `--object m140`
 
 #### `--variant` 
@@ -259,8 +280,8 @@ All examples in this document use the new wrapper script format.
 ## File Path Patterns
 
 ### Input Files
-- **Excel Input**: `data/01_source/fields_{object}_{variant}.xlsx`
-- **Example**: `data/01_source/fields_m140_bnka.xlsx`
+- **Excel Input**: `data/01_source/{object}_{variant}.xlsx`
+- **Example**: `data/01_source/m140_bnka.xlsx`
 
 ### Output Files  
 - **Global Config Files**: `output/object_list.yaml`, `output/mapping.yaml`, `output/targets.yaml`

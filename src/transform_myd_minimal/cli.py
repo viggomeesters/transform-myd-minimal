@@ -19,7 +19,7 @@ from .logging_config import get_logger
 logger = get_logger(__name__)
 
 
-__version__ = "4.0.0"
+__version__ = "4.1.0"
 
 
 def setup_cli():
