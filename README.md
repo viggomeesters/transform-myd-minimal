@@ -19,6 +19,57 @@ transform-myd-minimal --help
 python -m transform_myd_minimal --help
 ```
 
+## Quality Assurance & Development Tools
+
+This project uses a modern QA toolchain to ensure code quality:
+
+### 🔍 Code Quality Tools
+
+- **Ruff**: Fast Python linter for code quality checks
+- **Black**: Automatic code formatter for consistent style
+- **mypy**: Static type checker for type safety
+- **pytest**: Testing framework with coverage reporting
+- **pre-commit**: Git hooks for automated quality checks
+
+### 🚀 Quick QA Commands
+
+```bash
+# Run linter
+ruff check src/ tests/
+
+# Auto-fix linting issues
+ruff check --fix src/ tests/
+
+# Format code
+black src/ tests/
+
+# Type checking
+mypy src/
+
+# Run tests
+pytest tests/ -v
+
+# Run tests with coverage
+pytest tests/ --cov=src/transform_myd_minimal --cov-report=term
+
+# Install pre-commit hooks
+pre-commit install
+
+# Run all pre-commit checks
+pre-commit run --all-files
+```
+
+### 🔄 Continuous Integration
+
+GitHub Actions automatically runs:
+- ✅ Linting (ruff)
+- ✅ Formatting checks (black)
+- ✅ Type checking (mypy)
+- ✅ Tests across Python 3.9-3.12
+- ✅ Integration tests
+
+See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for detailed development guidelines.
+
 ## Verdere Documentatie
 - [Gebruik - USAGE.md](docs/USAGE.md)
 - [Logging - LOGGING.md](docs/LOGGING.md)

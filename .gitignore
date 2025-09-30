@@ -12,6 +12,11 @@ env/
 ENV/
 test_env/
 
+# Environment variables
+.env
+.env.local
+.env.*.local
+
 # IDE files
 .vscode/
 .idea/
@@ -87,11 +92,18 @@ build/
 dist/
 *.egg-info/
 
-# Development environment
+# Development environment and testing
 .pytest_cache/
 .mypy_cache/
+.ruff_cache/
+
+# Coverage reports
 .coverage
+.coverage.*
 htmlcov/
+coverage.xml
+*.cover
+.hypothesis/
 
 # Editor and system files
 *.log
