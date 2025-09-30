@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.1.0] - 2025-09-23
+## [4.1.0] - 2024-09-23
 
 ### Added
 - **Self-contained HTML reports for ALL F01–F04 steps** with interactive features:
@@ -68,7 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Path normalization with forward slashes confirmed working
 - Exit codes properly implemented per specification
 - TTY-based logging (human vs JSON) confirmed working  
-- Default logging to `data/09_logging/` confirmed working
+- Default logging to `data/99_logging/` confirmed working
 - No environment variable dependencies confirmed
 
 ## [4.0.0] - Previous release

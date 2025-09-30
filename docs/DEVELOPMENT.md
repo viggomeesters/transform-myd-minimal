@@ -49,17 +49,38 @@ transform-myd-minimal/
 │       ├── main.py                     # Core orchestration and matching logic
 │       ├── cli.py                      # CLI argument parsing and subcommands
 │       ├── config_loader.py            # Configuration management
+│       ├── enhanced_logging.py         # Rich logging system for F01/F02
+│       ├── logging_config.py           # Logging configuration utilities
 │       ├── fuzzy.py                    # Fuzzy matching algorithms
 │       ├── generator.py                # YAML generation logic
-│       └── synonym.py                  # Synonym matching logic
+│       ├── source_mapping.py           # Mapping logic
+│       ├── synonym.py                  # Synonym matching utilities
+│       ├── parsers.py                  # Excel/XML parsing utilities
+│       ├── reporting.py               # HTML report generation
+│       └── csv_reporting.py           # CSV data profiling and reporting
 ├── transform-myd-minimal               # Wrapper script for easy execution
 ├── config/                             # Configuration directory
 │   ├── config.yaml                     # Application settings (if exists)
 │   └── central_mapping_memory.yaml     # Central mapping rules (if exists)
-├── output/                             # Generated output (legacy structure)
-├── data/                               # Input Excel files
-│   └── 02_fields/                      # Expected input directory
-├── migrations/                         # Generated output (new structure)
+├── data/                               # Input data and outputs
+│   ├── 01_source/                      # F01 inputs (source XLSX files)
+│   ├── 02_target/                      # F02 inputs (target XML files)
+│   ├── 03_index_source/                # F01 HTML/JSON reports
+│   ├── 04_index_target/                # F02 HTML/JSON reports
+│   ├── 05_map/                         # F03 HTML/JSON reports
+│   ├── 06_template/                    # F04 CSV templates
+│   ├── 07_raw/                         # F04 raw data inputs
+│   ├── 08_raw_validation/              # F04 validation outputs
+│   ├── 09_rejected/                    # F04 rejected records
+│   ├── 10_transformed/                 # F04 final CSV outputs
+│   ├── 11_transformed_validation/      # F04 post-transform validation
+│   └── 99_logging/                     # All log files
+├── migrations/                         # Generated YAML structures
+│   └── {object}/                       # Per object directory
+│       └── {variant}/                  # Per variant directory
+│           ├── index_source.yaml       # F01 output
+│           ├── index_target.yaml       # F02 output
+│           └── mapping.yaml            # F03 output
 ├── requirements.txt                    # Python dependencies
 ├── pyproject.toml                      # Modern Python project configuration
 └── README.md                          # Main project documentation
@@ -67,35 +88,73 @@ transform-myd-minimal/
 
 ## Running the Tool
 
-### Basic Usage
+### Step-by-Step Workflow (v4.1)
+
+Transform MYD Minimal uses a 4-step pipeline:
+
 ```bash
-# Generate mapping files for an object/variant combination
+# Step 1: Index source fields
+./transform-myd-minimal index_source --object m140 --variant bnka
+
+# Step 2: Index target fields  
+./transform-myd-minimal index_target --object m140 --variant bnka
+
+# Step 3: Generate mappings
 ./transform-myd-minimal map --object m140 --variant bnka
 
-# Or use config defaults (if object/variant set in config/config.yaml)
-./transform-myd-minimal map
+# Step 4: Transform data
+./transform-myd-minimal transform --object m140 --variant bnka
+```
 
-# View available options
+### View Available Options
+```bash
+# Main help
+./transform-myd-minimal --help
+
+# Command-specific help
+./transform-myd-minimal index_source --help
+./transform-myd-minimal index_target --help
 ./transform-myd-minimal map --help
+./transform-myd-minimal transform --help
 ```
 
 ### Advanced Options
 ```bash
-# Adjust fuzzy matching threshold
+# Adjust fuzzy matching threshold (map command)
 ./transform-myd-minimal map --object m140 --variant bnka --fuzzy-threshold 0.8
 
-# Disable fuzzy matching for faster processing
+# Disable fuzzy matching for faster processing (map command)
 ./transform-myd-minimal map --object m140 --variant bnka --disable-fuzzy
 
-# Increase number of suggestions shown
+# Increase number of suggestions shown (map command)
 ./transform-myd-minimal map --object m140 --variant bnka --max-suggestions 10
+
+# Skip HTML report generation (all commands)
+./transform-myd-minimal index_source --object m140 --variant bnka --no-html
+
+# Force overwrite existing files (all commands)
+./transform-myd-minimal index_source --object m140 --variant bnka --force
+
+# Use quiet mode with custom log file (all commands)
+./transform-myd-minimal index_target --object m140 --variant bnka --quiet --log-file my_log.jsonl
 ```
 
 ### Input Requirements
-The tool expects Excel files in the format:
-- Path: `data/02_fields/fields_{object}_{variant}.xlsx`
-- Content: Must contain `field`, `field_name`, and `field_description` columns
-- Structure: Rows marked as 'Source' and 'Target' in the `field` column
+
+The tool expects the following file structure:
+
+**F01 (index_source):**
+- Path: `data/01_source/{object}_{variant}.xlsx`
+- Content: Excel file with source headers
+
+**F02 (index_target):**
+- Path: `data/02_target/{object}_{variant}.xml`  
+- Fallback: `data/02_target/{object}_{variant}.xlsx`
+- Content: Target field definitions
+
+**F04 (transform):**
+- Path: `data/07_raw/{object}_{variant}.xlsx` - Raw data to transform
+- Templates: `data/06_template/S_{VARIANT}#*.csv` - CSV templates
 
 ## Configuration
 
@@ -107,8 +166,8 @@ max_suggestions: 3          # Maximum suggestions to show
 disable_fuzzy: false        # Whether to disable fuzzy matching
 
 # Directory configuration  
-input_dir: "data/02_fields" # Input directory for Excel files
-output_dir: "output"        # Output directory for generated files
+input_dir: "data/01_source"   # F01 input directory for source Excel files
+output_dir: "migrations"      # Output directory for generated YAML files
 ```
 
 ### Central Mapping Memory (`config/central_mapping_memory.yaml`)

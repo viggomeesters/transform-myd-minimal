@@ -1,6 +1,6 @@
 [project]
 name = "transform-myd-minimal"
-version = "3.0.0"
+version = "4.1.0"
 description = "CLI tool for generating column mapping and YAML files from Excel field definitions for SAP data migration workflows"
 authors = [
     {name = "Transform MYD Team"}
