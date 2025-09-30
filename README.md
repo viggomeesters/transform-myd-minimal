@@ -19,6 +19,14 @@ transform-myd-minimal --help
 python -m transform_myd_minimal --help
 ```
 
+## Verdere Documentatie
+- [Gebruik - USAGE.md](docs/USAGE.md)
+- [Logging - LOGGING.md](docs/LOGGING.md)
+- [Development Setup - DEVELOPMENT.md](docs/DEVELOPMENT.md)
+- [CLI Opties - CLI_OPTIONS.md](docs/CLI_OPTIONS.md)
+- [Contributie - CONTRIBUTING.md](docs/CONTRIBUTING.md)
+- [Changelog - CHANGELOG.md](docs/CHANGELOG.md)
+
 ## 🆕 NEW: Step-by-Step Workflow (v4.0)
 
 Deze nieuwe workflow zorgt ervoor dat elke stap een aparte CLI-command is en alle output variant-specifiek wordt opgeslagen.
@@ -162,7 +170,7 @@ migrations/
 ./transform-myd-minimal index_source --object m140 --variant bnka --no-log-file
 ```
 
-See [LOGGING.md](LOGGING.md) for complete documentation.
+See [LOGGING.md](docs/LOGGING.md) for complete documentation.
 
 ### 📊 Rapportage per stap (F01–F04)
 
@@ -509,7 +517,7 @@ Genereert: `migrations/M140/bnka/` met alle 4 YAML bestanden
 *Het `map` subcommand is optioneel voor backward compatibility  
 **Default waarden kunnen worden aangepast via config.yaml
 
-Voor een volledig overzicht van alle CLI opties, zie: **[CLI_OPTIONS.md](CLI_OPTIONS.md)**
+Voor een volledig overzicht van alle CLI opties, zie: **[CLI_OPTIONS.md](docs/CLI_OPTIONS.md)**
 
 ## Configuratie (config/config.yaml)
 
@@ -700,7 +708,7 @@ Het script verwacht de volgende structuur:
 ./transform-myd-minimal --help
 ```
 
-**Uitgebreide CLI documentatie**: Zie [CLI_OPTIONS.md](CLI_OPTIONS.md) voor alle opties, voorbeelden en changelog.
+**Uitgebreide CLI documentatie**: Zie [CLI_OPTIONS.md](docs/CLI_OPTIONS.md) voor alle opties, voorbeelden en changelog.
 
 ## Smart Transformation Logic
 
@@ -865,4 +873,4 @@ Het script scant automatisch de bestaande Excel-bestanden in `data/01_source/fie
 - **v2.0** - Advanced matching algoritmen (fuzzy, synonym)
 - **v1.0** - Basis exact matching functionaliteit
 
-Voor volledige documentatie zie [CLI_OPTIONS.md](CLI_OPTIONS.md)
+Voor volledige documentatie zie [CLI_OPTIONS.md](docs/CLI_OPTIONS.md)
