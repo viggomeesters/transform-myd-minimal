@@ -6,6 +6,9 @@ openpyxl>=3.1.0
 # YAML file generation and parsing  
 PyYAML>=6.0
 
+# Rich text formatting for console output
+rich>=13.7
+
 # Optional: Development dependencies (uncomment if needed)
 # pytest>=7.0.0
 # black>=22.0.0
