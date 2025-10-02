@@ -59,15 +59,6 @@ pre-commit install
 pre-commit run --all-files
 ```
 
-### 🔄 Continuous Integration
-
-GitHub Actions automatically runs:
-- ✅ Linting (ruff)
-- ✅ Formatting checks (black)
-- ✅ Type checking (mypy)
-- ✅ Tests across Python 3.9-3.12
-- ✅ Integration tests
-
 See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for detailed development guidelines.
 
 ## Verdere Documentatie

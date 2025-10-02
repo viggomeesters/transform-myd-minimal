@@ -29,21 +29,12 @@ Updated to exclude:
 - `coverage.xml`, `*.cover`, `.hypothesis/` (coverage outputs)
 - `.coverage.*` (coverage data files)
 
-#### `.github/workflows/ci.yml`
-Comprehensive CI pipeline with 5 jobs:
-1. **Lint** (ruff) - Non-blocking, documents issues
-2. **Format** (black) - Non-blocking, documents issues
-3. **Type Check** (mypy) - Non-blocking, documents issues
-4. **Test** (pytest) - BLOCKING, runs on Python 3.9-3.12
-5. **Integration** - BLOCKING, verifies CLI functionality
-
 ### 2. Documentation
 
 #### `README.md`
 Added "Quality Assurance & Development Tools" section with:
 - Overview of QA tools
 - Quick command reference
-- CI pipeline description
 - Links to detailed guides
 
 #### `ROLLBACK_QA.md`
@@ -56,8 +47,7 @@ Complete rollback instructions including:
 ## 🎯 Design Decisions
 
 ### Non-Breaking Approach
-All QA checks (lint, format, typecheck) are **non-blocking** (`continue-on-error: true`) to:
-- Allow current codebase to pass CI
+All QA checks (lint, format, typecheck) can be run locally to:
 - Document existing quality issues
 - Enable gradual improvement without blocking development
 
@@ -71,7 +61,7 @@ Only tests are **blocking** to ensure:
 Following the requirement strictly:
 - ✅ Zero modifications to `src/transform_myd_minimal/*.py`
 - ✅ Zero modifications to product logic
-- ✅ Only config, documentation, and CI files changed
+- ✅ Only config and documentation files changed
 
 ## 📊 Current Status
 
@@ -142,40 +132,25 @@ pre-commit install
 pre-commit run --all-files
 ```
 
-### CI Pipeline
-
-The CI runs automatically on:
-- Push to master, main, or develop branches
-- Pull requests to master, main, or develop branches
-- Manual workflow dispatch
-
 ## ✨ Benefits
 
-1. **Consistent Code Quality**: Automated checks on every commit
-2. **Multi-Python Support**: Tests run on Python 3.9, 3.10, 3.11, 3.12
-3. **Coverage Tracking**: Integrated with Codecov for coverage reporting
-4. **Developer Friendly**: Pre-commit hooks catch issues before push
-5. **Gradual Adoption**: Non-blocking checks allow incremental improvements
-6. **Well Documented**: Clear commands and rollback procedures
+1. **Consistent Code Quality**: Automated checks via pre-commit hooks
+2. **Coverage Tracking**: Coverage reporting available locally
+3. **Developer Friendly**: Pre-commit hooks catch issues before commit
+4. **Gradual Adoption**: Non-blocking checks allow incremental improvements
+5. **Well Documented**: Clear commands and rollback procedures
 
 ## 🔄 Future Improvements
 
 Once ready to enforce stricter quality standards:
 
-1. Remove `continue-on-error: true` from lint job in `.github/workflows/ci.yml`
-2. Run `ruff check --fix src/ tests/` to auto-fix issues
-3. Run `black src/ tests/` to format code
-4. Add type stubs: `pip install types-PyYAML pandas-stubs`
-5. Gradually increase mypy strictness per module
+1. Run `ruff check --fix src/ tests/` to auto-fix issues
+2. Run `black src/ tests/` to format code
+3. Add type stubs: `pip install types-PyYAML pandas-stubs`
+4. Gradually increase mypy strictness per module
+5. Consider adding CI/CD workflow if needed
 
 ## 📝 Verification
-
-### Proof of Green CI
-The CI pipeline has been designed and tested locally to ensure:
-- ✅ All jobs complete successfully
-- ✅ Tests pass on all Python versions
-- ✅ CLI commands work correctly
-- ✅ No breaking changes introduced
 
 ### Local Test Results
 ```bash
