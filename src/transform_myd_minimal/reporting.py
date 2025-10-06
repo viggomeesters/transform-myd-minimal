@@ -1104,8 +1104,8 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
                     const hasSamples = data.mappings.length > 0 && data.mappings[0].source_samples !== undefined;
                     
                     const headers = hasSamples 
-                        ? ['Target Field', 'Source Header', 'Source Samples', 'Target Samples', 'Transformation', 'Required', 'Confidence', 'Status', 'Rationale']
-                        : ['Target Field', 'Source Header', 'Required', 'Confidence', 'Status', 'Rationale'];
+                        ? ['Target Field', 'Source Field', 'Source Samples', 'Target Samples', 'Transformation', 'Required', 'Confidence', 'Status', 'Rationale']
+                        : ['Target Field', 'Source Field', 'Required', 'Confidence', 'Status', 'Rationale'];
                     
                     const rows = data.mappings.map(m => {{
                         const baseRow = hasSamples 
@@ -1134,7 +1134,7 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
                 }}
                 
                 if (data.to_audit_rows) {{
-                    const headers = ['Target Table', 'Target Field', 'Source Header', 'Confidence', 'Reason'];
+                    const headers = ['Target Table', 'Target Field', 'Source Field', 'Confidence', 'Reason'];
                     const rows = data.to_audit_rows.map(r => [
                         r.target_table || '',
                         r.target_field || '',
