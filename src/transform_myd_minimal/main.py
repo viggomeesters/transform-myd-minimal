@@ -2485,9 +2485,9 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             to_audit.append(
                 {
                     "target_table": mapping["target_table"],
-                    "target_field": mapping["target_field"],
+                    "target_field_name": mapping["target_field_name"],
                     "source_header": source_header,
-                    "confidence": mapping["confidence"],
+                    "confidence": mapping["map_confidence"],
                     "reason": "reused_source",
                 }
             )

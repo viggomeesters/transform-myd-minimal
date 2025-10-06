@@ -1,13 +1,13 @@
 metadata:
   object: m140
   variant: bnka
-  generated_at: '2025-09-25T11:50:56.042353'
+  generated_at: '2025-10-06T09:45:55.830123'
   source_index: migrations/m140/bnka/index_source.yaml
   target_index: migrations/m140/bnka/index_target.yaml
   mapped_count: 11
   unmapped_count: 1
-  to_audit: 0
-  unused_sources: 26
+  to_audit: 3
+  unused_sources: 1
   unused_targets: 0
 
 
@@ -16,8 +16,9 @@ mappings:
 - map_confidence: 1.0
   map_rationale: Exact field name match
   map_status: auto
-  source_field_description: None
+  source_field_description: Bank Country (BANK)
   source_field_name: BANKS
+  source_header: BANKS
   target_field_description: Bank Country/Region Key
   target_field_name: BANKS
   target_table: bnka
@@ -25,8 +26,9 @@ mappings:
 - map_confidence: 1.0
   map_rationale: Exact field name match
   map_status: auto
-  source_field_description: None
+  source_field_description: Bank Key (BKEY)
   source_field_name: BANKL
+  source_header: BANKL
   target_field_description: Bank Key
   target_field_name: BANKL
   target_table: bnka
@@ -34,8 +36,9 @@ mappings:
 - map_confidence: 1.0
   map_rationale: Exact field name match
   map_status: auto
-  source_field_description: None
+  source_field_description: Bank Name (BNAM)
   source_field_name: BANKA
+  source_header: BANKA
   target_field_description: Name of Bank
   target_field_name: BANKA
   target_table: bnka
@@ -43,8 +46,9 @@ mappings:
 - map_confidence: 1.0
   map_rationale: Exact field name match
   map_status: auto
-  source_field_description: None
+  source_field_description: Region (REGN)
   source_field_name: PROVZ
+  source_header: PROVZ
   target_field_description: Region (State, Province, Country)
   target_field_name: PROVZ
   target_table: bnka
@@ -52,8 +56,9 @@ mappings:
 - map_confidence: 1.0
   map_rationale: Exact field name match
   map_status: auto
-  source_field_description: None
+  source_field_description: Street (STRT)
   source_field_name: STRAS
+  source_header: STRAS
   target_field_description: House Number and Street
   target_field_name: STRAS
   target_table: bnka
@@ -61,17 +66,19 @@ mappings:
 - map_confidence: 1.0
   map_rationale: Exact field name match
   map_status: auto
-  source_field_description: None
+  source_field_description: City (CITY)
   source_field_name: ORT01
+  source_header: ORT01
   target_field_description: City
   target_field_name: ORT01
   target_table: bnka
 
-- map_confidence: 1.0
-  map_rationale: Exact field name match
+- map_confidence: 0.9
+  map_rationale: Fuzzy match with 90% confidence
   map_status: auto
-  source_field_description: None
-  source_field_name: BRNCH
+  source_field_description: Bank Name (BNAM)
+  source_field_name: BANKA
+  source_header: BANKA
   target_field_description: Bank Branch
   target_field_name: BRNCH
   target_table: bnka
@@ -79,8 +86,9 @@ mappings:
 - map_confidence: 1.0
   map_rationale: Exact field name match
   map_status: auto
-  source_field_description: None
+  source_field_description: SWIFT Code (SWFT)
   source_field_name: SWIFT
+  source_header: SWIFT
   target_field_description: SWIFT Code for International Payments
   target_field_name: SWIFT
   target_table: bnka
@@ -88,17 +96,19 @@ mappings:
 - map_confidence: 1.0
   map_rationale: Exact field name match
   map_status: auto
-  source_field_description: None
+  source_field_description: Post Office Bank (PSTB)
   source_field_name: XPGRO
+  source_header: XPGRO
   target_field_description: Post Office Bank Current Account
   target_field_name: XPGRO
   target_table: bnka
 
-- map_confidence: 1.0
-  map_rationale: Exact field name match
+- map_confidence: 0.88
+  map_rationale: Fuzzy match with 88% confidence
   map_status: auto
-  source_field_description: None
-  source_field_name: BNKLZ
+  source_field_description: Bank Key (BKEY)
+  source_field_name: BANKL
+  source_header: BANKL
   target_field_description: Bank Number
   target_field_name: BNKLZ
   target_table: bnka
@@ -106,8 +116,9 @@ mappings:
 - map_confidence: 1.0
   map_rationale: Exact field name match
   map_status: auto
-  source_field_description: None
+  source_field_description: Bank Group (BGRP)
   source_field_name: BGRUP
+  source_header: BGRUP
   target_field_description: Bank Group (Bank Network)
   target_field_name: BGRUP
   target_table: bnka
@@ -117,13 +128,30 @@ mappings:
   map_status: unmapped
   source_field_description: none
   source_field_name: field_name onbekend
+  source_header: null
   target_field_description: Do Not Overwrite Existing Data
   target_field_name: ISNOTOVERWRITE
   target_table: bnka
 
 
 
-to_audit: []
+to_audit:
+- target_table: bnka
+  target_field_name: BNKLZ
+  source_header: BANKL
+  source_field_name: BANKL
+  confidence: 0.88
+  reason: low_confidence_fuzzy
+- target_table: bnka
+  target_field_name: BRNCH
+  source_header: BANKA
+  confidence: 0.9
+  reason: reused_source
+- target_table: bnka
+  target_field_name: BNKLZ
+  source_header: BANKL
+  confidence: 0.88
+  reason: reused_source
 
 
 
@@ -138,86 +166,6 @@ unmapped_source_fields:
   status: unmapped
   target_field: null
   target_table: null
-- source_field_name: ERDAT
-  source_field_description: Creation Date
-  confidence: 1.0
-  rationale: Global skip field configured in central mapping memory
-  comment: 'Audit field: Creation date is not relevant for data mapping'
-  required: false
-  source_header: null
-  status: unmapped
-  target_field: null
-  target_table: null
-- source_field_name: ERNAM
-  source_field_description: Name of Person who Created the Object
-  confidence: 1.0
-  rationale: Global skip field configured in central mapping memory
-  comment: 'Audit field: Creator name is not relevant for data mapping'
-  required: false
-  source_header: null
-  status: unmapped
-  target_field: null
-  target_table: null
-- LOEVM
-- PSKTO
-- ADRNR
-- CHKME
-- VERS
-- source_field_name: IBAN_RULE
-  source_field_description: IBAN Validation Rule
-  confidence: 0.0
-  rationale: Manual mapping configured but target not found
-  comment: 'BNKA table specific: Map IBAN validation rule to SWIFT field for business
-    process alignment'
-  required: false
-  source_header: null
-  status: unmapped
-  target_field: SWIFT
-  target_table: null
-- SDD_B2B
-- SDD_COR1
-- SDD_RTRANS
-- ZNOCHECK
-- ZACC_LEN
-- source_field_name: ZRES1
-  source_field_description: Reserved field 1
-  confidence: 1.0
-  rationale: Global skip field configured in central mapping memory
-  comment: 'BNKA table specific: Reserved field not used in current implementation'
-  required: false
-  source_header: null
-  status: unmapped
-  target_field: null
-  target_table: null
-- source_field_name: ZRES2
-  source_field_description: Reserved field 2
-  confidence: 1.0
-  rationale: Global skip field configured in central mapping memory
-  comment: 'BNKA table specific: Reserved field not used in current implementation'
-  required: false
-  source_header: null
-  status: unmapped
-  target_field: null
-  target_table: null
-- source_field_name: ZRES3
-  source_field_description: Reserved field 3
-  confidence: 1.0
-  rationale: Global skip field configured in central mapping memory
-  comment: 'BNKA table specific: Future reserved field, skip for now'
-  required: false
-  source_header: null
-  status: unmapped
-  target_field: null
-  target_table: null
-- ZRES4
-- ZRES5
-- ZRES6
-- ZRES7
-- ZRES8
-- ZRES9
-- ZRES10
-- BICKY
-- RCCODE
 
 
 
