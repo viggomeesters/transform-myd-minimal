@@ -11,7 +11,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from rich.console import Console
 from rich.table import Table
@@ -72,10 +72,10 @@ class EnhancedLogger:
         try:
             # Try to make path relative to root_path
             relative_path = path.relative_to(self.root_path)
-            return str(relative_path).replace("\\", "/")
+            return relative_path.as_posix()
         except ValueError:
             # If path is not relative to root, use as-is
-            return str(path).replace("\\", "/")
+            return path.as_posix()
 
     def get_log_file_path(self) -> Optional[Path]:
         """Get the log file path based on naming convention."""
@@ -136,7 +136,7 @@ class EnhancedLogger:
             )
         elif self.step == "map":
             mapped_count = event.get("mapped", 0)
-            unmapped_count = event.get("unmapped", 0) 
+            unmapped_count = event.get("unmapped", 0)
             to_audit_count = event.get("to_audit", 0)
             self.console.print(
                 f"[{check_color}]{check_mark}[/{check_color}] {self.step}  {self.object_name}/{self.variant}  mapped={mapped_count}  unmapped={unmapped_count}  to_audit={to_audit_count}"
@@ -163,15 +163,21 @@ class EnhancedLogger:
             source_index = event.get("source_index", "")
             target_index = event.get("target_index", "")
             if source_index:
-                self.console.print(f"  source: {self.normalize_path(Path(source_index))}")
+                self.console.print(
+                    f"  source: {self.normalize_path(Path(source_index))}"
+                )
             if target_index:
-                self.console.print(f"  target: {self.normalize_path(Path(target_index))}")
-            
+                self.console.print(
+                    f"  target: {self.normalize_path(Path(target_index))}"
+                )
+
             # Ruleset sources
             ruleset_sources = event.get("ruleset_sources", "")
             if ruleset_sources:
-                self.console.print(f"  ruleset: {self.normalize_path(Path(ruleset_sources))}")
-                
+                self.console.print(
+                    f"  ruleset: {self.normalize_path(Path(ruleset_sources))}"
+                )
+
         elif self.step == "transform":
             # Transform-specific paths (no longer showing sap_csv as per requirement 4)
             input_raw = event.get("input_raw", "")
@@ -179,7 +185,7 @@ class EnhancedLogger:
             snapshot_csv = event.get("snapshot_csv", "")
             rejects_csv = event.get("rejects_csv", "")
             template_used = event.get("template_used", "")
-            
+
             if input_raw:
                 self.console.print(f"  raw: {self.normalize_path(Path(input_raw))}")
             if mapping:
@@ -189,7 +195,9 @@ class EnhancedLogger:
             if rejects_csv:
                 self.console.print(f"  rej: {self.normalize_path(Path(rejects_csv))}")
             if template_used:
-                self.console.print(f"  template: {self.normalize_path(Path(template_used)) if template_used != 'missing' else 'missing'}")
+                self.console.print(
+                    f"  template: {self.normalize_path(Path(template_used)) if template_used != 'missing' else 'missing'}"
+                )
 
         # Structure (for index_target)
         if self.step == "index_target":
@@ -212,7 +220,9 @@ class EnhancedLogger:
             transform_rules_count = event.get("transform_rules_count", 0)
             if transform_scaffold:
                 # Determine status based on transform_rules_count
-                transform_status = "created" if transform_rules_count > 0 else "skipped:exists"
+                transform_status = (
+                    "created" if transform_rules_count > 0 else "skipped:exists"
+                )
                 self.console.print(
                     f"  transform: rules={transform_rules_count} → {transform_scaffold} ({transform_status})"
                 )
@@ -302,7 +312,9 @@ class EnhancedLogger:
             table.add_row(
                 item.get("target_field", ""),
                 item.get("source_header", ""),
-                item.get("source_field_name", "field_name onbekend"),  # Always show field_name
+                item.get(
+                    "source_field_name", "field_name onbekend"
+                ),  # Always show field_name
                 item.get("confidence", ""),
                 item.get("status", ""),
             )
@@ -313,7 +325,7 @@ class EnhancedLogger:
         """Output preview table for transform with first 8 columns of data."""
         table = Table(title="Transformed data (sample)")
         table.add_column("#", style="dim")
-        
+
         # Get first 8 columns from preview data
         if preview_data:
             first_row = preview_data[0]

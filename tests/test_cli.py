@@ -14,7 +14,7 @@ def test_cli_help():
         [sys.executable, "-m", "transform_myd_minimal", "--help"],
         capture_output=True,
         text=True,
-        cwd=Path(__file__).parent.parent
+        cwd=Path(__file__).parent.parent,
     )
     assert result.returncode == 0
     assert "Transform MYD Minimal" in result.stdout
@@ -30,7 +30,7 @@ def test_index_source_help():
         [sys.executable, "-m", "transform_myd_minimal", "index_source", "--help"],
         capture_output=True,
         text=True,
-        cwd=Path(__file__).parent.parent
+        cwd=Path(__file__).parent.parent,
     )
     assert result.returncode == 0
     assert "index_source" in result.stdout
@@ -42,7 +42,7 @@ def test_index_target_help():
         [sys.executable, "-m", "transform_myd_minimal", "index_target", "--help"],
         capture_output=True,
         text=True,
-        cwd=Path(__file__).parent.parent
+        cwd=Path(__file__).parent.parent,
     )
     assert result.returncode == 0
     assert "index_target" in result.stdout
@@ -54,7 +54,7 @@ def test_map_help():
         [sys.executable, "-m", "transform_myd_minimal", "map", "--help"],
         capture_output=True,
         text=True,
-        cwd=Path(__file__).parent.parent
+        cwd=Path(__file__).parent.parent,
     )
     assert result.returncode == 0
     assert "map" in result.stdout
@@ -66,7 +66,7 @@ def test_transform_help():
         [sys.executable, "-m", "transform_myd_minimal", "transform", "--help"],
         capture_output=True,
         text=True,
-        cwd=Path(__file__).parent.parent
+        cwd=Path(__file__).parent.parent,
     )
     assert result.returncode == 0
     assert "transform" in result.stdout
@@ -78,7 +78,10 @@ def test_missing_command():
         [sys.executable, "-m", "transform_myd_minimal"],
         capture_output=True,
         text=True,
-        cwd=Path(__file__).parent.parent
+        cwd=Path(__file__).parent.parent,
     )
     assert result.returncode == 1
-    assert "Transform MYD Minimal" in result.stdout or "Transform MYD Minimal" in result.stderr
+    assert (
+        "Transform MYD Minimal" in result.stdout
+        or "Transform MYD Minimal" in result.stderr
+    )

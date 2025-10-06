@@ -14,15 +14,15 @@ Provides interactive HTML report generation for CSV files (rejects) with:
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict
+
 import pandas as pd
-import numpy as np
 
 
 def generate_csv_html_report(csv_file: Path, output_file: Path, title: str) -> None:
     """
     Generate an interactive HTML report from a CSV file.
-    
+
     Args:
         csv_file: Path to the input CSV file
         output_file: Path for the output HTML file
@@ -30,18 +30,18 @@ def generate_csv_html_report(csv_file: Path, output_file: Path, title: str) -> N
     """
     # Read CSV file
     df = pd.read_csv(csv_file, dtype=str)
-    
+
     # Replace NaN/None values with empty strings for display
     df = df.fillna("")
-    
+
     # Prepare data for JSON embedding
     columns = df.columns.tolist()
     rows = df.values.tolist()
-    
+
     # Calculate basic statistics
     total_rows = len(df)
     total_columns = len(columns)
-    
+
     # Generate column statistics for KPIs
     column_stats = {}
     for col in columns:
@@ -49,40 +49,42 @@ def generate_csv_html_report(csv_file: Path, output_file: Path, title: str) -> N
         if len(values) > 0:
             value_counts = values.value_counts().head(5)
             column_stats[col] = {
-                'total': len(df[col]),
-                'non_empty': len(values),
-                'top_values': [{'value': str(val), 'count': int(count)} 
-                              for val, count in value_counts.items()]
+                "total": len(df[col]),
+                "non_empty": len(values),
+                "top_values": [
+                    {"value": str(val), "count": int(count)}
+                    for val, count in value_counts.items()
+                ],
             }
         else:
             column_stats[col] = {
-                'total': len(df[col]),
-                'non_empty': 0,
-                'top_values': []
+                "total": len(df[col]),
+                "non_empty": 0,
+                "top_values": [],
             }
-    
+
     # Create JSON data object
     data = {
-        'title': title,
-        'csv_file': str(csv_file.name),
-        'total_rows': total_rows,
-        'total_columns': total_columns,
-        'columns': columns,
-        'rows': rows,
-        'column_stats': column_stats
+        "title": title,
+        "csv_file": str(csv_file.name),
+        "total_rows": total_rows,
+        "total_columns": total_columns,
+        "columns": columns,
+        "rows": rows,
+        "column_stats": column_stats,
     }
-    
+
     # Generate HTML content
     html_content = _generate_html_template(data)
-    
+
     # Write to output file
-    with open(output_file, 'w', encoding='utf-8') as f:
+    with open(output_file, "w", encoding="utf-8") as f:
         f.write(html_content)
 
 
 def _generate_html_template(data: Dict[str, Any]) -> str:
     """Generate the complete HTML template with embedded data and JavaScript."""
-    
+
     html_template = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -731,5 +733,5 @@ def _generate_html_template(data: Dict[str, Any]) -> str:
     </script>
 </body>
 </html>"""
-    
+
     return html_template

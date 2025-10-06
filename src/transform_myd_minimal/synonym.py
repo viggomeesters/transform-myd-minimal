@@ -10,6 +10,7 @@ Contains all logic and dictionary for synonym matching including:
 """
 
 from typing import List
+
 from .fuzzy import FieldNormalizer
 
 

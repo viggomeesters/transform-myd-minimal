@@ -143,11 +143,11 @@ def setup_cli():
         "--json", action="store_true", help="Force JSONL output to stdout"
     )
     map_parser.add_argument(
-        "--format", choices=["human", "jsonl"], help="Output format (overrides TTY detection)"
+        "--format",
+        choices=["human", "jsonl"],
+        help="Output format (overrides TTY detection)",
     )
-    map_parser.add_argument(
-        "--log-file", type=str, help="Override log file path"
-    )
+    map_parser.add_argument("--log-file", type=str, help="Override log file path")
     map_parser.add_argument(
         "--no-log-file", action="store_true", help="Do not write log file"
     )
@@ -159,7 +159,7 @@ def setup_cli():
         action="store_true",
         help="No stdout output; still writes file unless --no-log-file",
     )
-    
+
     # HTML reporting options for map command
     map_parser.add_argument(
         "--no-html", action="store_true", help="Skip HTML report generation"
@@ -242,7 +242,7 @@ def setup_cli():
         action="store_true",
         help="No stdout output; still writes file unless --no-log-file",
     )
-    
+
     # HTML reporting options for index_source command
     index_source_parser.add_argument(
         "--no-html", action="store_true", help="Skip HTML report generation"
@@ -268,7 +268,9 @@ def setup_cli():
         "--force", action="store_true", help="Overwrite existing outputs"
     )
     index_target_parser.add_argument(
-        "--prefer-xlsx", action="store_true", help="Prefer .xlsx file over .xml when both exist (F02 fallback feature)"
+        "--prefer-xlsx",
+        action="store_true",
+        help="Prefer .xlsx file over .xml when both exist (F02 fallback feature)",
     )
     # Logging flags
     index_target_parser.add_argument(
@@ -293,7 +295,7 @@ def setup_cli():
         action="store_true",
         help="No stdout output; still writes file unless --no-log-file",
     )
-    
+
     # HTML reporting options for index_target command
     index_target_parser.add_argument(
         "--no-html", action="store_true", help="Skip HTML report generation"
@@ -322,11 +324,11 @@ def setup_cli():
         "--json", action="store_true", help="Force JSONL output to stdout"
     )
     transform_parser.add_argument(
-        "--format", choices=["human", "jsonl"], help="Output format (overrides TTY detection)"
+        "--format",
+        choices=["human", "jsonl"],
+        help="Output format (overrides TTY detection)",
     )
-    transform_parser.add_argument(
-        "--log-file", type=str, help="Override log file path"
-    )
+    transform_parser.add_argument("--log-file", type=str, help="Override log file path")
     transform_parser.add_argument(
         "--no-log-file", action="store_true", help="Do not write log file"
     )
@@ -338,7 +340,7 @@ def setup_cli():
         action="store_true",
         help="No stdout output; still writes file unless --no-log-file",
     )
-    
+
     # HTML reporting options for transform command
     transform_parser.add_argument(
         "--no-html", action="store_true", help="Skip HTML report generation"
