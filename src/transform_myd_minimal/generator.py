@@ -318,10 +318,7 @@ def is_constant_field(field_name, field_description):
         return True
 
     # Check for single character fields (often flags)
-    if len(field_name) == 1 and field_name.upper() in "XYZQWERTY":
-        return True
-
-    return False
+    return bool(len(field_name) == 1 and field_name.upper() in "XYZQWERTY")
 
 
 def generate_column_map_yaml(
@@ -629,7 +626,7 @@ def update_objects_catalog(objects_file, object_code, table_name):
     objects_data = {"objects": []}
     if objects_file.exists():
         try:
-            with open(objects_file, "r", encoding="utf-8") as f:
+            with open(objects_file, encoding="utf-8") as f:
                 existing_data = yaml.safe_load(f)
                 if existing_data and "objects" in existing_data:
                     objects_data = existing_data
@@ -765,11 +762,13 @@ def generate_migration_mappings_yaml(
                 "target_field_name": match.target_field,
                 "source_field_name": match.source_field,
                 "target_field_description": target_desc,
-                "source_field_description": match.source_description if match.source_description else "none",
+                "source_field_description": (
+                    match.source_description if match.source_description else "none"
+                ),
                 "target_table": "",  # Will be filled from target data
                 "map_status": "mapped",
                 "map_confidence": match.confidence_score,
-                "map_rationale": f"Exact field match",
+                "map_rationale": "Exact field match",
             }
             mappings_data["mappings"].append(mapping_entry)
             processed_source_fields.add(match.source_field)
@@ -794,7 +793,9 @@ def generate_migration_mappings_yaml(
                 "target_field_name": match.target_field,
                 "source_field_name": match.source_field,
                 "target_field_description": target_desc,
-                "source_field_description": match.source_description if match.source_description else "none",
+                "source_field_description": (
+                    match.source_description if match.source_description else "none"
+                ),
                 "target_table": "",  # Will be filled from target data
                 "map_status": "manual",
                 "map_confidence": match.confidence_score,
@@ -809,7 +810,9 @@ def generate_migration_mappings_yaml(
                 "target_field_name": "",
                 "source_field_name": match.source_field,
                 "target_field_description": "",
-                "source_field_description": match.source_description if match.source_description else "none",
+                "source_field_description": (
+                    match.source_description if match.source_description else "none"
+                ),
                 "target_table": "",
                 "map_status": "skipped",
                 "map_confidence": match.confidence_score,
@@ -859,7 +862,8 @@ def generate_migration_mappings_yaml(
                 "target_field_name": "",
                 "source_field_name": source_row.get("field_name", ""),
                 "target_field_description": "",
-                "source_field_description": source_row.get("field_description", "") or "none",
+                "source_field_description": source_row.get("field_description", "")
+                or "none",
                 "target_table": "",
                 "map_status": "pending",
                 "map_confidence": 0.0,

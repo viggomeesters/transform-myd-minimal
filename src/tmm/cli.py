@@ -3,9 +3,10 @@
 CLI entry point using Typer for transform-myd-minimal
 """
 
-import typer
-import sys
 import os
+import sys
+
+import typer
 
 # Add the transform_myd_minimal package to the path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))

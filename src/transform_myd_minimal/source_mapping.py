@@ -9,12 +9,12 @@ Implements direct mapping generation from source files:
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
-from .parsers import parse_source_and_targets
-from .fuzzy import FuzzyConfig, FieldNormalizer, FuzzyMatcher
-from .synonym import SynonymMatcher
+from .fuzzy import FieldNormalizer, FuzzyConfig, FuzzyMatcher
 from .logging_config import get_logger
+from .parsers import parse_source_and_targets
+from .synonym import SynonymMatcher
 
 # Initialize logger for this module
 logger = get_logger(__name__)
@@ -62,7 +62,7 @@ class SourceBasedMatcher:
         }
 
         for target in target_fields:
-            for key in target_lookups.keys():
+            for key in target_lookups:
                 if target.get(key):
                     target_lookups[key][target[key].lower()] = target
 
@@ -101,12 +101,11 @@ class SourceBasedMatcher:
                     # Check synonym match first
                     if self.synonym_matcher.is_synonym_match(
                         source_header, target.get("sap_field", "")
-                    ):
-                        if 0.85 > best_confidence:
-                            best_match = target
-                            best_confidence = 0.85
-                            match_type = "synonym"
-                            match_reason = "Synonym match found"
+                    ) and best_confidence < 0.85:
+                        best_match = target
+                        best_confidence = 0.85
+                        match_type = "synonym"
+                        match_reason = "Synonym match found"
 
                     # Try fuzzy matching on various target fields
                     for priority_field in priority_fields:
@@ -201,8 +200,9 @@ def generate_targets_yaml(
         target_fields: List of target field dictionaries
         output_path: Path to write the targets.yaml file
     """
-    import yaml
     from datetime import datetime
+
+    import yaml
 
     targets_data = {
         "metadata": {
@@ -252,8 +252,9 @@ def generate_mapping_yaml(mapping_result: Dict[str, Any], output_path: Path) -> 
         mapping_result: Result from source-based matching
         output_path: Path to write the mapping.yaml file
     """
-    import yaml
     from datetime import datetime
+
+    import yaml
 
     mapping_data = {
         "metadata": {

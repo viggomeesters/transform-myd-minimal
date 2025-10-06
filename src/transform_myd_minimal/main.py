@@ -9,22 +9,20 @@ Contains the entrypoint and orchestration of the different modules including:
 - Core data classes and structures
 """
 
-import sys
 import json
+import sys
 from collections import OrderedDict
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 import yaml
 from pandas.api.types import infer_dtype
-from rich.console import Console
-from rich.table import Table
 
 from .cli import setup_cli
-from .fuzzy import FuzzyConfig, FieldNormalizer, FuzzyMatcher
+from .fuzzy import FieldNormalizer, FuzzyConfig, FuzzyMatcher
 from .logging_config import get_logger
 from .synonym import SynonymMatcher
 
@@ -514,7 +512,7 @@ def load_central_mapping_memory(base_path: Path) -> Optional[CentralMappingMemor
         return None
 
     try:
-        with open(central_memory_path, "r", encoding="utf-8") as f:
+        with open(central_memory_path, encoding="utf-8") as f:
             data = yaml.safe_load(f)
 
         if not data:
@@ -547,7 +545,7 @@ def load_central_mapping_memory(base_path: Path) -> Optional[CentralMappingMemor
 
         # Parse table-specific rules (keep as dict for flexible processing)
         table_specific = data.get("table_specific", {})
-        
+
         # Parse synonyms
         synonyms = data.get("synonyms", {})
 
@@ -705,38 +703,40 @@ def analyze_column_data(
         raise ValueError(f"Error analyzing column data: {e}")
 
 
-def apply_field_descriptions_from_central_memory(source_fields, central_memory, object_name, variant):
+def apply_field_descriptions_from_central_memory(
+    source_fields, central_memory, object_name, variant
+):
     """
     Apply field descriptions from central mapping memory for known fields.
-    
+
     Args:
         source_fields: List of source field dictionaries
         central_memory: CentralMappingMemory instance
         object_name: Object name for table-specific rules
         variant: Variant name for table-specific rules
-        
+
     Returns:
         List of enhanced source_fields with descriptions from central mapping memory
     """
     if not central_memory:
         return source_fields
-    
+
     # Get effective rules for this table
     skip_rules, manual_mappings = get_effective_rules_for_table(
         central_memory, object_name, variant
     )
-    
+
     # Create lookup dictionaries for fast matching
     skip_dict = {rule.source_field: rule for rule in skip_rules}
     manual_dict = {mapping.source_field: mapping for mapping in manual_mappings}
-    
+
     enhanced_fields = []
     descriptions_applied = 0
-    
+
     for field in source_fields:
         enhanced_field = field.copy()
         field_name = field.get("field_name", "")
-        
+
         # Apply description from skip rules first (highest priority)
         if field_name in skip_dict:
             rule = skip_dict[field_name]
@@ -747,113 +747,135 @@ def apply_field_descriptions_from_central_memory(source_fields, central_memory, 
             mapping = manual_dict[field_name]
             enhanced_field["field_description"] = mapping.source_description
             descriptions_applied += 1
-        
+
         enhanced_fields.append(enhanced_field)
-    
+
     if descriptions_applied > 0:
-        print(f"Applied {descriptions_applied} field descriptions from central mapping memory")
-    
+        print(
+            f"Applied {descriptions_applied} field descriptions from central mapping memory"
+        )
+
     return enhanced_fields
 
 
-def apply_field_name_fallback(source_fields, central_memory, object_name, variant, enhanced_logger):
+def apply_field_name_fallback(
+    source_fields, central_memory, object_name, variant, enhanced_logger
+):
     """
     Apply fallback mechanism for missing or unclear field_names using global mapping rules.
-    
+
     Args:
         source_fields: List of source field dictionaries
         central_memory: CentralMappingMemory instance
         object_name: Object name for table-specific rules
         variant: Variant name for table-specific rules
         enhanced_logger: EnhancedLogger for making fallback process visible
-        
+
     Returns:
         List of enhanced source_fields with fallback field_names applied
     """
     if not central_memory:
         return source_fields
-    
+
     # Get effective rules for this table
     table_key = f"{object_name}_{variant}"
     enhanced_fields = []
     fallbacks_applied = 0
     fallback_messages = []
-    
+
     for field in source_fields:
         enhanced_field = field.copy()
         original_name = field.get("field_name", "")
         fallback_applied = False
         fallback_source = ""
-        
+
         # Check if field_name is missing, empty, or seems unclear
         needs_fallback = (
-            not original_name or 
-            original_name.strip() == "" or
-            original_name.lower() in ["unknown", "unnamed", "column", "field"] or
-            original_name.startswith("Column") or
-            original_name.startswith("Unnamed")
+            not original_name
+            or original_name.strip() == ""
+            or original_name.lower() in ["unknown", "unnamed", "column", "field"]
+            or original_name.startswith("Column")
+            or original_name.startswith("Unnamed")
         )
-        
+
         if needs_fallback:
             # Try to find fallback from global manual mappings first
             for mapping in central_memory.global_manual_mappings:
                 # Match by example value, field description, or position
                 field_example = str(field.get("example", "")).strip().upper()
-                if (field_example and 
-                    field_example in mapping.source_description.upper()):
+                if (
+                    field_example
+                    and field_example in mapping.source_description.upper()
+                ):
                     enhanced_field["field_name"] = mapping.target
-                    enhanced_field["field_description"] = f"Global fallback: {mapping.comment}"
+                    enhanced_field["field_description"] = (
+                        f"Global fallback: {mapping.comment}"
+                    )
                     fallback_applied = True
                     fallback_source = "global_manual_mapping"
                     break
-            
+
             # Try table-specific manual mappings
             if not fallback_applied and table_key in central_memory.table_specific:
                 table_rules = central_memory.table_specific[table_key]
                 for mapping_data in table_rules.get("manual_mappings", []):
                     field_example = str(field.get("example", "")).strip().upper()
-                    if (field_example and 
-                        field_example in mapping_data.get("source_description", "").upper()):
+                    if (
+                        field_example
+                        and field_example
+                        in mapping_data.get("source_description", "").upper()
+                    ):
                         enhanced_field["field_name"] = mapping_data["target"]
-                        enhanced_field["field_description"] = f"Table fallback: {mapping_data['comment']}"
+                        enhanced_field["field_description"] = (
+                            f"Table fallback: {mapping_data['comment']}"
+                        )
                         fallback_applied = True
                         fallback_source = "table_specific_mapping"
                         break
-            
+
             # Try synonyms as fallback
             if not fallback_applied:
                 field_example = str(field.get("example", "")).strip()
                 for target_field, synonym_list in central_memory.synonyms.items():
                     for synonym in synonym_list:
-                        if (field_example and 
-                            synonym.lower() in field_example.lower()):
+                        if field_example and synonym.lower() in field_example.lower():
                             enhanced_field["field_name"] = target_field
-                            enhanced_field["field_description"] = f"Synonym fallback: matched '{synonym}'"
+                            enhanced_field["field_description"] = (
+                                f"Synonym fallback: matched '{synonym}'"
+                            )
                             fallback_applied = True
                             fallback_source = "synonyms"
                             break
                     if fallback_applied:
                         break
-            
+
             # Last resort: mark as unknown but keep original
             if not fallback_applied:
-                enhanced_field["field_name"] = original_name or f"Unknown_Field_{field.get('field_count', '')}"
-                enhanced_field["field_description"] = "field_name onbekend - geen match in global mapping"
+                enhanced_field["field_name"] = (
+                    original_name or f"Unknown_Field_{field.get('field_count', '')}"
+                )
+                enhanced_field["field_description"] = (
+                    "field_name onbekend - geen match in global mapping"
+                )
                 fallback_source = "unknown_fallback"
-        
+
         if fallback_applied:
             fallbacks_applied += 1
             # Make fallback process visible in CLI output/logging (using print for immediate visibility)
-            fallback_messages.append(f"Field fallback applied: '{original_name}' -> '{enhanced_field['field_name']}' (via {fallback_source})")
-        
+            fallback_messages.append(
+                f"Field fallback applied: '{original_name}' -> '{enhanced_field['field_name']}' (via {fallback_source})"
+            )
+
         enhanced_fields.append(enhanced_field)
-    
+
     # Make fallback process visible in CLI (explicit as requested)
     if fallbacks_applied > 0:
-        print(f"Applied {fallbacks_applied} field name fallbacks using global mapping rules")
+        print(
+            f"Applied {fallbacks_applied} field name fallbacks using global mapping rules"
+        )
         for msg in fallback_messages:
             print(f"  {msg}")
-    
+
     return enhanced_fields
 
 
@@ -861,35 +883,35 @@ def parse_csv_field_definitions(csv_path: Path) -> List[Dict]:
     """
     Parse CSV file containing field definitions with headers:
     table name, field name, data type, field text, length, is key, # of occ, from total
-    
+
     Args:
         csv_path: Path to CSV file containing field definitions
-        
+
     Returns:
         List of field dictionaries compatible with analyze_column_data output
     """
     import csv
-    
+
     try:
         source_fields = []
         field_count = 1
-        
-        with open(csv_path, 'r', encoding='utf-8') as f:
+
+        with open(csv_path, encoding="utf-8") as f:
             # Create CSV reader and detect headers
             reader = csv.DictReader(f)
-            
+
             # Expected headers (case-insensitive matching)
             expected_headers = {
-                'table name': 'table_name',
-                'field name': 'field_name', 
-                'data type': 'data_type',
-                'field text': 'field_text',
-                'length': 'length',
-                'is key': 'is_key',
-                '# of occ': 'num_occ',
-                'from total': 'from_total'
+                "table name": "table_name",
+                "field name": "field_name",
+                "data type": "data_type",
+                "field text": "field_text",
+                "length": "length",
+                "is key": "is_key",
+                "# of occ": "num_occ",
+                "from total": "from_total",
             }
-            
+
             # Map actual headers to expected ones (case-insensitive)
             header_mapping = {}
             for actual_header in reader.fieldnames:
@@ -898,68 +920,74 @@ def parse_csv_field_definitions(csv_path: Path) -> List[Dict]:
                     if actual_lower == expected:
                         header_mapping[actual_header] = key
                         break
-            
+
             # Process each row as a field definition
             for row in reader:
                 # Skip empty rows
                 if not any(row.values()):
                     continue
-                    
+
                 # Extract field information using header mapping
                 field_name = ""
                 field_description = ""
                 field_length = None
                 is_key = False
-                
+
                 for actual_header, value in row.items():
                     if not value:
                         continue
-                        
+
                     mapped_key = header_mapping.get(actual_header)
-                    if mapped_key == 'field_name':
+                    if mapped_key == "field_name":
                         field_name = str(value).strip()
-                    elif mapped_key == 'data_type':
+                    elif mapped_key == "data_type":
                         field_description = str(value).strip()
-                    elif mapped_key == 'field_text':
+                    elif mapped_key == "field_text":
                         # Use field_text as additional description if available
                         field_text = str(value).strip()
                         if field_text and field_text != field_description:
-                            field_description = f"{field_description} ({field_text})" if field_description else field_text
-                    elif mapped_key == 'length':
+                            field_description = (
+                                f"{field_description} ({field_text})"
+                                if field_description
+                                else field_text
+                            )
+                    elif mapped_key == "length":
                         # Parse length, stripping leading zeros
                         length_str = str(value).strip()
                         if length_str and length_str.isdigit():
-                            field_length = int(length_str.lstrip('0') or '0')
-                    elif mapped_key == 'is_key':
-                        is_key = str(value).strip().upper() == 'X'
-                
+                            field_length = int(length_str.lstrip("0") or "0")
+                    elif mapped_key == "is_key":
+                        is_key = str(value).strip().upper() == "X"
+
                 # Skip rows without field names
                 if not field_name:
                     continue
-                
+
                 # Create field definition compatible with analyze_column_data output
                 field_def = {
                     "field_name": field_name,
-                    "field_description": field_description if field_description else None,
+                    "field_description": (
+                        field_description if field_description else None
+                    ),
                     "example": None,  # CSV format doesn't include examples
                     "field_count": field_count,
                     "dtype": "string",  # Default to string, could be enhanced based on data_type
                     "nullable": not is_key,  # Key fields are typically not nullable
                 }
-                
+
                 # Add length information if available
                 if field_length is not None:
                     field_def["length"] = field_length
-                    
+
                 # Add key information
                 if is_key:
                     field_def["is_key"] = True
-                
+
                 source_fields.append(field_def)
                 field_count += 1
-        
+
         return source_fields
-        
+
     except Exception as e:
         raise ValueError(f"Error parsing CSV field definitions from {csv_path}: {e}")
 
@@ -977,35 +1005,33 @@ def run_index_source_command(args, config):
     try:
         # Construct input file path for index_source command (F01 spec: data/01_source/<object>_<variant>.xlsx)
         xlsx_input_file = (
-            root_path
-            / config.input_dir
-            / f"{args.object}_{args.variant}.xlsx"
+            root_path / config.input_dir / f"{args.object}_{args.variant}.xlsx"
         )
-        
+
         # CSV fallback file path (F01 spec: data/01_source/<object>_<variant>.csv)
         csv_input_file = (
-            root_path
-            / config.input_dir
-            / f"{args.object}_{args.variant}.csv"
+            root_path / config.input_dir / f"{args.object}_{args.variant}.csv"
         )
 
         # Check if XLSX input file exists, fallback to CSV if not
         input_file = None
         sheet_name = None
         is_csv_fallback = False
-        
+
         if xlsx_input_file.exists():
             input_file = xlsx_input_file
             print(f"Using XLSX source: {input_file.relative_to(root_path)}")
         elif csv_input_file.exists():
             input_file = csv_input_file
             is_csv_fallback = True
-            print(f"XLSX not found, using CSV fallback: {input_file.relative_to(root_path)}")
+            print(
+                f"XLSX not found, using CSV fallback: {input_file.relative_to(root_path)}"
+            )
         else:
             error_data = {
-                "error": "missing_input", 
+                "error": "missing_input",
                 "xlsx_path": str(xlsx_input_file),
-                "csv_path": str(csv_input_file)
+                "csv_path": str(csv_input_file),
             }
             logger.log_error(error_data)
             sys.exit(2)
@@ -1065,7 +1091,9 @@ def run_index_source_command(args, config):
         # Load central mapping memory for field name fallbacks and descriptions
         central_memory = load_central_mapping_memory(root_path)
         if central_memory:
-            print("Loaded central mapping memory for field name fallbacks and descriptions")
+            print(
+                "Loaded central mapping memory for field name fallbacks and descriptions"
+            )
             # Apply field descriptions from central mapping memory first
             source_fields = apply_field_descriptions_from_central_memory(
                 source_fields, central_memory, args.object, args.variant
@@ -1109,13 +1137,13 @@ def run_index_source_command(args, config):
                 f.write(f"  variant: {args.variant}\n")
                 f.write(f"  source_file: {input_file.relative_to(root_path)}\n")
                 f.write(f"  generated_at: '{datetime.now().isoformat()}'\n")
-                
+
                 # Only include sheet for XLSX files
                 if not is_csv_fallback and sheet_name:
                     f.write(f"  sheet: {sheet_name}\n")
                 elif is_csv_fallback:
                     f.write("  format: csv_field_definitions\n")
-                    
+
                 f.write(f"  source_fields_count: {len(source_fields)}\n")
 
                 # Add 3 empty lines between large blocks
@@ -1127,15 +1155,15 @@ def run_index_source_command(args, config):
                     if i > 0:
                         f.write("\n")  # Add 1 empty line between records
                     f.write(f"- source_field_name: {field['field_name']}\n")
-                    
+
                     # Quote field descriptions to handle colons in text
-                    desc = field['field_description']
+                    desc = field["field_description"]
                     if desc is None:
                         desc = "None"
                     else:
                         desc = f'"{desc}"'
                     f.write(f"  source_field_description: {desc}\n")
-                    
+
                     f.write(
                         f"  source_example: {repr(field['example']) if field['example'] is not None else 'null'}\n"
                     )
@@ -1148,7 +1176,7 @@ def run_index_source_command(args, config):
 
         # Prepare preview data for human output (first 8 headers)
         preview_data = []
-        for i, field in enumerate(source_fields[:8]):
+        for _i, field in enumerate(source_fields[:8]):
             preview_data.append(
                 {
                     "field_name": field.get("field_name", ""),
@@ -1163,7 +1191,7 @@ def run_index_source_command(args, config):
             total_columns = len(source_fields)
         else:
             total_columns = len([h for h in headers if h != ""])
-            
+
         summary_data = {
             "step": "index_source",
             "object": args.object,
@@ -1174,21 +1202,22 @@ def run_index_source_command(args, config):
             "is_csv_fallback": is_csv_fallback,
             "warnings": warnings,
         }
-        
+
         # Generate HTML report if enabled
-        if not getattr(args, 'no_html', False):
-            from .reporting import write_html_report
+        if not getattr(args, "no_html", False):
             import json
             from datetime import datetime as dt
-            
+
+            from .reporting import write_html_report
+
             timestamp = dt.now().strftime("%Y%m%d_%H%M")
-            
+
             # Determine report directory for F01 (index_source) reports
-            if hasattr(args, 'html_dir') and args.html_dir:
+            if hasattr(args, "html_dir") and args.html_dir:
                 reports_dir = Path(args.html_dir)
             else:
                 reports_dir = root_path / "data" / "03_index_source"
-            
+
             # Generate enriched summary for HTML report
             html_summary = {
                 "step": "index_source",
@@ -1198,9 +1227,9 @@ def run_index_source_command(args, config):
                 "input_file": str(input_file.relative_to(root_path)),
                 "total_columns": total_columns,
                 "is_csv_fallback": is_csv_fallback,
-                "warnings": warnings
+                "warnings": warnings,
             }
-            
+
             # Add sheet info for XLSX, format info for CSV
             if is_csv_fallback:
                 html_summary["format"] = "csv_field_definitions"
@@ -1212,7 +1241,7 @@ def run_index_source_command(args, config):
                         "nullable": field.get("nullable", True),
                         "example": field.get("example", None),
                         "is_key": field.get("is_key", False),
-                        "length": field.get("length", None)
+                        "length": field.get("length", None),
                     }
                     for i, field in enumerate(source_fields)
                 ]
@@ -1225,34 +1254,36 @@ def run_index_source_command(args, config):
                         "index": i + 1,
                         "field_name": header,
                         "dtype": "string",  # Could be enhanced with actual dtype detection
-                        "nullable": True,   # Could be enhanced with actual nullable detection
-                        "example": None     # Could be enhanced with sample data
+                        "nullable": True,  # Could be enhanced with actual nullable detection
+                        "example": None,  # Could be enhanced with sample data
                     }
                     for i, header in enumerate([h for h in headers if h != ""])
                 ]
-                html_summary["duplicates"] = [h for h in headers if headers.count(h) > 1 and h != ""]
+                html_summary["duplicates"] = [
+                    h for h in headers if headers.count(h) > 1 and h != ""
+                ]
                 html_summary["empty_headers"] = len([h for h in headers if h == ""])
-            
+
             # Write JSON summary
             json_filename = f"index_source_{timestamp}.json"
             json_path = reports_dir / json_filename
             json_path.parent.mkdir(parents=True, exist_ok=True)
-            
-            with open(json_path, 'w', encoding='utf-8') as f:
+
+            with open(json_path, "w", encoding="utf-8") as f:
                 json.dump(html_summary, f, ensure_ascii=False, indent=2)
-            
+
             # Write HTML report
             html_filename = f"index_source_{timestamp}.html"
             html_path = reports_dir / html_filename
             title = f"index_source · {args.object}/{args.variant}"
-            
+
             write_html_report(html_summary, html_path, title)
-            
+
             # Human-readable logging with forward slashes
-            html_path_display = str(html_path.relative_to(root_path)).replace('\\', '/')
+            html_path_display = str(html_path.relative_to(root_path)).replace("\\", "/")
             if not (args.json or not sys.stdout.isatty()):
                 print(f"report: {html_path_display}")
-        
+
         logger.log_event(summary_data, preview_data)
 
     except Exception as e:
@@ -1264,43 +1295,44 @@ def run_index_source_command(args, config):
 def _clean_xml_file(xml_path: Path) -> Path:
     """
     Clean XML file by removing comments and control characters.
-    
+
     Args:
         xml_path: Path to original XML file
-        
+
     Returns:
         Path to cleaned XML file (same path, with original backed up)
     """
     import re
-    from lxml import etree
-    
+
     # Create backup of original file
     backup_path = xml_path.with_name(f"{xml_path.stem}_original{xml_path.suffix}")
     xml_path.rename(backup_path)
-    
+
     # Read original content
-    with open(backup_path, 'r', encoding='utf-8', errors='ignore') as f:
+    with open(backup_path, encoding="utf-8", errors="ignore") as f:
         content = f.read()
-    
+
     # Remove XML comments
-    content = re.sub(r'<!--.*?-->', '', content, flags=re.DOTALL)
-    
+    content = re.sub(r"<!--.*?-->", "", content, flags=re.DOTALL)
+
     # Remove control characters (except tabs, newlines, carriage returns)
-    content = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]', '', content)
-    
+    content = re.sub(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]", "", content)
+
     # Remove invalid attribute patterns like '&invalid;' and unclosed tags
-    content = re.sub(r'&[a-zA-Z0-9]*;', '', content)
-    content = re.sub(r'<[^/>]*\s+&[^>]*>', lambda m: m.group(0).split('&')[0] + '>', content)
-    
+    content = re.sub(r"&[a-zA-Z0-9]*;", "", content)
+    content = re.sub(
+        r"<[^/>]*\s+&[^>]*>", lambda m: m.group(0).split("&")[0] + ">", content
+    )
+
     # Fix unclosed tags and invalid syntax
-    content = re.sub(r'<([^/>]+)\s+&[^>]*>', r'<\1>', content)
-    content = re.sub(r'</invalid>', '', content)
-    content = re.sub(r'<invalid[^>]*>', '', content)
-    
+    content = re.sub(r"<([^/>]+)\s+&[^>]*>", r"<\1>", content)
+    content = re.sub(r"</invalid>", "", content)
+    content = re.sub(r"<invalid[^>]*>", "", content)
+
     # Write cleaned content to original path
-    with open(xml_path, 'w', encoding='utf-8') as f:
+    with open(xml_path, "w", encoding="utf-8") as f:
         f.write(content)
-    
+
     return xml_path
 
 
@@ -1314,42 +1346,47 @@ def _parse_spreadsheetml_target_fields(
     ["sap_field","field_description","sap_table","mandatory","field_group","key","sheet_name","data_type","length","decimal"]
     """
     import xml.etree.ElementTree as ET
+
     from lxml import etree
 
     # Check if file contains comments or control characters that might cause issues
-    with open(xml_path, 'r', encoding='utf-8', errors='ignore') as f:
+    with open(xml_path, encoding="utf-8", errors="ignore") as f:
         content = f.read()
-    
-    has_comments = '<!--' in content
-    has_control_chars = any(ord(c) < 32 and c not in '\t\n\r' for c in content)
-    
+
+    has_comments = "<!--" in content
+    has_control_chars = any(ord(c) < 32 and c not in "\t\n\r" for c in content)
+
     # Try parsing with standard library first
     try:
         tree = ET.parse(xml_path)
         root = tree.getroot()
-        
+
         # If parsing succeeded but we detected comments/control chars, proactively clean
         if has_comments or has_control_chars:
-            print("XML file contains comments or illegal characters. Old file is backed-up and cleaned.")
+            print(
+                "XML file contains comments or illegal characters. Old file is backed-up and cleaned."
+            )
             _clean_xml_file(xml_path)
             # Re-parse the cleaned file
             tree = ET.parse(xml_path)
             root = tree.getroot()
-            
-    except ET.ParseError as e:
+
+    except ET.ParseError:
         # If parsing fails, try with lxml's recovery parser
         try:
             parser = etree.XMLParser(recover=True)
-            with open(xml_path, 'rb') as f:
+            with open(xml_path, "rb") as f:
                 lxml_tree = etree.parse(f, parser)
-            
+
             # Convert lxml tree to ElementTree for compatibility
-            xml_string = etree.tostring(lxml_tree, encoding='unicode')
+            xml_string = etree.tostring(lxml_tree, encoding="unicode")
             root = ET.fromstring(xml_string)
             tree = None  # We don't need the tree object, just the root
         except Exception:
             # Last resort: clean the file and try again
-            print("XML file contains comments or illegal characters. Old file is backed-up and cleaned.")
+            print(
+                "XML file contains comments or illegal characters. Old file is backed-up and cleaned."
+            )
             cleaned_path = _clean_xml_file(xml_path)
             tree = ET.parse(cleaned_path)
             root = tree.getroot()
@@ -1378,7 +1415,7 @@ def _parse_spreadsheetml_target_fields(
     parsed_rows = []
     carry = {}  # For vertical propagation (ss:MergeDown)
 
-    for row_idx, row in enumerate(rows):
+    for _row_idx, row in enumerate(rows):
         col = 1  # 1-based column pointer
         row_data = [None] * 15  # Pre-allocate for up to 15 columns
 
@@ -1408,9 +1445,8 @@ def _parse_spreadsheetml_target_fields(
                     cell_value = None
 
             # Place value at current column (convert to 0-based)
-            if col <= len(row_data):
-                if col - 1 < len(row_data):
-                    row_data[col - 1] = cell_value
+            if col <= len(row_data) and col - 1 < len(row_data):
+                row_data[col - 1] = cell_value
 
             # Handle ss:MergeDown
             merge_down_attr = cell.get(f'{{{ns["ss"]}}}MergeDown')
@@ -1552,9 +1588,10 @@ def _parse_spreadsheetml_target_fields(
 
 def run_index_target_command(args, config):
     """Run the index_target command - parse XML and filter target fields by variant."""
-    from .enhanced_logging import EnhancedLogger
     from datetime import datetime
     from pathlib import Path
+
+    from .enhanced_logging import EnhancedLogger
 
     root_path = Path(args.root).resolve()
 
@@ -1562,24 +1599,22 @@ def run_index_target_command(args, config):
     logger = EnhancedLogger(args, "index_target", args.object, args.variant, root_path)
 
     # Construct input file path - check both .xml and fallback formats (F02 spec: data/02_target/{object}_{variant}.xml)
-    xml_file = (
-        root_path / f"data/02_target/{args.object}_{args.variant}.xml"
-    )
-    
+    xml_file = root_path / f"data/02_target/{args.object}_{args.variant}.xml"
+
     input_file = xml_file
     xml_parse_error = None
-    
+
     # Check if --prefer-xlsx flag is set
-    prefer_xlsx = getattr(args, 'prefer_xlsx', False)
-    
+    prefer_xlsx = getattr(args, "prefer_xlsx", False)
+
     # If prefer-xlsx is set, try xlsx first
     if prefer_xlsx:
-        xlsx_file = (
-            root_path / f"data/02_target/{args.object}_{args.variant}.xlsx"
-        )
+        xlsx_file = root_path / f"data/02_target/{args.object}_{args.variant}.xlsx"
         if xlsx_file.exists():
             input_file = xlsx_file
-            print(f"Using {xlsx_file.name} as target definition (--prefer-xlsx enabled).")
+            print(
+                f"Using {xlsx_file.name} as target definition (--prefer-xlsx enabled)."
+            )
         else:
             input_file = None  # Force fallback search
     else:
@@ -1600,22 +1635,20 @@ def run_index_target_command(args, config):
 
     # Check for fallback files if XML doesn't exist or has parse errors or --prefer-xlsx was set but xlsx not found
     if input_file is None:
-        xlsx_file = (
-            root_path / f"data/02_target/{args.object}_{args.variant}.xlsx"
-        )
-        json_file = (
-            root_path / f"data/02_target/{args.object}_{args.variant}.json"
-        )
-        yaml_file = (
-            root_path / f"data/02_target/{args.object}_{args.variant}.yaml"
-        )
+        xlsx_file = root_path / f"data/02_target/{args.object}_{args.variant}.xlsx"
+        json_file = root_path / f"data/02_target/{args.object}_{args.variant}.json"
+        yaml_file = root_path / f"data/02_target/{args.object}_{args.variant}.yaml"
 
         if xlsx_file.exists():
             input_file = xlsx_file
             if xml_file.exists():
-                print(f"Fallback: {xml_file.name} parsing failed, using {xlsx_file.name} as target definition.")
+                print(
+                    f"Fallback: {xml_file.name} parsing failed, using {xlsx_file.name} as target definition."
+                )
             else:
-                print(f"Fallback: {xml_file.name} not found, using {xlsx_file.name} as target definition.")
+                print(
+                    f"Fallback: {xml_file.name} not found, using {xlsx_file.name} as target definition."
+                )
         elif json_file.exists():
             input_file = json_file
         elif yaml_file.exists():
@@ -1625,7 +1658,11 @@ def run_index_target_command(args, config):
             if xml_parse_error:
                 error_msg += f" (parse error: {xml_parse_error})"
             error_msg += f", {xlsx_file.name}, {json_file.name}, {yaml_file.name}"
-            error_data = {"error": "missing_input", "path": str(xml_file), "message": error_msg}
+            error_data = {
+                "error": "missing_input",
+                "path": str(xml_file),
+                "message": error_msg,
+            }
             logger.log_error(error_data)
             sys.exit(2)
 
@@ -1647,6 +1684,7 @@ def run_index_target_command(args, config):
         elif input_file.suffix == ".xlsx":
             # Import xlsx parser
             from .parsers import read_excel_target_fields
+
             target_fields = read_excel_target_fields(input_file, args.variant)
         else:
             # Handle JSON/YAML fallback (simplified for now)
@@ -1678,9 +1716,7 @@ def run_index_target_command(args, config):
             f.write("metadata:\n")
             f.write(f"  object: {args.object}\n")
             f.write(f"  variant: {args.variant}\n")
-            f.write(
-                f"  target_file: {input_file.relative_to(root_path)}\n"
-            )
+            f.write(f"  target_file: {input_file.relative_to(root_path)}\n")
             f.write(f"  generated_at: '{datetime.now().isoformat()}'\n")
             f.write(f"  structure: S_{args.variant.upper()}\n")
             f.write(f"  target_fields_count: {len(target_fields)}\n")
@@ -1694,15 +1730,15 @@ def run_index_target_command(args, config):
                 if i > 0:
                     f.write("\n")  # Add 1 empty line between records
                 f.write(f"- target_field_name: {field['sap_field'].upper()}\n")
-                
+
                 # Quote field descriptions to handle colons in text
-                desc = field['field_description']
+                desc = field["field_description"]
                 if desc:
                     desc = f'"{desc}"'
                 else:
                     desc = '""'
                 f.write(f"  target_field_description: {desc}\n")
-                
+
                 f.write(f"  target_table: {field['sap_table']}\n")
                 f.write(f"  target_is_mandatory: {str(field['mandatory']).lower()}\n")
                 f.write(f"  target_field_group: {field['field_group']}\n")
@@ -1835,16 +1871,18 @@ def run_index_target_command(args, config):
                 base_field = field["sap_field"].upper()
                 data_type = field.get("data_type", "")
                 field_desc = field.get("field_description", "")
-                
+
                 # Create a basic transformation rule for each field
                 transform_rule = {
                     "target_field": base_field,
-                    "target_field_description": field_desc if field_desc else f"Transform data for {base_field}",
+                    "target_field_description": (
+                        field_desc if field_desc else f"Transform data for {base_field}"
+                    ),
                     "transformation_type": "direct",  # default transformation type
                     "placeholder_value": "",
                     "value_mappings": [],
                 }
-                
+
                 transform_rules.append(transform_rule)
 
             # Write transform.yaml with custom formatting
@@ -1858,7 +1896,9 @@ def run_index_target_command(args, config):
                 )
                 f.write(f"  generated_at: '{datetime.now().isoformat()}'\n")
                 f.write(f"  structure: S_{args.variant.upper()}\n")
-                f.write(f"  description: 'Transformation rules for {args.object}/{args.variant}'\n")
+                f.write(
+                    f"  description: 'Transformation rules for {args.object}/{args.variant}'\n"
+                )
                 f.write("\n\n\n")  # Add 3 blank lines after metadata
 
                 # Write transformations section
@@ -1867,7 +1907,9 @@ def run_index_target_command(args, config):
                     if i > 0:
                         f.write("\n")  # Add blank line between transformation records
                     f.write(f"- target_field: {rule['target_field']}\n")
-                    f.write(f"  target_field_description: '{rule['target_field_description']}'\n")
+                    f.write(
+                        f"  target_field_description: '{rule['target_field_description']}'\n"
+                    )
                     f.write(f"  transformation_type: {rule['transformation_type']}\n")
                     f.write(f"  placeholder_value: '{rule['placeholder_value']}'\n")
                     f.write("  value_mappings:\n")
@@ -1878,8 +1920,12 @@ def run_index_target_command(args, config):
                 # Add general transformation settings
                 f.write("\n\n# General transformation settings\n")
                 f.write("transformation_settings:\n")
-                f.write("  null_handling: 'use_placeholder'  # Options: 'use_placeholder', 'skip', 'error'\n")
-                f.write("  empty_string_handling: 'use_placeholder'  # Options: 'use_placeholder', 'skip', 'keep'\n")
+                f.write(
+                    "  null_handling: 'use_placeholder'  # Options: 'use_placeholder', 'skip', 'error'\n"
+                )
+                f.write(
+                    "  empty_string_handling: 'use_placeholder'  # Options: 'use_placeholder', 'skip', 'keep'\n"
+                )
                 f.write("  case_sensitive_mappings: false\n")
                 f.write("  trim_whitespace: true\n")
 
@@ -1918,26 +1964,27 @@ def run_index_target_command(args, config):
             ),
             "warnings": validation_warnings + transform_warnings,
         }
-        
+
         # Generate HTML report if enabled
-        if not getattr(args, 'no_html', False):
-            from .reporting import write_html_report
+        if not getattr(args, "no_html", False):
             import json
             from datetime import datetime as dt
-            
+
+            from .reporting import write_html_report
+
             timestamp = dt.now().strftime("%Y%m%d_%H%M")
-            
+
             # Determine report directory for F02 (index_target) reports
-            if hasattr(args, 'html_dir') and args.html_dir:
+            if hasattr(args, "html_dir") and args.html_dir:
                 reports_dir = Path(args.html_dir)
             else:
                 reports_dir = root_path / "data" / "04_index_target"
-            
+
             # Count field groups for chart data
             field_groups = {}
             mandatory_count = 0
             key_count = 0
-            
+
             for field in target_fields:
                 group = field.get("field_group", "unknown")
                 field_groups[group] = field_groups.get(group, 0) + 1
@@ -1945,10 +1992,10 @@ def run_index_target_command(args, config):
                     mandatory_count += 1
                 if field.get("key", False):
                     key_count += 1
-            
+
             # Check for enforced 10-key rule
             order_ok = key_count == 10
-            
+
             # Generate enriched summary for HTML report
             html_summary = {
                 "step": "index_target",
@@ -1970,7 +2017,7 @@ def run_index_target_command(args, config):
                         "key": field.get("key", False),
                         "data_type": field.get("data_type", ""),
                         "length": field.get("length", ""),
-                        "decimal": field.get("decimal", "")
+                        "decimal": field.get("decimal", ""),
                     }
                     for field in target_fields
                 ],
@@ -1978,31 +2025,33 @@ def run_index_target_command(args, config):
                 "validation_scaffold": {
                     "created": validation_created == "created",
                     "path": f"migrations/{args.object}/{args.variant}/validation.yaml",
-                    "rules_count": len(validation_rules) if validation_created == "created" else 0
+                    "rules_count": (
+                        len(validation_rules) if validation_created == "created" else 0
+                    ),
                 },
-                "warnings": validation_warnings
+                "warnings": validation_warnings,
             }
-            
+
             # Write JSON summary
             json_filename = f"index_target_{timestamp}.json"
             json_path = reports_dir / json_filename
             json_path.parent.mkdir(parents=True, exist_ok=True)
-            
-            with open(json_path, 'w', encoding='utf-8') as f:
+
+            with open(json_path, "w", encoding="utf-8") as f:
                 json.dump(html_summary, f, ensure_ascii=False, indent=2)
-            
+
             # Write HTML report
             html_filename = f"index_target_{timestamp}.html"
             html_path = reports_dir / html_filename
             title = f"index_target · S_{args.variant.upper()} · {args.object}/{args.variant}"
-            
+
             write_html_report(html_summary, html_path, title)
-            
+
             # Human-readable logging with forward slashes
-            html_path_display = str(html_path.relative_to(root_path)).replace('\\', '/')
+            html_path_display = str(html_path.relative_to(root_path)).replace("\\", "/")
             if not (args.json or not sys.stdout.isatty()):
                 print(f"report: {html_path_display}")
-        
+
         logger.log_event(summary_data, preview_data)
 
     except Exception as e:
@@ -2022,7 +2071,7 @@ def update_object_list(object_name: str, variant: str, root_path: Path = None):
     object_list_data = {"entries": []}
     if object_list_file.exists():
         try:
-            with open(object_list_file, "r", encoding="utf-8") as f:
+            with open(object_list_file, encoding="utf-8") as f:
                 existing_data = yaml.safe_load(f)
                 if existing_data and "entries" in existing_data:
                     object_list_data = existing_data
@@ -2049,73 +2098,79 @@ def update_object_list(object_name: str, variant: str, root_path: Path = None):
             yaml.dump(object_list_data, f, default_flow_style=False, allow_unicode=True)
 
 
-def apply_central_memory_to_unmapped_fields(mapping_result, central_memory, object_name, variant):
+def apply_central_memory_to_unmapped_fields(
+    mapping_result, central_memory, object_name, variant
+):
     """
     Post-process unmapped source fields to apply central mapping memory context.
-    
+
     Args:
         mapping_result: Result from process_f03_mapping
         central_memory: CentralMappingMemory instance
         object_name: Object name for table-specific rules
         variant: Variant name for table-specific rules
-        
+
     Returns:
         Enhanced mapping_result with detailed unmapped field information
     """
     if not central_memory:
         return mapping_result
-    
+
     # Get effective rules for this table
     skip_rules, manual_mappings = get_effective_rules_for_table(
         central_memory, object_name, variant
     )
-    
+
     # Create lookup dictionaries
     skip_dict = {rule.source_field: rule for rule in skip_rules if rule.skip}
     manual_dict = {mapping.source_field: mapping for mapping in manual_mappings}
-    
+
     # Transform simple unmapped field names to detailed objects
     enhanced_unmapped_fields = []
-    
+
     for field_name in mapping_result["unmapped_source_fields"]:
         if field_name in skip_dict:
             # This field is configured to be skipped
             rule = skip_dict[field_name]
-            enhanced_unmapped_fields.append({
-                "source_field_name": field_name,
-                "source_field_description": rule.source_description,
-                "confidence": 1.0,
-                "rationale": "Global skip field configured in central mapping memory",
-                "comment": rule.comment,
-                "required": False,
-                "source_header": None,
-                "status": "unmapped",
-                "target_field": None,
-                "target_table": None
-            })
+            enhanced_unmapped_fields.append(
+                {
+                    "source_field_name": field_name,
+                    "source_field_description": rule.source_description,
+                    "confidence": 1.0,
+                    "rationale": "Global skip field configured in central mapping memory",
+                    "comment": rule.comment,
+                    "required": False,
+                    "source_header": None,
+                    "status": "unmapped",
+                    "target_field": None,
+                    "target_table": None,
+                }
+            )
         elif field_name in manual_dict:
             # This field has a manual mapping but wasn't used (might be unmapped target)
             mapping = manual_dict[field_name]
-            enhanced_unmapped_fields.append({
-                "source_field_name": field_name,
-                "source_field_description": mapping.source_description,
-                "confidence": 0.0,
-                "rationale": "Manual mapping configured but target not found",
-                "comment": mapping.comment,
-                "required": False,
-                "source_header": None,
-                "status": "unmapped",
-                "target_field": mapping.target,
-                "target_table": None
-            })
+            enhanced_unmapped_fields.append(
+                {
+                    "source_field_name": field_name,
+                    "source_field_description": mapping.source_description,
+                    "confidence": 0.0,
+                    "rationale": "Manual mapping configured but target not found",
+                    "comment": mapping.comment,
+                    "required": False,
+                    "source_header": None,
+                    "status": "unmapped",
+                    "target_field": mapping.target,
+                    "target_table": None,
+                }
+            )
         else:
             # Regular unmapped field - keep as simple string for now
             # Could be enhanced further if needed
             enhanced_unmapped_fields.append(field_name)
-    
+
     # Update the mapping result
     mapping_result["unmapped_source_fields"] = enhanced_unmapped_fields
-    
+
     return mapping_result
 
 
@@ -2134,6 +2189,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
         Dict with metadata, mappings, to_audit, unmapped_source_fields, unmapped_target_fields
     """
     from datetime import datetime
+
     from .fuzzy import FieldNormalizer, FuzzyMatcher
 
     # Helper function for tiebreakers (as per spec: longest common substring, then shortest source header)
@@ -2179,7 +2235,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
     # Extract verbatim and normalized headers, creating a lookup map for field names
     verbatim_headers = [field.get("field_name", "") for field in source_fields]
     [norm(header) for header in verbatim_headers]
-    
+
     # Create lookup map from header to source field for preserving field_name information
     header_to_field = {field.get("field_name", ""): field for field in source_fields}
 
@@ -2208,7 +2264,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
         candidates = []  # For tie-break detection
 
         # 1. EXACT MATCH: norm(header) == t_name
-        for i, header in enumerate(verbatim_headers):
+        for _i, header in enumerate(verbatim_headers):
             if norm(header) == t_name:
                 best_match = header
                 best_confidence = 1.00
@@ -2220,7 +2276,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             t_name_upper = t_name.upper()
             if t_name_upper in synonyms:
                 synonym_variants = synonyms[t_name_upper]
-                for i, header in enumerate(verbatim_headers):
+                for _i, header in enumerate(verbatim_headers):
                     if norm(header) in [norm(variant) for variant in synonym_variants]:
                         best_match = header
                         best_confidence = 0.95
@@ -2229,7 +2285,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
 
         # 3. FUZZY MATCH: against t_name and t_desc
         if not best_match:
-            for i, header in enumerate(verbatim_headers):
+            for _i, header in enumerate(verbatim_headers):
                 norm_header = normalizer.normalize_field_name(header)
 
                 # Try against target field name
@@ -2288,8 +2344,10 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             # Tie detected - add to audit with field_name
             tie_field_name = "field_name onbekend"
             if best_match and best_match in header_to_field:
-                tie_field_name = header_to_field[best_match].get("field_name", "field_name onbekend")
-            
+                tie_field_name = header_to_field[best_match].get(
+                    "field_name", "field_name onbekend"
+                )
+
             to_audit.append(
                 {
                     "target_table": t_table,
@@ -2321,7 +2379,9 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             "target_field_name": t_name.upper(),  # Make target_field uppercase for SAP compliance
             "source_field_name": source_field_name,  # Always show field_name
             "target_field_description": target.get("field_description", ""),
-            "source_field_description": source_field_description if source_field_description else "none",
+            "source_field_description": (
+                source_field_description if source_field_description else "none"
+            ),
             "target_table": t_table,
             "map_status": status,
             "map_confidence": round(best_confidence, 2),
@@ -2343,8 +2403,10 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             # Get field_name for audit entries
             audit_field_name = "field_name onbekend"
             if best_match in header_to_field:
-                audit_field_name = header_to_field[best_match].get("field_name", "field_name onbekend")
-            
+                audit_field_name = header_to_field[best_match].get(
+                    "field_name", "field_name onbekend"
+                )
+
             # Low confidence fuzzy
             if 0.80 <= best_confidence < 0.90:
                 to_audit.append(
@@ -2431,14 +2493,15 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
 
 def run_map_command(args, config):
     """Run the map command - generates mapping from indexed source and target YAML files."""
-    from .enhanced_logging import EnhancedLogger
     import time
 
+    from .enhanced_logging import EnhancedLogger
+
     start_time = time.time()
-    
+
     # Set up paths using root directory
     root_path = Path(args.root)
-    
+
     # Initialize enhanced logger
     logger = EnhancedLogger(args, "map", args.object, args.variant, root_path)
     migrations_dir = root_path / "migrations" / args.object / args.variant
@@ -2479,11 +2542,11 @@ def run_map_command(args, config):
 
     try:
         # Load source fields
-        with open(source_index_file, "r", encoding="utf-8") as f:
+        with open(source_index_file, encoding="utf-8") as f:
             source_data = yaml.safe_load(f)
 
         # Load target fields
-        with open(target_index_file, "r", encoding="utf-8") as f:
+        with open(target_index_file, encoding="utf-8") as f:
             target_data = yaml.safe_load(f)
 
         source_fields = source_data.get("source_fields", [])
@@ -2504,7 +2567,7 @@ def run_map_command(args, config):
             synonyms = central_memory.synonyms
         elif central_mapping_file.exists():
             try:
-                with open(central_mapping_file, "r", encoding="utf-8") as f:
+                with open(central_mapping_file, encoding="utf-8") as f:
                     central_data = yaml.safe_load(f)
                     synonyms = central_data.get("synonyms", {})
             except Exception:
@@ -2650,31 +2713,36 @@ def run_map_command(args, config):
         # Prepare preview data for human output (first 12 mappings)
         preview_data = []
         for mapping in mapping_result["mappings"][:12]:
-            preview_data.append({
-                "target_field": mapping["target_field_name"],
-                "source_header": mapping.get("source_header", "null") or "null", 
-                "source_field_name": mapping.get("source_field_name", "field_name onbekend"),  # Always show field_name
-                "confidence": f"{mapping['map_confidence']:.2f}",
-                "status": mapping["map_status"],
-            })
+            preview_data.append(
+                {
+                    "target_field": mapping["target_field_name"],
+                    "source_header": mapping.get("source_header", "null") or "null",
+                    "source_field_name": mapping.get(
+                        "source_field_name", "field_name onbekend"
+                    ),  # Always show field_name
+                    "confidence": f"{mapping['map_confidence']:.2f}",
+                    "status": mapping["map_status"],
+                }
+            )
 
         # Log event using Enhanced Logger (this will handle both stdout and file logging)
         logger.log_event(summary_data, preview_data)
 
         # Generate HTML report if enabled
-        if not getattr(args, 'no_html', False):
-            from .reporting import write_html_report
+        if not getattr(args, "no_html", False):
             import json
             from datetime import datetime as dt
-            
+
+            from .reporting import write_html_report
+
             timestamp = dt.now().strftime("%Y%m%d_%H%M")
-            
+
             # Determine report directory for F03 (map) reports
-            if hasattr(args, 'html_dir') and args.html_dir:
+            if hasattr(args, "html_dir") and args.html_dir:
                 reports_dir = Path(args.html_dir)
             else:
                 reports_dir = root_path / "data" / "05_map"
-            
+
             # Generate enriched summary for HTML report
             html_summary = {
                 "step": "map",
@@ -2695,7 +2763,7 @@ def run_map_command(args, config):
                         "required": mapping.get("required", False),
                         "confidence": mapping["map_confidence"],
                         "status": mapping["map_status"],
-                        "rationale": mapping["map_rationale"]
+                        "rationale": mapping["map_rationale"],
                     }
                     for mapping in mapping_result["mappings"]
                 ],
@@ -2705,39 +2773,45 @@ def run_map_command(args, config):
                         "target_field": audit["target_field_name"],
                         "source_header": audit.get("source_header"),
                         "confidence": audit.get("confidence", 0.0),
-                        "reason": audit.get("reason", "")
+                        "reason": audit.get("reason", ""),
                     }
                     for audit in mapping_result["to_audit"]
                 ],
                 "unmapped_source_fields": mapping_result["unmapped_source_fields"],
                 "unmapped_target_fields": [
-                    {
-                        "target_table": target.get("target_table", ""),
-                        "target_field": target.get("target_field", str(target)),
-                        "required": target.get("required", False)
-                    } if isinstance(target, dict) else {"target_field": str(target), "required": False}
+                    (
+                        {
+                            "target_table": target.get("target_table", ""),
+                            "target_field": target.get("target_field", str(target)),
+                            "required": target.get("required", False),
+                        }
+                        if isinstance(target, dict)
+                        else {"target_field": str(target), "required": False}
+                    )
                     for target in mapping_result["unmapped_target_fields"]
                 ],
-                "warnings": []
+                "warnings": [],
             }
-            
+
             # Write JSON summary
             json_filename = f"mapping_{timestamp}.json"
             json_path = reports_dir / json_filename
             json_path.parent.mkdir(parents=True, exist_ok=True)
-            
-            with open(json_path, 'w', encoding='utf-8') as f:
+
+            with open(json_path, "w", encoding="utf-8") as f:
                 json.dump(html_summary, f, ensure_ascii=False, indent=2)
-            
+
             # Write HTML report
             html_filename = f"mapping_{timestamp}.html"
             html_path = reports_dir / html_filename
             title = f"mapping · {args.object}/{args.variant}"
-            
+
             write_html_report(html_summary, html_path, title)
-            
+
             # Human-readable logging with forward slashes
-            html_path_display = str(html_path.relative_to(Path(args.root))).replace('\\', '/')
+            html_path_display = str(html_path.relative_to(Path(args.root))).replace(
+                "\\", "/"
+            )
             if not (args.json or not sys.stdout.isatty()):
                 print(f"report: {html_path_display}")
 
@@ -2749,12 +2823,13 @@ def run_map_command(args, config):
 
 def run_transform_command(args, config):
     """Run the transform command - transforms raw data through ETL pipeline to SAP CSV."""
-    from .enhanced_logging import EnhancedLogger
     import csv
     import glob
     import re
     import time
     from datetime import datetime
+
+    from .enhanced_logging import EnhancedLogger
 
     start_time = time.time()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M")
@@ -2766,10 +2841,12 @@ def run_transform_command(args, config):
 
     # Set up paths using root directory
     root_path = Path(args.root)
-    
+
     # Initialize enhanced logger
-    enhanced_logger = EnhancedLogger(args, "transform", args.object, args.variant, root_path)
-    
+    enhanced_logger = EnhancedLogger(
+        args, "transform", args.object, args.variant, root_path
+    )
+
     migrations_dir = root_path / "migrations" / args.object / args.variant
 
     # Input files (F04 spec: data/07_raw/{object}_{variant}.xlsx)
@@ -2796,13 +2873,13 @@ def run_transform_command(args, config):
     transformed_validation_dir = root_path / "data" / "11_transformed_validation"
     transformed_validation_dir.mkdir(parents=True, exist_ok=True)
 
-    # Template glob pattern  
+    # Template glob pattern
     template_glob = str(
         root_path / "data" / "06_template" / f"S_{args.variant.upper()}#*.csv"
     )
 
     # Primary outputs
-    sap_csv = output_dir / f"S_{args.variant.upper()}#{args.object}_Data.csv"
+    _sap_csv = output_dir / f"S_{args.variant.upper()}#{args.object}_Data.csv"
     snapshot_csv = (
         output_dir / f"S_{args.variant.upper()}#{args.object}_{timestamp}_output.csv"
     )
@@ -2845,7 +2922,9 @@ def run_transform_command(args, config):
             "error": "would_overwrite",
             "object": args.object,
             "variant": args.variant,
-            "existing_files": [str(f) for f in [snapshot_csv, rejects_csv] if f.exists()],
+            "existing_files": [
+                str(f) for f in [snapshot_csv, rejects_csv] if f.exists()
+            ],
         }
         enhanced_logger.log_error(error_data)
         sys.exit(5)
@@ -2863,26 +2942,26 @@ def run_transform_command(args, config):
         logger.info(f"Loaded {rows_in} rows from raw data")
 
         # Load mapping configuration
-        with open(mapping_file, "r", encoding="utf-8") as f:
+        with open(mapping_file, encoding="utf-8") as f:
             mapping_data = yaml.safe_load(f)
 
         # Load target index
-        with open(target_index_file, "r", encoding="utf-8") as f:
+        with open(target_index_file, encoding="utf-8") as f:
             target_data = yaml.safe_load(f)
         target_fields = target_data.get("target_fields", [])
 
         # Load optional configurations
         if transformations_file.exists():
-            with open(transformations_file, "r", encoding="utf-8") as f:
+            with open(transformations_file, encoding="utf-8") as f:
                 yaml.safe_load(f) or {}
 
         if value_rules_file.exists():
-            with open(value_rules_file, "r", encoding="utf-8") as f:
+            with open(value_rules_file, encoding="utf-8") as f:
                 yaml.safe_load(f) or {}
 
         validation_config = {}
         if validation_file.exists():
-            with open(validation_file, "r", encoding="utf-8") as f:
+            with open(validation_file, encoding="utf-8") as f:
                 validation_config = yaml.safe_load(f) or {}
 
         # Template processing
@@ -2895,7 +2974,7 @@ def run_transform_command(args, config):
             logger.info(f"Using template: {template_path}")
 
             # Read template headers
-            with open(template_path, "r", encoding="utf-8", newline="") as f:
+            with open(template_path, encoding="utf-8", newline="") as f:
                 reader = csv.reader(f)
                 template_headers = next(reader)
         else:
@@ -2951,26 +3030,34 @@ def run_transform_command(args, config):
             json.dump(raw_stats, f, indent=2)
 
         # Generate HTML report for RAW validation if enabled
-        if not getattr(args, 'no_html', False):
-            from .reporting import write_html_report
+        if not getattr(args, "no_html", False):
             from datetime import datetime as dt
-            
+
+            from .reporting import write_html_report
+
             timestamp_html = dt.now().strftime("%Y%m%d_%H%M")
-            
+
             # Determine report directory for RAW validation
-            if hasattr(args, 'html_dir') and args.html_dir:
+            if hasattr(args, "html_dir") and args.html_dir:
                 reports_dir = Path(args.html_dir)
             else:
                 reports_dir = raw_validation_dir
-            
+
             # Generate enriched summary for RAW validation HTML report
-            null_rate_by_source = {stat["source_header"]: stat["pct_empty"] / 100.0 for stat in raw_stats}
-            missing_sources = [stat["source_header"] for stat in raw_stats if stat["pct_empty"] == 100.0]
-            
+            null_rate_by_source = {
+                stat["source_header"]: stat["pct_empty"] / 100.0 for stat in raw_stats
+            }
+            missing_sources = [
+                stat["source_header"]
+                for stat in raw_stats
+                if stat["pct_empty"] == 100.0
+            ]
+
             # Add data profiling for RAW validation
             from .reporting import profile_dataframe
+
             raw_profiles = profile_dataframe(raw_df)
-            
+
             html_summary_raw = {
                 "step": "raw_validation",
                 "object": args.object,
@@ -2980,26 +3067,34 @@ def run_transform_command(args, config):
                 "null_rate_by_source": null_rate_by_source,
                 "missing_sources": missing_sources,
                 "field_profiles": raw_profiles,
-                "warnings": [w for w in warnings if w.get("warning") == "missing_source_column"]
+                "warnings": [
+                    w for w in warnings if w.get("warning") == "missing_source_column"
+                ],
             }
-            
+
             # Write JSON summary for RAW validation
-            json_filename_raw = f"raw_validation_{args.object}_{args.variant}_{timestamp_html}.json"
+            json_filename_raw = (
+                f"raw_validation_{args.object}_{args.variant}_{timestamp_html}.json"
+            )
             json_path_raw = reports_dir / json_filename_raw
             json_path_raw.parent.mkdir(parents=True, exist_ok=True)
-            
-            with open(json_path_raw, 'w', encoding='utf-8') as f:
+
+            with open(json_path_raw, "w", encoding="utf-8") as f:
                 json.dump(html_summary_raw, f, ensure_ascii=False, indent=2)
-            
+
             # Write HTML report for RAW validation
-            html_filename_raw = f"raw_validation_{args.object}_{args.variant}_{timestamp_html}.html"
+            html_filename_raw = (
+                f"raw_validation_{args.object}_{args.variant}_{timestamp_html}.html"
+            )
             html_path_raw = reports_dir / html_filename_raw
             title_raw = f"raw_validation · {args.object}/{args.variant}"
-            
+
             write_html_report(html_summary_raw, html_path_raw, title_raw)
-            
+
             # Human-readable logging with forward slashes
-            html_path_display_raw = str(html_path_raw.relative_to(root_path)).replace('\\', '/')
+            html_path_display_raw = str(html_path_raw.relative_to(root_path)).replace(
+                "\\", "/"
+            )
             if not (args.json or not sys.stdout.isatty()):
                 print(f"report: {html_path_display_raw}")
 
@@ -3016,7 +3111,7 @@ def run_transform_command(args, config):
 
         # Initialize skeleton with all target columns (lowercase keys, empty values)
         skeleton = pd.DataFrame(index=raw_df.index)
-        for col_lower in skeleton_columns.keys():
+        for col_lower in skeleton_columns:
             skeleton[col_lower] = ""
 
         # 4) Fill skeleton from mapping
@@ -3218,17 +3313,17 @@ def run_transform_command(args, config):
         if rejected_rows:
             rejected_df = pd.DataFrame(rejected_rows)
             rejected_df.to_csv(rejects_csv, index=False)
-            
+
             # Generate HTML report for rejected records
             try:
                 from .csv_reporting import generate_csv_html_report
-                
-                rejects_html = rejects_csv.with_suffix('.html')
+
+                rejects_html = rejects_csv.with_suffix(".html")
                 report_title = f"Rejected Records Report · {args.object}/{args.variant}"
-                
+
                 generate_csv_html_report(rejects_csv, rejects_html, report_title)
                 logger.info(f"Generated HTML rejects report: {rejects_html}")
-                
+
             except Exception as e:
                 logger.warning(f"Failed to generate HTML rejects report: {e}")
                 # Don't fail the entire transform if HTML generation fails
@@ -3263,23 +3358,30 @@ def run_transform_command(args, config):
             json.dump(post_stats, f, indent=2)
 
         # Generate HTML report for POST-transform validation if enabled
-        if not getattr(args, 'no_html', False):
-            from .reporting import write_html_report
+        if not getattr(args, "no_html", False):
             from datetime import datetime as dt
-            
+
+            from .reporting import write_html_report
+
             timestamp_html = dt.now().strftime("%Y%m%d_%H%M")
-            
+
             # Determine report directory for POST validation
-            if hasattr(args, 'html_dir') and args.html_dir:
+            if hasattr(args, "html_dir") and args.html_dir:
                 reports_dir = Path(args.html_dir)
             else:
                 reports_dir = transformed_validation_dir
-            
+
             # Calculate mapped coverage
-            total_mapped_fields = len([m for m in mapping_entries if m.get("source_header")])
+            total_mapped_fields = len(
+                [m for m in mapping_entries if m.get("source_header")]
+            )
             total_target_fields = len(target_fields)
-            mapped_coverage = total_mapped_fields / total_target_fields if total_target_fields > 0 else 0.0
-            
+            mapped_coverage = (
+                total_mapped_fields / total_target_fields
+                if total_target_fields > 0
+                else 0.0
+            )
+
             # Generate sample rows with errors
             sample_rows = []
             if len(final_data) > 0:
@@ -3290,7 +3392,7 @@ def run_transform_command(args, config):
                     target_sample = list(final_data.columns)[:3]
                     for col in target_sample:
                         row_dict[col] = str(row[col]) if pd.notna(row[col]) else ""
-                    
+
                     # Add errors (simplified - could be enhanced with actual validation)
                     row_errors = []
                     for col in target_sample:
@@ -3298,19 +3400,19 @@ def run_transform_command(args, config):
                             row_errors.append(f"{col}.required")
                     row_dict["errors"] = row_errors
                     sample_rows.append(row_dict)
-            
+
             # Add data profiling for POST-transform validation (on skeleton before split)
             from .reporting import profile_dataframe
-            
+
             # Prepare validation rules mapping for profiler
             validation_rules_mapping = {}
             if validation_config:
                 for field_name, rules in validation_config.items():
                     validation_rules_mapping[field_name.lower()] = rules
-            
+
             # Profile the skeleton (transformed target columns before splitting)
             post_profiles = profile_dataframe(skeleton, validation_rules_mapping)
-            
+
             # Generate enriched summary for POST-transform validation HTML report
             html_summary_post = {
                 "step": "post_transform_validation",
@@ -3322,32 +3424,35 @@ def run_transform_command(args, config):
                 "rows_out": rows_out,
                 "rows_rejected": rows_rejected,
                 "mapped_coverage": mapped_coverage,
-                "template_used": template_path or f"data/06_template/S_{args.variant.upper()}#*.csv",
+                "template_used": template_path
+                or f"data/06_template/S_{args.variant.upper()}#*.csv",
                 "ignored_targets": ignored_targets,
                 "errors_by_rule": error_stats,
                 "errors_by_field": post_stats["errors_by_field"],
                 "sample_rows": sample_rows,
                 "field_profiles": post_profiles,
-                "warnings": warnings
+                "warnings": warnings,
             }
-            
+
             # Write JSON summary for POST validation
             json_filename_post = f"post_transform_validation_{args.object}_{args.variant}_{timestamp_html}.json"
             json_path_post = reports_dir / json_filename_post
             json_path_post.parent.mkdir(parents=True, exist_ok=True)
-            
-            with open(json_path_post, 'w', encoding='utf-8') as f:
+
+            with open(json_path_post, "w", encoding="utf-8") as f:
                 json.dump(html_summary_post, f, ensure_ascii=False, indent=2)
-            
+
             # Write HTML report for POST validation
             html_filename_post = f"post_transform_validation_{args.object}_{args.variant}_{timestamp_html}.html"
             html_path_post = reports_dir / html_filename_post
             title_post = f"post_transform_validation · S_{args.variant.upper()} · {args.object}/{args.variant}"
-            
+
             write_html_report(html_summary_post, html_path_post, title_post)
-            
+
             # Human-readable logging with forward slashes
-            html_path_display_post = str(html_path_post.relative_to(root_path)).replace('\\', '/')
+            html_path_display_post = str(html_path_post.relative_to(root_path)).replace(
+                "\\", "/"
+            )
             if not (args.json or not sys.stdout.isatty()):
                 print(f"report: {html_path_display_post}")
 
@@ -3379,8 +3484,8 @@ def run_transform_command(args, config):
         if len(final_data) > 0:
             preview_cols = final_headers[:8]
             preview_df = final_data[preview_cols].head(5)
-            
-            for idx, row in preview_df.iterrows():
+
+            for _idx, row in preview_df.iterrows():
                 row_dict = {}
                 for col in preview_cols:
                     row_dict[col] = str(row[col])[:15] if pd.notna(row[col]) else ""

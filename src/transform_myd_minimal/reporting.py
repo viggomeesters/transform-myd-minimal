@@ -2,7 +2,7 @@
 """
 HTML reporting module for transform-myd-minimal.
 
-Provides self-contained HTML report generation for all F01-F04 steps 
+Provides self-contained HTML report generation for all F01-F04 steps
 with embedded JSON data, inline CSS/JS, and client-side UI features.
 """
 
@@ -10,17 +10,18 @@ import json
 import re
 from pathlib import Path
 from typing import Any, Dict, Optional
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 
 
 def ensure_json_serializable(obj: Any) -> Any:
     """
     Ensure an object is JSON serializable by converting non-serializable types.
-    
+
     Args:
         obj: Object to make JSON serializable
-        
+
     Returns:
         JSON-serializable version of the object
     """
@@ -30,14 +31,15 @@ def ensure_json_serializable(obj: Any) -> Any:
         else:
             return [ensure_json_serializable(item) for item in obj]
     elif isinstance(obj, Path):
-        return str(obj)
+        # Use as_posix() for cross-platform compatibility (always forward slashes)
+        return obj.as_posix()
     elif isinstance(obj, (pd.Timestamp, pd.NaT.__class__)):
         return str(obj) if pd.notna(obj) else None
     elif isinstance(obj, (np.integer, np.floating)):
         return float(obj)
     elif isinstance(obj, np.ndarray):
         return obj.tolist()
-    elif hasattr(obj, '__dict__'):
+    elif hasattr(obj, "__dict__"):
         return ensure_json_serializable(obj.__dict__)
     elif isinstance(obj, (str, int, float, bool)) or obj is None:
         return obj
@@ -45,14 +47,16 @@ def ensure_json_serializable(obj: Any) -> Any:
         return str(obj)
 
 
-def _determine_field_type(field_name: str, validation_rules: Optional[Dict] = None) -> str:
+def _determine_field_type(
+    field_name: str, validation_rules: Optional[Dict] = None
+) -> str:
     """
     Determine field type based on validation.yaml rules or fallback heuristics.
-    
+
     Args:
         field_name: Name of the field
         validation_rules: Optional validation rules dict
-        
+
     Returns:
         Field type: string, int, decimal, date, or time
     """
@@ -61,7 +65,7 @@ def _determine_field_type(field_name: str, validation_rules: Optional[Dict] = No
         vtype = validation_rules[field_name.lower()].get("type", "").lower()
         if vtype in {"string", "int", "decimal", "date", "time"}:
             return vtype
-    
+
     # Fallback heuristics based on field name
     field_lower = field_name.lower()
     if any(x in field_lower for x in ["decimal", "number", "num", "decimals"]):
@@ -76,29 +80,31 @@ def _determine_field_type(field_name: str, validation_rules: Optional[Dict] = No
         return "string"
 
 
-def _parse_field_by_type(series: pd.Series, field_type: str) -> tuple[pd.Series, pd.Series]:
+def _parse_field_by_type(
+    series: pd.Series, field_type: str
+) -> tuple[pd.Series, pd.Series]:
     """
     Parse series values according to field type and return parsed values and validity mask.
-    
+
     Args:
         series: Input pandas Series
         field_type: Type to parse as (string, int, decimal, date, time)
-        
+
     Returns:
         Tuple of (parsed_series, is_valid_mask)
     """
     if field_type == "decimal":
-        parsed = pd.to_numeric(series, errors='coerce')
+        parsed = pd.to_numeric(series, errors="coerce")
         is_valid = pd.notna(parsed)
         return parsed, is_valid
     elif field_type == "int":
-        parsed = pd.to_numeric(series, errors='coerce')
+        parsed = pd.to_numeric(series, errors="coerce")
         # For int, also check if values are actually integers
-        is_valid = pd.notna(parsed) & (parsed == parsed.astype(int, errors='ignore'))
+        is_valid = pd.notna(parsed) & (parsed == parsed.astype(int, errors="ignore"))
         return parsed, is_valid
     elif field_type == "date":
         # Try to parse YYYYMMDD format
-        parsed = pd.to_datetime(series, format='%Y%m%d', errors='coerce')
+        parsed = pd.to_datetime(series, format="%Y%m%d", errors="coerce")
         is_valid = pd.notna(parsed)
         return parsed, is_valid
     elif field_type == "time":
@@ -115,7 +121,7 @@ def _parse_field_by_type(series: pd.Series, field_type: str) -> tuple[pd.Series,
                 return np.nan
             except (ValueError, TypeError):
                 return np.nan
-        
+
         parsed = series.apply(parse_time_to_seconds)
         is_valid = pd.notna(parsed)
         return parsed, is_valid
@@ -126,51 +132,57 @@ def _parse_field_by_type(series: pd.Series, field_type: str) -> tuple[pd.Series,
         return parsed, is_valid
 
 
-def _calculate_histogram(series: pd.Series, field_type: str, parsed_series: pd.Series) -> Dict[str, Any]:
+def _calculate_histogram(
+    series: pd.Series, field_type: str, parsed_series: pd.Series
+) -> Dict[str, Any]:
     """
     Calculate histogram data based on field type.
-    
+
     Args:
         series: Original series
         field_type: Field type (string, int, decimal, date, time)
         parsed_series: Parsed series values
-        
+
     Returns:
         Dictionary with histogram data
     """
     valid_data = parsed_series[pd.notna(parsed_series)]
-    
+
     if len(valid_data) == 0:
         return {"bins": [], "counts": []}
-    
+
     if field_type in ["int", "decimal"]:
         # Numeric histogram with 12 bins
         try:
             hist, bin_edges = np.histogram(valid_data, bins=12)
-            bins = [f"{bin_edges[i]:.2f}-{bin_edges[i+1]:.2f}" for i in range(len(hist))]
+            bins = [
+                f"{bin_edges[i]:.2f}-{bin_edges[i+1]:.2f}" for i in range(len(hist))
+            ]
             return {"bins": bins, "counts": hist.tolist()}
-        except:
+        except Exception:
             return {"bins": [], "counts": []}
     elif field_type == "date":
         # Group by month YYYY-MM
         try:
-            months = valid_data.dt.strftime('%Y-%m')
+            months = valid_data.dt.strftime("%Y-%m")
             month_counts = months.value_counts().head(24).sort_index()
             return {
                 "bins": month_counts.index.tolist(),
                 "counts": month_counts.values.tolist(),
-                "type": "monthly"
+                "type": "monthly",
             }
-        except:
+        except Exception:
             return {"bins": [], "counts": []}
     elif field_type == "time":
         # Histogram on seconds (0-86400)
         try:
             hist, bin_edges = np.histogram(valid_data, bins=12, range=(0, 86400))
-            bins = [f"{int(bin_edges[i])//3600:02d}:{(int(bin_edges[i])%3600)//60:02d}-{int(bin_edges[i+1])//3600:02d}:{(int(bin_edges[i+1])%3600)//60:02d}" 
-                   for i in range(len(hist))]
+            bins = [
+                f"{int(bin_edges[i])//3600:02d}:{(int(bin_edges[i])%3600)//60:02d}-{int(bin_edges[i+1])//3600:02d}:{(int(bin_edges[i+1])%3600)//60:02d}"
+                for i in range(len(hist))
+            ]
             return {"bins": bins, "counts": hist.tolist()}
-        except:
+        except Exception:
             return {"bins": [], "counts": []}
     else:  # string
         # Histogram on string length
@@ -178,60 +190,77 @@ def _calculate_histogram(series: pd.Series, field_type: str, parsed_series: pd.S
             lengths = series[pd.notna(series)].astype(str).str.len()
             if len(lengths) > 0:
                 hist, bin_edges = np.histogram(lengths, bins=12)
-                bins = [f"{int(bin_edges[i])}-{int(bin_edges[i+1])}" for i in range(len(hist))]
+                bins = [
+                    f"{int(bin_edges[i])}-{int(bin_edges[i+1])}"
+                    for i in range(len(hist))
+                ]
                 return {"bins": bins, "counts": hist.tolist()}
             return {"bins": [], "counts": []}
-        except:
+        except Exception:
             return {"bins": [], "counts": []}
 
 
-def profile_series(name: str, series: pd.Series, field_type: str, validation_rules: Optional[Dict] = None) -> Dict[str, Any]:
+def profile_series(
+    name: str,
+    series: pd.Series,
+    field_type: str,
+    validation_rules: Optional[Dict] = None,
+) -> Dict[str, Any]:
     """
     Profile a pandas Series and return comprehensive statistics.
-    
+
     Args:
         name: Name of the field
         series: Pandas Series to profile
         field_type: Field type (string, int, decimal, date, time)
         validation_rules: Optional validation rules for the field
-        
+
     Returns:
         Dictionary with profiling results
     """
     # Limit to 100,000 samples for performance
     if len(series) > 100_000:
         series = series.sample(100_000, random_state=0)
-    
+
     # Basic counts
     total_count = len(series)
     missing_count = series.isna().sum() + (series.astype(str).str.strip() == "").sum()
     count = total_count - missing_count
-    
+
     # Parse by type and determine validity
     parsed_series, is_valid = _parse_field_by_type(series, field_type)
     invalid_count = count - is_valid.sum()
-    
+
     # Unique values
-    unique_count = series[pd.notna(series) & (series.astype(str).str.strip() != "")].nunique()
+    unique_count = series[
+        pd.notna(series) & (series.astype(str).str.strip() != "")
+    ].nunique()
     unique_ratio = unique_count / count if count > 0 else 0
-    
+
     # Top values (limited to 10)
     try:
-        top_values_series = series[pd.notna(series) & (series.astype(str).str.strip() != "")]
+        top_values_series = series[
+            pd.notna(series) & (series.astype(str).str.strip() != "")
+        ]
         top_values = top_values_series.value_counts().head(10)
-        top_values_list = [{"value": str(val), "count": int(count)} for val, count in top_values.items()]
-    except:
+        top_values_list = [
+            {"value": str(val), "count": int(count)}
+            for val, count in top_values.items()
+        ]
+    except Exception:
         top_values_list = []
-    
+
     # Calculate histogram
     histogram = _calculate_histogram(series, field_type, parsed_series)
-    
+
     # Quality score calculation
     missing_pct = missing_count / total_count if total_count > 0 else 0
     invalid_pct = invalid_count / total_count if total_count > 0 else 0
     dup_pct = 1 - unique_ratio
-    quality_score = max(0, min(100, 100 - (missing_pct * 40 + invalid_pct * 40 + dup_pct * 20)))
-    
+    quality_score = max(
+        0, min(100, 100 - (missing_pct * 40 + invalid_pct * 40 + dup_pct * 20))
+    )
+
     # Base profile
     profile = {
         "field": name,
@@ -246,15 +275,17 @@ def profile_series(name: str, series: pd.Series, field_type: str, validation_rul
         "invalid_pct": round(invalid_pct * 100, 2),
         "unique_pct": round(unique_ratio * 100, 2),
         "top_values": top_values_list,
-        "histogram": histogram
+        "histogram": histogram,
     }
-    
+
     # Type-specific statistics
     valid_data = parsed_series[pd.notna(parsed_series) & is_valid]
-    
+
     if field_type == "string":
         # String-specific stats
-        string_data = series[pd.notna(series) & (series.astype(str).str.strip() != "")].astype(str)
+        string_data = series[
+            pd.notna(series) & (series.astype(str).str.strip() != "")
+        ].astype(str)
         if len(string_data) > 0:
             lengths = string_data.str.len()
             profile["length"] = {
@@ -262,34 +293,42 @@ def profile_series(name: str, series: pd.Series, field_type: str, validation_rul
                 "p50": int(lengths.median()),
                 "p95": int(lengths.quantile(0.95)),
                 "max": int(lengths.max()),
-                "mean": round(lengths.mean(), 2)
+                "mean": round(lengths.mean(), 2),
             }
-            
+
             # Whitespace issues
             profile["whitespace_issues"] = {
-                "leading_or_trailing": int((string_data.str.strip() != string_data).sum())
+                "leading_or_trailing": int(
+                    (string_data.str.strip() != string_data).sum()
+                )
             }
-            
+
             # Case mix analysis
             non_empty = string_data[string_data.str.len() > 0]
             if len(non_empty) > 0:
                 upper_ratio = (non_empty.str.isupper()).mean()
                 lower_ratio = (non_empty.str.islower()).mean()
                 mixed_ratio = 1 - upper_ratio - lower_ratio
-                
+
                 profile["case_mix"] = {
                     "upper_ratio": round(upper_ratio, 4),
                     "lower_ratio": round(lower_ratio, 4),
-                    "mixed_ratio": round(mixed_ratio, 4)
+                    "mixed_ratio": round(mixed_ratio, 4),
                 }
-                
+
                 # Character analysis
-                digit_ratios = [len(re.findall(r'\d', s)) / len(s) if len(s) > 0 else 0 for s in non_empty]
-                alpha_ratios = [len(re.findall(r'[A-Za-z]', s)) / len(s) if len(s) > 0 else 0 for s in non_empty]
-                
+                digit_ratios = [
+                    len(re.findall(r"\d", s)) / len(s) if len(s) > 0 else 0
+                    for s in non_empty
+                ]
+                alpha_ratios = [
+                    len(re.findall(r"[A-Za-z]", s)) / len(s) if len(s) > 0 else 0
+                    for s in non_empty
+                ]
+
                 profile["digit_ratio"] = round(np.mean(digit_ratios), 4)
                 profile["alpha_ratio"] = round(np.mean(alpha_ratios), 4)
-    
+
     elif field_type in ["int", "decimal"]:
         # Numeric stats
         if len(valid_data) > 0:
@@ -301,30 +340,31 @@ def profile_series(name: str, series: pd.Series, field_type: str, validation_rul
                 "p95": float(valid_data.quantile(0.95)),
                 "max": float(valid_data.max()),
                 "mean": float(valid_data.mean()),
-                "std": float(valid_data.std())
+                "std": float(valid_data.std()),
             }
-    
+
     elif field_type == "date":
         # Date stats
         if len(valid_data) > 0:
             profile["date"] = {
-                "min": valid_data.min().strftime('%Y%m%d'),
-                "max": valid_data.max().strftime('%Y%m%d'),
-                "by_month": histogram.get("bins", [])
+                "min": valid_data.min().strftime("%Y%m%d"),
+                "max": valid_data.max().strftime("%Y%m%d"),
+                "by_month": histogram.get("bins", []),
             }
-    
+
     elif field_type == "time":
         # Time stats
         if len(valid_data) > 0:
+
             def seconds_to_hhmmss(seconds):
                 h = int(seconds // 3600)
                 m = int((seconds % 3600) // 60)
                 s = int(seconds % 60)
                 return f"{h:02d}{m:02d}{s:02d}"
-            
+
             profile["time"] = {
                 "min": seconds_to_hhmmss(valid_data.min()),
-                "max": seconds_to_hhmmss(valid_data.max())
+                "max": seconds_to_hhmmss(valid_data.max()),
             }
             # Also include numeric stats for time as seconds
             profile["numeric"] = {
@@ -335,43 +375,47 @@ def profile_series(name: str, series: pd.Series, field_type: str, validation_rul
                 "p95": float(valid_data.quantile(0.95)),
                 "max": float(valid_data.max()),
                 "mean": float(valid_data.mean()),
-                "std": float(valid_data.std())
+                "std": float(valid_data.std()),
             }
-    
+
     return profile
 
 
-def profile_dataframe(df: pd.DataFrame, validation_rules: Optional[Dict] = None, field_types: Optional[Dict] = None) -> Dict[str, Any]:
+def profile_dataframe(
+    df: pd.DataFrame,
+    validation_rules: Optional[Dict] = None,
+    field_types: Optional[Dict] = None,
+) -> Dict[str, Any]:
     """
     Profile all columns in a DataFrame.
-    
+
     Args:
         df: DataFrame to profile
         validation_rules: Optional validation rules mapping field names to rules
         field_types: Optional mapping of field names to types
-        
+
     Returns:
         Dictionary with field_profiles for all columns
     """
     profiles = {}
-    
+
     for col in df.columns:
         # Determine field type
         if field_types and col in field_types:
             field_type = field_types[col]
         else:
             field_type = _determine_field_type(col, validation_rules)
-        
+
         # Profile the column
         profiles[col] = profile_series(col, df[col], field_type, validation_rules)
-    
+
     return profiles
 
 
 def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> None:
     """
     Write a self-contained HTML report with embedded JSON data.
-    
+
     Args:
         summary: Data dictionary to embed and display
         out_html: Output HTML file path
@@ -379,14 +423,14 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
     """
     # Ensure summary is JSON serializable
     clean_summary = ensure_json_serializable(summary)
-    
+
     # Escape JSON for HTML embedding (prevent </script> breaking)
     json_data = json.dumps(clean_summary, ensure_ascii=False, indent=2)
-    escaped_json = json_data.replace("</script>", "</scr\" + \"ipt>")
-    
+    escaped_json = json_data.replace("</script>", '</scr" + "ipt>')
+
     # Determine step type and generate appropriate content
-    step = summary.get("step", "unknown")
-    
+    _step = summary.get("step", "unknown")
+
     html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -796,7 +840,7 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
             const container = document.getElementById('kpi-cards');
             const kpis = getKPIs(data);
             
-            container.innerHTML = kpis.map(kpi => 
+            container.innerHTML = kpis.map(kpi =>
                 `<div class="kpi-card">
                     <div class="kpi-value">${{kpi.value}}</div>
                     <div class="kpi-label">${{kpi.label}}</div>
@@ -896,7 +940,7 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
                     <div class="section">
                         <h2>${{table.title}}</h2>
                         <div class="controls">
-                            <input type="text" class="search-box" placeholder="Search ${{table.title.toLowerCase()}}..." 
+                            <input type="text" class="search-box" placeholder="Search ${{table.title.toLowerCase()}}..."
                                    onkeyup="filterTable(this, '${{table.id}}')">
                             <button class="download-btn" onclick="downloadCSV('${{table.id}}', '${{table.title}}')">
                                 Download CSV
@@ -905,13 +949,13 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
                         <table id="${{table.id}}">
                             <thead>
                                 <tr>
-                                    ${{table.headers.map((h, i) => 
+                                    ${{table.headers.map((h, i) =>
                                         `<th class="sortable" onclick="sortTable('${{table.id}}', ${{i}})">${{h}}</th>`
                                     ).join('')}}
                                 </tr>
                             </thead>
                             <tbody>
-                                ${{table.rows.map(row => 
+                                ${{table.rows.map(row =>
                                     `<tr>${{row.map(cell => `<td>${{cell}}</td>`).join('')}}</tr>`
                                 ).join('')}}
                             </tbody>
@@ -1054,7 +1098,7 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
                 }}
                 
                 if (data.unmapped_target_fields) {{
-                    const items = data.unmapped_target_fields.map(f => 
+                    const items = data.unmapped_target_fields.map(f =>
                         typeof f === 'object' ? `${{f.target_table}}.${{f.target_field}}${{f.required ? ' (required)' : ''}}` : f
                     );
                     lists.push({{id: 'unmapped-target-list', title: 'Unmapped Target Fields', items}});
@@ -1494,10 +1538,10 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
     </script>
 </body>
 </html>"""
-    
+
     # Ensure output directory exists
     out_html.parent.mkdir(parents=True, exist_ok=True)
-    
+
     # Write HTML file
-    with open(out_html, 'w', encoding='utf-8') as f:
+    with open(out_html, "w", encoding="utf-8") as f:
         f.write(html_content)

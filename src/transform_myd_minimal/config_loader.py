@@ -83,7 +83,7 @@ class Config:
     def _load_from_file(self, config_path: Path) -> None:
         """Load configuration from YAML file."""
         try:
-            with open(config_path, "r", encoding="utf-8") as f:
+            with open(config_path, encoding="utf-8") as f:
                 config_data = yaml.safe_load(f)
 
             if config_data:
