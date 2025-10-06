@@ -1,0 +1,2415 @@
+{
+  "step": "raw_validation",
+  "object": "test",
+  "variant": "bnka",
+  "ts": "2025-10-06T10:20:50.625597",
+  "rows_in": 8,
+  "null_rate_by_source": {
+    "MANDT": 0.0,
+    "BANKS": 0.0,
+    "BANKL": 0.0,
+    "ERDAT": 0.0,
+    "ERNAM": 0.0,
+    "BANKA": 0.0,
+    "PROVZ": 1.0,
+    "STRAS": 0.875,
+    "ORT01": 0.0,
+    "SWIFT": 0.0,
+    "BGRUP": 1.0,
+    "XPGRO": 1.0,
+    "LOEVM": 1.0,
+    "BNKLZ": 0.125,
+    "PSKTO": 1.0,
+    "ADRNR": 1.0,
+    "BRNCH": 1.0,
+    "CHKME": 1.0,
+    "VERS": 1.0,
+    "IBAN_RULE": 1.0,
+    "SDD_B2B": 0.0,
+    "SDD_COR1": 0.0,
+    "SDD_RTRANS": 0.0,
+    "ZNOCHECK": 1.0,
+    "ZACC_LEN": 1.0,
+    "ZRES1": 0.0,
+    "ZRES2": 0.0,
+    "ZRES3": 0.0,
+    "ZRES4": 0.0,
+    "ZRES5": 0.0,
+    "ZRES6": 0.0,
+    "ZRES7": 0.0,
+    "ZRES8": 0.0,
+    "ZRES9": 0.0,
+    "ZRES10": 0.0,
+    "BICKY": 1.0,
+    "RCCODE": 1.0
+  },
+  "missing_sources": [
+    "PROVZ",
+    "BGRUP",
+    "XPGRO",
+    "LOEVM",
+    "PSKTO",
+    "ADRNR",
+    "BRNCH",
+    "CHKME",
+    "VERS",
+    "IBAN_RULE",
+    "ZNOCHECK",
+    "ZACC_LEN",
+    "BICKY",
+    "RCCODE"
+  ],
+  "field_profiles": {
+    "MANDT": {
+      "field": "MANDT",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 8,
+      "unique_ratio": 1.0,
+      "quality_score": 100,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 100.0,
+      "top_values": [
+        {
+          "value": "110",
+          "count": 1
+        },
+        {
+          "value": "120",
+          "count": 1
+        },
+        {
+          "value": "130",
+          "count": 1
+        },
+        {
+          "value": "140",
+          "count": 1
+        },
+        {
+          "value": "150",
+          "count": 1
+        },
+        {
+          "value": "160",
+          "count": 1
+        },
+        {
+          "value": "170",
+          "count": 1
+        },
+        {
+          "value": "180",
+          "count": 1
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 3,
+        "p50": 3,
+        "p95": 3,
+        "max": 3,
+        "mean": 3.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "BANKS": {
+      "field": "BANKS",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 7,
+      "unique_ratio": 0.875,
+      "quality_score": 97.5,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 87.5,
+      "top_values": [
+        {
+          "value": "AT",
+          "count": 2
+        },
+        {
+          "value": "DE",
+          "count": 1
+        },
+        {
+          "value": "NL",
+          "count": 1
+        },
+        {
+          "value": "FR",
+          "count": 1
+        },
+        {
+          "value": "GER",
+          "count": 1
+        },
+        {
+          "value": "PL",
+          "count": 1
+        },
+        {
+          "value": "UK",
+          "count": 1
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-3"
+        ],
+        "counts": [
+          7,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "length": {
+        "min": 2,
+        "p50": 2,
+        "p95": 2,
+        "max": 3,
+        "mean": 2.12
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 1.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 0.0
+      },
+      "digit_ratio": 0.0,
+      "alpha_ratio": 1.0
+    },
+    "BANKL": {
+      "field": "BANKL",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 8,
+      "unique_ratio": 1.0,
+      "quality_score": 100,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 100.0,
+      "top_values": [
+        {
+          "value": "11000",
+          "count": 1
+        },
+        {
+          "value": "12000",
+          "count": 1
+        },
+        {
+          "value": "13500",
+          "count": 1
+        },
+        {
+          "value": "16000",
+          "count": 1
+        },
+        {
+          "value": "25000",
+          "count": 1
+        },
+        {
+          "value": "32000",
+          "count": 1
+        },
+        {
+          "value": "33000",
+          "count": 1
+        },
+        {
+          "value": "41000",
+          "count": 1
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "4-4",
+          "4-4",
+          "4-4",
+          "4-4",
+          "4-4",
+          "4-5",
+          "5-5",
+          "5-5",
+          "5-5",
+          "5-5",
+          "5-5",
+          "5-5"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 5,
+        "p50": 5,
+        "p95": 5,
+        "max": 5,
+        "mean": 5.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "ERDAT": {
+      "field": "ERDAT",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 8,
+      "unique_ratio": 1.0,
+      "quality_score": 100,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 100.0,
+      "top_values": [
+        {
+          "value": "20220323",
+          "count": 1
+        },
+        {
+          "value": "20150327",
+          "count": 1
+        },
+        {
+          "value": "20120925",
+          "count": 1
+        },
+        {
+          "value": "20151230",
+          "count": 1
+        },
+        {
+          "value": "20180508",
+          "count": 1
+        },
+        {
+          "value": "20161027",
+          "count": 1
+        },
+        {
+          "value": "20090129",
+          "count": 1
+        },
+        {
+          "value": "20120427",
+          "count": 1
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "7-7",
+          "7-7",
+          "7-7",
+          "7-7",
+          "7-7",
+          "7-8",
+          "8-8",
+          "8-8",
+          "8-8",
+          "8-8",
+          "8-8",
+          "8-8"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 8,
+        "p50": 8,
+        "p95": 8,
+        "max": 8,
+        "mean": 8.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "ERNAM": {
+      "field": "ERNAM",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 1,
+      "unique_ratio": 0.125,
+      "quality_score": 82.5,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 12.5,
+      "top_values": [
+        {
+          "value": "JOHNDOE",
+          "count": 8
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "6-6",
+          "6-6",
+          "6-6",
+          "6-6",
+          "6-6",
+          "6-7",
+          "7-7",
+          "7-7",
+          "7-7",
+          "7-7",
+          "7-7",
+          "7-7"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 7,
+        "p50": 7,
+        "p95": 7,
+        "max": 7,
+        "mean": 7.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 1.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 0.0
+      },
+      "digit_ratio": 0.0,
+      "alpha_ratio": 1.0
+    },
+    "BANKA": {
+      "field": "BANKA",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 8,
+      "unique_ratio": 1.0,
+      "quality_score": 100,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 100.0,
+      "top_values": [
+        {
+          "value": "Paarden BANK",
+          "count": 1
+        },
+        {
+          "value": "Herten Bank",
+          "count": 1
+        },
+        {
+          "value": "Water Bank NL",
+          "count": 1
+        },
+        {
+          "value": "Money Bank",
+          "count": 1
+        },
+        {
+          "value": "Bank Bank",
+          "count": 1
+        },
+        {
+          "value": "Gold Bank",
+          "count": 1
+        },
+        {
+          "value": "Fort Knox",
+          "count": 1
+        },
+        {
+          "value": "W bank",
+          "count": 1
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "6-6",
+          "6-7",
+          "7-7",
+          "7-8",
+          "8-8",
+          "8-9",
+          "9-10",
+          "10-10",
+          "10-11",
+          "11-11",
+          "11-12",
+          "12-13"
+        ],
+        "counts": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          3,
+          1,
+          0,
+          1,
+          0,
+          1,
+          1
+        ]
+      },
+      "length": {
+        "min": 6,
+        "p50": 9,
+        "p95": 12,
+        "max": 13,
+        "mean": 9.88
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 0.0,
+      "alpha_ratio": 0.884
+    },
+    "PROVZ": {
+      "field": "PROVZ",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "STRAS": {
+      "field": "STRAS",
+      "type": "string",
+      "count": 1,
+      "missing": 7,
+      "invalid": 0,
+      "unique": 1,
+      "unique_ratio": 1.0,
+      "quality_score": 65.0,
+      "missing_pct": 87.5,
+      "invalid_pct": 0.0,
+      "unique_pct": 100.0,
+      "top_values": [
+        {
+          "value": "HOECHTLGASSE 6",
+          "count": 1
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "0-1",
+          "1-2",
+          "2-3",
+          "3-4",
+          "4-5",
+          "5-7",
+          "7-8",
+          "8-9",
+          "9-10",
+          "10-11",
+          "11-12",
+          "12-14"
+        ],
+        "counts": [
+          7,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "length": {
+        "min": 14,
+        "p50": 14,
+        "p95": 14,
+        "max": 14,
+        "mean": 14.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 1.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 0.0
+      },
+      "digit_ratio": 0.0714,
+      "alpha_ratio": 0.8571
+    },
+    "ORT01": {
+      "field": "ORT01",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 8,
+      "unique_ratio": 1.0,
+      "quality_score": 100,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 100.0,
+      "top_values": [
+        {
+          "value": "Rotterdam",
+          "count": 1
+        },
+        {
+          "value": "Amsterdam",
+          "count": 1
+        },
+        {
+          "value": "Papendrecht",
+          "count": 1
+        },
+        {
+          "value": "Tilburg",
+          "count": 1
+        },
+        {
+          "value": "Groningen",
+          "count": 1
+        },
+        {
+          "value": "TOegauw",
+          "count": 1
+        },
+        {
+          "value": "Pramtal",
+          "count": 1
+        },
+        {
+          "value": "ödling",
+          "count": 1
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "6-6",
+          "6-6",
+          "6-7",
+          "7-7",
+          "7-8",
+          "8-8",
+          "8-8",
+          "8-9",
+          "9-9",
+          "9-10",
+          "10-10",
+          "10-11"
+        ],
+        "counts": [
+          1,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "length": {
+        "min": 6,
+        "p50": 8,
+        "p95": 10,
+        "max": 11,
+        "mean": 8.12
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.125,
+        "mixed_ratio": 0.875
+      },
+      "digit_ratio": 0.0,
+      "alpha_ratio": 0.9792
+    },
+    "SWIFT": {
+      "field": "SWIFT",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 8,
+      "unique_ratio": 1.0,
+      "quality_score": 100,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 100.0,
+      "top_values": [
+        {
+          "value": "EBILAEAD",
+          "count": 1
+        },
+        {
+          "value": "BAWAATWW",
+          "count": 1
+        },
+        {
+          "value": "GEBAATWW",
+          "count": 1
+        },
+        {
+          "value": "DEUTATWW",
+          "count": 1
+        },
+        {
+          "value": "RZBAATWW",
+          "count": 1
+        },
+        {
+          "value": "RLBBAT2E002",
+          "count": 1
+        },
+        {
+          "value": "RZOOAT2L455",
+          "count": 1
+        },
+        {
+          "value": "VBOEATWWBAD",
+          "count": 1
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "8-8",
+          "8-8",
+          "8-8",
+          "8-9",
+          "9-9",
+          "9-9",
+          "9-9",
+          "9-10",
+          "10-10",
+          "10-10",
+          "10-10",
+          "10-11"
+        ],
+        "counts": [
+          5,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3
+        ]
+      },
+      "length": {
+        "min": 8,
+        "p50": 8,
+        "p95": 11,
+        "max": 11,
+        "mean": 9.12
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 1.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 0.0
+      },
+      "digit_ratio": 0.0909,
+      "alpha_ratio": 0.9091
+    },
+    "BGRUP": {
+      "field": "BGRUP",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "XPGRO": {
+      "field": "XPGRO",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "LOEVM": {
+      "field": "LOEVM",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "BNKLZ": {
+      "field": "BNKLZ",
+      "type": "string",
+      "count": 7,
+      "missing": 1,
+      "invalid": 0,
+      "unique": 7,
+      "unique_ratio": 1.0,
+      "quality_score": 95.0,
+      "missing_pct": 12.5,
+      "invalid_pct": 0.0,
+      "unique_pct": 100.0,
+      "top_values": [
+        {
+          "value": "12000",
+          "count": 1
+        },
+        {
+          "value": "13000",
+          "count": 1
+        },
+        {
+          "value": "14000",
+          "count": 1
+        },
+        {
+          "value": "15000",
+          "count": 1
+        },
+        {
+          "value": "16000",
+          "count": 1
+        },
+        {
+          "value": "17000",
+          "count": 1
+        },
+        {
+          "value": "18000",
+          "count": 1
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-1",
+          "1-1",
+          "1-2",
+          "2-2",
+          "2-2",
+          "2-3",
+          "3-3",
+          "3-4",
+          "4-4",
+          "4-5"
+        ],
+        "counts": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          7
+        ]
+      },
+      "length": {
+        "min": 5,
+        "p50": 5,
+        "p95": 5,
+        "max": 5,
+        "mean": 5.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "PSKTO": {
+      "field": "PSKTO",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "ADRNR": {
+      "field": "ADRNR",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "BRNCH": {
+      "field": "BRNCH",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "CHKME": {
+      "field": "CHKME",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "VERS": {
+      "field": "VERS",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "IBAN_RULE": {
+      "field": "IBAN_RULE",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "SDD_B2B": {
+      "field": "SDD_B2B",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 1,
+      "unique_ratio": 0.125,
+      "quality_score": 82.5,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 12.5,
+      "top_values": [
+        {
+          "value": "0",
+          "count": 8
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-1",
+          "1-1",
+          "1-1",
+          "1-1",
+          "1-1",
+          "1-1",
+          "1-1"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 1,
+        "p50": 1,
+        "p95": 1,
+        "max": 1,
+        "mean": 1.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "SDD_COR1": {
+      "field": "SDD_COR1",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 1,
+      "unique_ratio": 0.125,
+      "quality_score": 82.5,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 12.5,
+      "top_values": [
+        {
+          "value": "0",
+          "count": 8
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-1",
+          "1-1",
+          "1-1",
+          "1-1",
+          "1-1",
+          "1-1",
+          "1-1"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 1,
+        "p50": 1,
+        "p95": 1,
+        "max": 1,
+        "mean": 1.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "SDD_RTRANS": {
+      "field": "SDD_RTRANS",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 1,
+      "unique_ratio": 0.125,
+      "quality_score": 82.5,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 12.5,
+      "top_values": [
+        {
+          "value": "0",
+          "count": 8
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-1",
+          "1-1",
+          "1-1",
+          "1-1",
+          "1-1",
+          "1-1",
+          "1-1"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 1,
+        "p50": 1,
+        "p95": 1,
+        "max": 1,
+        "mean": 1.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "ZNOCHECK": {
+      "field": "ZNOCHECK",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "ZACC_LEN": {
+      "field": "ZACC_LEN",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "ZRES1": {
+      "field": "ZRES1",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 1,
+      "unique_ratio": 0.125,
+      "quality_score": 82.5,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 12.5,
+      "top_values": [
+        {
+          "value": "000",
+          "count": 8
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 3,
+        "p50": 3,
+        "p95": 3,
+        "max": 3,
+        "mean": 3.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "ZRES2": {
+      "field": "ZRES2",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 1,
+      "unique_ratio": 0.125,
+      "quality_score": 82.5,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 12.5,
+      "top_values": [
+        {
+          "value": "000",
+          "count": 8
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 3,
+        "p50": 3,
+        "p95": 3,
+        "max": 3,
+        "mean": 3.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "ZRES3": {
+      "field": "ZRES3",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 1,
+      "unique_ratio": 0.125,
+      "quality_score": 82.5,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 12.5,
+      "top_values": [
+        {
+          "value": "000",
+          "count": 8
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 3,
+        "p50": 3,
+        "p95": 3,
+        "max": 3,
+        "mean": 3.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "ZRES4": {
+      "field": "ZRES4",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 1,
+      "unique_ratio": 0.125,
+      "quality_score": 82.5,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 12.5,
+      "top_values": [
+        {
+          "value": "000",
+          "count": 8
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 3,
+        "p50": 3,
+        "p95": 3,
+        "max": 3,
+        "mean": 3.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "ZRES5": {
+      "field": "ZRES5",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 1,
+      "unique_ratio": 0.125,
+      "quality_score": 82.5,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 12.5,
+      "top_values": [
+        {
+          "value": "000",
+          "count": 8
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 3,
+        "p50": 3,
+        "p95": 3,
+        "max": 3,
+        "mean": 3.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "ZRES6": {
+      "field": "ZRES6",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 1,
+      "unique_ratio": 0.125,
+      "quality_score": 82.5,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 12.5,
+      "top_values": [
+        {
+          "value": "000",
+          "count": 8
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 3,
+        "p50": 3,
+        "p95": 3,
+        "max": 3,
+        "mean": 3.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "ZRES7": {
+      "field": "ZRES7",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 1,
+      "unique_ratio": 0.125,
+      "quality_score": 82.5,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 12.5,
+      "top_values": [
+        {
+          "value": "000",
+          "count": 8
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 3,
+        "p50": 3,
+        "p95": 3,
+        "max": 3,
+        "mean": 3.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "ZRES8": {
+      "field": "ZRES8",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 1,
+      "unique_ratio": 0.125,
+      "quality_score": 82.5,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 12.5,
+      "top_values": [
+        {
+          "value": "000",
+          "count": 8
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 3,
+        "p50": 3,
+        "p95": 3,
+        "max": 3,
+        "mean": 3.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "ZRES9": {
+      "field": "ZRES9",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 1,
+      "unique_ratio": 0.125,
+      "quality_score": 82.5,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 12.5,
+      "top_values": [
+        {
+          "value": "000",
+          "count": 8
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 3,
+        "p50": 3,
+        "p95": 3,
+        "max": 3,
+        "mean": 3.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "ZRES10": {
+      "field": "ZRES10",
+      "type": "string",
+      "count": 8,
+      "missing": 0,
+      "invalid": 0,
+      "unique": 1,
+      "unique_ratio": 0.125,
+      "quality_score": 82.5,
+      "missing_pct": 0.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 12.5,
+      "top_values": [
+        {
+          "value": "000",
+          "count": 8
+        }
+      ],
+      "histogram": {
+        "bins": [
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-2",
+          "2-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3",
+          "3-3"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "length": {
+        "min": 3,
+        "p50": 3,
+        "p95": 3,
+        "max": 3,
+        "mean": 3.0
+      },
+      "whitespace_issues": {
+        "leading_or_trailing": 0
+      },
+      "case_mix": {
+        "upper_ratio": 0.0,
+        "lower_ratio": 0.0,
+        "mixed_ratio": 1.0
+      },
+      "digit_ratio": 1.0,
+      "alpha_ratio": 0.0
+    },
+    "BICKY": {
+      "field": "BICKY",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "RCCODE": {
+      "field": "RCCODE",
+      "type": "string",
+      "count": 0,
+      "missing": 8,
+      "invalid": 0,
+      "unique": 0,
+      "unique_ratio": 0,
+      "quality_score": 40.0,
+      "missing_pct": 100.0,
+      "invalid_pct": 0.0,
+      "unique_pct": 0,
+      "top_values": [],
+      "histogram": {
+        "bins": [
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0",
+          "0-0"
+        ],
+        "counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  },
+  "warnings": []
+}
