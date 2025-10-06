@@ -1154,7 +1154,9 @@ def run_index_source_command(args, config):
                 for i, field in enumerate(source_fields):
                     if i > 0:
                         f.write("\n")  # Add 1 empty line between records
-                    f.write(f"- source_field_name: {field['field_name']}\n")
+                    # Use source_field as primary, source_field_name as alias for backward compatibility
+                    f.write(f"- source_field: {field['field_name']}\n")
+                    f.write(f"  source_field_name: {field['field_name']}\n")
 
                     # Quote field descriptions to handle colons in text
                     desc = field["field_description"]
@@ -1729,7 +1731,9 @@ def run_index_target_command(args, config):
             for i, field in enumerate(target_fields):
                 if i > 0:
                     f.write("\n")  # Add 1 empty line between records
-                f.write(f"- target_field_name: {field['sap_field'].upper()}\n")
+                # Use target_field as primary, target_field_name as alias for backward compatibility
+                f.write(f"- target_field: {field['sap_field'].upper()}\n")
+                f.write(f"  target_field_name: {field['sap_field'].upper()}\n")
 
                 # Quote field descriptions to handle colons in text
                 desc = field["field_description"]
@@ -2233,11 +2237,18 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
         return collapsed.strip()
 
     # Extract verbatim and normalized headers, creating a lookup map for field names
-    verbatim_headers = [field.get("field_name", "") for field in source_fields]
+    # Prioritize new names (source_field) but support old names (source_field_name) for backward compatibility
+    verbatim_headers = [
+        field.get("source_field", field.get("source_field_name", field.get("field_name", "")))
+        for field in source_fields
+    ]
     [norm(header) for header in verbatim_headers]
 
     # Create lookup map from header to source field for preserving field_name information
-    header_to_field = {field.get("field_name", ""): field for field in source_fields}
+    header_to_field = {
+        field.get("source_field", field.get("source_field_name", field.get("field_name", ""))): field
+        for field in source_fields
+    }
 
     # Create fuzzy matcher components
     normalizer = FieldNormalizer()
@@ -2253,10 +2264,14 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
 
     # Process each target field (target-centric approach)
     for target in target_fields:
-        t_name = target.get("sap_field", "").lower()
-        t_desc = (target.get("field_description") or "").lower()
-        t_table = target.get("sap_table", "").lower()
-        required = bool(target.get("mandatory", False))
+        # Prioritize new names (target_field) but support old names (target_field_name, sap_field) for backward compatibility
+        t_name = target.get("target_field", target.get("target_field_name", target.get("sap_field", ""))).lower()
+        t_desc = (
+            target.get("target_field_description", target.get("field_description", ""))
+            or ""
+        ).lower()
+        t_table = target.get("target_table", target.get("sap_table", "")).lower()
+        required = bool(target.get("target_is_mandatory", target.get("mandatory", False)))
 
         best_match = None
         best_confidence = 0.0
@@ -2344,8 +2359,10 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             # Tie detected - add to audit with field_name
             tie_field_name = "field_name onbekend"
             if best_match and best_match in header_to_field:
-                tie_field_name = header_to_field[best_match].get(
-                    "field_name", "field_name onbekend"
+                source_field = header_to_field[best_match]
+                # Prioritize new name (source_field) but support old names for backward compatibility
+                tie_field_name = source_field.get(
+                    "source_field", source_field.get("source_field_name", source_field.get("field_name", "field_name onbekend"))
                 )
 
             to_audit.append(
@@ -2370,15 +2387,22 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
         source_field_description = None
         if best_match and best_match in header_to_field:
             source_field = header_to_field[best_match]
-            source_field_name = source_field.get("field_name", "field_name onbekend")
-            source_field_description = source_field.get("field_description")
+            # Prioritize new name (source_field) but support old names for backward compatibility
+            source_field_name = source_field.get(
+                "source_field", source_field.get("source_field_name", source_field.get("field_name", "field_name onbekend"))
+            )
+            # Use source_field_description (already standardized)
+            source_field_description = source_field.get("source_field_description")
         elif not best_match:
             source_field_name = "field_name onbekend"
 
         mapping = {
             "target_field_name": t_name.upper(),  # Make target_field uppercase for SAP compliance
+            "source_header": best_match,  # Add source_header for preview table
             "source_field_name": source_field_name,  # Always show field_name
-            "target_field_description": target.get("field_description", ""),
+            "target_field_description": target.get(
+                "target_field_description", target.get("field_description", "")
+            ),
             "source_field_description": (
                 source_field_description if source_field_description else "none"
             ),
@@ -2403,8 +2427,10 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             # Get field_name for audit entries
             audit_field_name = "field_name onbekend"
             if best_match in header_to_field:
-                audit_field_name = header_to_field[best_match].get(
-                    "field_name", "field_name onbekend"
+                source_field = header_to_field[best_match]
+                # Prioritize new name (source_field) but support old names for backward compatibility
+                audit_field_name = source_field.get(
+                    "source_field", source_field.get("source_field_name", source_field.get("field_name", "field_name onbekend"))
                 )
 
             # Low confidence fuzzy
@@ -2461,9 +2487,9 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             to_audit.append(
                 {
                     "target_table": mapping["target_table"],
-                    "target_field": mapping["target_field"],
+                    "target_field_name": mapping["target_field_name"],
                     "source_header": source_header,
-                    "confidence": mapping["confidence"],
+                    "confidence": mapping["map_confidence"],
                     "reason": "reused_source",
                 }
             )
