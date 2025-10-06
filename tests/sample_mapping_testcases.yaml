@@ -1,0 +1,59 @@
+# Sample mapping test cases for transform-myd-minimal
+# Use this file to define test cases for your mapping logic
+
+test_cases:
+  - name: test_bank_name_copy
+    source_field: BANK_NAME
+    target_field: BANKL
+    source_value: "Deutsche Bank"
+    expected_value: "Deutsche Bank"
+    transformation: copy
+    description: "Copy bank name directly from source to target"
+
+  - name: test_country_constant
+    source_field: ANY_FIELD
+    target_field: BUKRS
+    source_value: "ignored"
+    expected_value: "1000"
+    transformation: constant
+    description: "Set constant company code for all records"
+
+  - name: test_country_code_lookup
+    source_field: COUNTRY_CODE
+    target_field: LAND1
+    source_value: "DE"
+    expected_value: "Germany"
+    transformation: lookup
+    description: "Lookup country name from country code"
+
+  - name: test_full_name_concatenate
+    source_field: NAME_PARTS
+    target_field: FULL_NAME
+    source_value: ["John", "Doe"]
+    expected_value: "John Doe"
+    transformation: concatenate
+    description: "Concatenate first and last name with space"
+
+  - name: test_extract_first_value
+    source_field: CSV_DATA
+    target_field: FIRST_COLUMN
+    source_value: "value1,value2,value3"
+    expected_value: "value1"
+    transformation: split
+    description: "Extract first value from comma-separated list"
+
+  - name: test_iban_validation
+    source_field: IBAN
+    target_field: VALIDATED_IBAN
+    source_value: "DE89370400440532013000"
+    expected_value: "DE89370400440532013000"
+    transformation: copy
+    description: "Validate IBAN format (basic copy for now)"
+
+  - name: test_account_number_padding
+    source_field: ACCOUNT_NUM
+    target_field: PADDED_ACCOUNT
+    source_value: "12345"
+    expected_value: "0000012345"
+    transformation: transform
+    description: "Pad account number to 10 digits with leading zeros"

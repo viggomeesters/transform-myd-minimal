@@ -901,6 +901,184 @@ De migration generator is geïntegreerd in het hoofdscript. Bij elke `map` opdra
 
 Het script scant automatisch de bestaande Excel-bestanden in `data/01_source/fields_{object}_{variant}.xlsx`.
 
+## 🎨 Mapping User Experience Features
+
+Transform-myd-minimal biedt geavanceerde tools voor het verbeteren van de mapping user experience:
+
+### 📊 Mapping Editor Template (Excel)
+
+Een Excel template voor het handmatig invoeren en valideren van mappings:
+
+**Locatie:** `migrations/mapping_editor_template.xlsx`
+
+**Features:**
+- Pre-gedefinieerde kolommen: Source Field, Target Field, Transformation, Note
+- Excel validatieregels met dropdowns voor Transformation types
+- Conditional formatting voor lege velden (rood gemarkeerd)
+- Automatische validatie van verplichte velden
+
+**Gebruik:**
+1. Open `migrations/mapping_editor_template.xlsx`
+2. Vul de mapping gegevens in
+3. Gebruik de dropdowns voor Transformation (copy, constant, derive, lookup, etc.)
+4. Excel markeert automatisch ontbrekende waarden
+
+### 🌐 Web-Based Mapping Editor
+
+Een interactieve web-UI gebouwd met Streamlit voor mapping bewerking:
+
+**Locatie:** `scripts/mapping_editor_webui.py`
+
+**Features:**
+- Upload en bewerk bestaande mapping bestanden (Excel of YAML)
+- Inline validatie met directe foutmeldingen
+- Interactieve tabel editor met add/remove row functionaliteit
+- Download mappings als Excel of YAML
+- Real-time statistieken en validatie feedback
+
+**Start de editor:**
+```bash
+# Installeer Streamlit (indien nog niet geïnstalleerd)
+pip install streamlit
+
+# Start de web-UI
+streamlit run scripts/mapping_editor_webui.py
+```
+
+**Gebruik:**
+1. Upload een bestaand mapping bestand of begin met lege template
+2. Bewerk mappings in de interactieve tabel
+3. Klik op "Validate" om fouten en waarschuwingen te controleren
+4. Download het resultaat als Excel of YAML bestand
+
+### 🤖 Auto-Suggest Mapping
+
+Automatische mapping suggesties op basis van intelligente matching:
+
+**Locatie:** `scripts/auto_suggest_mapping.py`
+
+**Features:**
+- Fuzzy matching op veldnamen (Levenshtein & Jaro-Winkler algoritmen)
+- Data type compatibiliteit check
+- Sample value pattern analyse
+- Confidence scores voor elke suggestie
+- Configureerbare threshold en max suggesties
+
+**Gebruik:**
+```bash
+# Genereer mapping suggesties voor een object/variant
+python scripts/auto_suggest_mapping.py \
+  --object m140 \
+  --variant bnka \
+  --max-suggestions 3 \
+  --fuzzy-threshold 0.6
+
+# Output naar YAML bestand
+python scripts/auto_suggest_mapping.py \
+  --object m140 \
+  --variant bnka \
+  --output suggestions.yaml
+```
+
+**Voorbeeld output:**
+```
+Source: BANKS (string)
+  1. BANKS - Confidence: 79.7%
+     Reason: High name similarity (100.0%); Compatible data types
+  2. BANKL - Confidence: 78.0%
+     Reason: High name similarity (86.0%); Compatible data types
+```
+
+### 🧪 Test-Driven Mapping
+
+Test framework voor mapping validatie met pytest:
+
+**Locatie:** `tests/test_mapping.py`
+
+**Features:**
+- Definieer test cases met source values → expected target values
+- Automatische validatie van transformatie logica
+- Pytest integratie voor CI/CD pipelines
+- HTML en JSON rapportage van test resultaten
+
+**Test cases definiëren:**
+
+Maak een YAML bestand met test cases:
+
+```yaml
+# tests/my_mapping_tests.yaml
+test_cases:
+  - name: test_bank_name_copy
+    source_field: BANK_NAME
+    target_field: BANKL
+    source_value: "Deutsche Bank"
+    expected_value: "Deutsche Bank"
+    transformation: copy
+    description: "Copy bank name directly"
+
+  - name: test_country_constant
+    source_field: ANY_FIELD
+    target_field: BUKRS
+    source_value: "ignored"
+    expected_value: "1000"
+    transformation: constant
+    description: "Set constant company code"
+```
+
+**Tests uitvoeren:**
+
+```bash
+# Via pytest (unit tests)
+pytest tests/test_mapping.py -v
+
+# Via command-line interface (YAML test cases)
+python tests/test_mapping.py --test-file tests/sample_mapping_testcases.yaml
+
+# Met HTML rapport
+python tests/test_mapping.py \
+  --test-file tests/sample_mapping_testcases.yaml \
+  --html-report test_results.html
+```
+
+**Voorbeeld test output:**
+```
+✅ PASS - test_bank_name_copy
+  Source: BANK_NAME = Deutsche Bank
+  Target: BANKL
+  Expected: Deutsche Bank
+  Actual: Deutsche Bank
+
+❌ FAIL - test_validation_rule
+  Source: IBAN = invalid-iban
+  Target: VALIDATED_IBAN
+  Expected: ERROR
+  Actual: invalid-iban
+
+Test Summary: 5 passed, 1 failed
+```
+
+### 📝 Sample Files
+
+- **Excel Template:** `migrations/mapping_editor_template.xlsx`
+- **Sample Test Cases:** `tests/sample_mapping_testcases.yaml`
+- **Web UI Script:** `scripts/mapping_editor_webui.py`
+- **Auto-Suggest Script:** `scripts/auto_suggest_mapping.py`
+- **Test Framework:** `tests/test_mapping.py`
+
+### 🔧 Installatie van Dependencies
+
+Voor volledige functionaliteit van de mapping UX features:
+
+```bash
+# Streamlit voor web-UI (optioneel)
+pip install streamlit
+
+# Pytest voor test-driven mapping (aanbevolen)
+pip install pytest
+
+# Basis dependencies zijn al geïnstalleerd via requirements.txt
+```
+
 ## Versie Informatie
 
 **Huidige versie: 4.1.0 - Step-by-Step Object+Variant Pipeline with HTML Reporting**
