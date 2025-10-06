@@ -958,12 +958,23 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
                     {{value: data.keys || 0, label: 'Keys'}}
                 ];
             }} else if (step === 'map') {{
-                return [
-                    {{value: data.mapped || 0, label: 'Mapped'}},
-                    {{value: data.unmapped || 0, label: 'Unmapped'}},
-                    {{value: data.to_audit || 0, label: 'To Audit'}},
-                    {{value: data.unused_sources || 0, label: 'Unused Sources'}}
-                ];
+                // Support both new format (with coverage_stats) and old format (without)
+                if (data.coverage_stats) {{
+                    return [
+                        {{value: data.coverage_stats.mapped_with_source || 0, label: 'Mapped'}},
+                        {{value: data.coverage_stats.unmapped_count || 0, label: 'Unmapped'}},
+                        {{value: data.coverage_stats.unmapped_sources_count || 0, label: 'Unused Sources'}},
+                        {{value: data.coverage_stats.unmapped_targets_count || 0, label: 'Unused Targets'}},
+                        {{value: data.coverage_stats.coverage_pct.toFixed(1) + '%', label: 'Coverage'}}
+                    ];
+                }} else {{
+                    return [
+                        {{value: data.mapped || 0, label: 'Mapped'}},
+                        {{value: data.unmapped || 0, label: 'Unmapped'}},
+                        {{value: data.to_audit || 0, label: 'To Audit'}},
+                        {{value: data.unused_sources || 0, label: 'Unused Sources'}}
+                    ];
+                }}
             }} else if (step === 'transform' && data.coverage_stats) {{
                 return [
                     {{value: data.coverage_stats.mapped_with_source || 0, label: 'Mapped'}},

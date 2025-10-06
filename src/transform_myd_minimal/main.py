@@ -2816,11 +2816,19 @@ def run_map_command(args, config):
                     )
                     for target in mapping_result["unmapped_target_fields"]
                 ],
+                "coverage_stats": {
+                    "total_mappings": len(mapping_result["mappings"]),
+                    "mapped_with_source": mapped_count,
+                    "unmapped_count": unmapped_count,
+                    "unmapped_sources_count": unused_sources_count,
+                    "unmapped_targets_count": len(mapping_result["unmapped_target_fields"]),
+                    "coverage_pct": round((mapped_count / len(mapping_result["mappings"]) * 100) if len(mapping_result["mappings"]) > 0 else 0.0, 2),
+                },
                 "warnings": [],
             }
 
             # Write JSON summary
-            json_filename = f"mapping_{timestamp}.json"
+            json_filename = f"{args.object}_{args.variant}_mapping_report_{timestamp}.json"
             json_path = reports_dir / json_filename
             json_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -2828,9 +2836,9 @@ def run_map_command(args, config):
                 json.dump(html_summary, f, ensure_ascii=False, indent=2)
 
             # Write HTML report
-            html_filename = f"mapping_{timestamp}.html"
+            html_filename = f"{args.object}_{args.variant}_mapping_report_{timestamp}.html"
             html_path = reports_dir / html_filename
-            title = f"mapping · {args.object}/{args.variant}"
+            title = f"Mapping Report · {args.object}/{args.variant}"
 
             write_html_report(html_summary, html_path, title)
 
