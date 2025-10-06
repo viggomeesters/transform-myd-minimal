@@ -412,6 +412,100 @@ def profile_dataframe(
     return profiles
 
 
+def generate_mapping_report_with_samples(
+    mapping_entries: list,
+    source_df: pd.DataFrame,
+    target_df: pd.DataFrame,
+    unmapped_source_fields: list,
+    unmapped_target_fields: list,
+) -> Dict[str, Any]:
+    """
+    Generate an enriched mapping report with sample values from source and target data.
+    
+    Args:
+        mapping_entries: List of mapping dictionaries from mapping.yaml
+        source_df: Source data DataFrame (raw_df)
+        target_df: Target data DataFrame (skeleton after mapping)
+        unmapped_source_fields: List of unmapped source field names
+        unmapped_target_fields: List of unmapped target fields (can be dicts or strings)
+        
+    Returns:
+        Dictionary with enriched mapping information including sample values
+    """
+    enriched_mappings = []
+    
+    for mapping in mapping_entries:
+        # Try both field names for compatibility
+        target_field = mapping.get("target_field_name") or mapping.get("target_field", "")
+        source_header = mapping.get("source_header")
+        
+        # Get sample values from source
+        source_samples = []
+        if source_header and source_header in source_df.columns:
+            # Get first 5 unique non-empty values
+            source_series = source_df[source_header]
+            unique_values = source_series[
+                pd.notna(source_series) & (source_series.astype(str).str.strip() != "")
+            ].unique()
+            source_samples = [str(val) for val in unique_values[:5]]
+        
+        # Get sample values from target
+        target_samples = []
+        if target_field:
+            target_field_lower = target_field.lower()
+            if target_field_lower in target_df.columns:
+                target_series = target_df[target_field_lower]
+                unique_values = target_series[
+                    pd.notna(target_series) & (target_series.astype(str).str.strip() != "")
+                ].unique()
+                target_samples = [str(val) for val in unique_values[:5]]
+        
+        # Build enriched mapping entry
+        enriched_mapping = {
+            "target_table": mapping.get("target_table", ""),
+            "target_field": target_field,
+            "source_header": source_header or "",
+            "source_field_name": mapping.get("source_field_name", ""),
+            "source_field_description": mapping.get("source_field_description", ""),
+            "target_field_description": mapping.get("target_field_description", ""),
+            "required": mapping.get("required", False),
+            "confidence": mapping.get("map_confidence", 0.0),
+            "status": mapping.get("map_status", ""),
+            "rationale": mapping.get("map_rationale", ""),
+            "transformation": mapping.get("transformation", ""),
+            "source_samples": source_samples,
+            "target_samples": target_samples,
+        }
+        enriched_mappings.append(enriched_mapping)
+    
+    # Calculate coverage statistics
+    total_mappings = len(mapping_entries)
+    mapped_with_source = len([m for m in mapping_entries if m.get("source_header")])
+    unmapped_count = total_mappings - mapped_with_source
+    
+    # Count unmapped sources and targets
+    unmapped_sources_count = len(unmapped_source_fields)
+    unmapped_targets_count = len(unmapped_target_fields)
+    
+    # Calculate coverage percentage
+    total_target_fields = total_mappings
+    coverage_pct = (mapped_with_source / total_target_fields * 100) if total_target_fields > 0 else 0.0
+    
+    return {
+        "mappings": enriched_mappings,
+        "coverage_stats": {
+            "total_mappings": total_mappings,
+            "mapped_with_source": mapped_with_source,
+            "unmapped_count": unmapped_count,
+            "unmapped_sources_count": unmapped_sources_count,
+            "unmapped_targets_count": unmapped_targets_count,
+            "coverage_pct": round(coverage_pct, 2),
+        },
+        "unmapped_source_fields": unmapped_source_fields,
+        "unmapped_target_fields": unmapped_target_fields,
+    }
+
+
 def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> None:
     """
     Write a self-contained HTML report with embedded JSON data.
@@ -870,6 +964,14 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
                     {{value: data.to_audit || 0, label: 'To Audit'}},
                     {{value: data.unused_sources || 0, label: 'Unused Sources'}}
                 ];
+            }} else if (step === 'transform' && data.coverage_stats) {{
+                return [
+                    {{value: data.coverage_stats.mapped_with_source || 0, label: 'Mapped'}},
+                    {{value: data.coverage_stats.unmapped_count || 0, label: 'Unmapped'}},
+                    {{value: data.coverage_stats.unmapped_sources_count || 0, label: 'Unused Sources'}},
+                    {{value: data.coverage_stats.unmapped_targets_count || 0, label: 'Unused Targets'}},
+                    {{value: data.coverage_stats.coverage_pct.toFixed(1) + '%', label: 'Coverage'}}
+                ];
             }} else if (step === 'raw_validation') {{
                 return [
                     {{value: data.rows_in || 0, label: 'Rows In'}},
@@ -996,17 +1098,38 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
                 tables.push({{id: 'fields-table', title: 'Target Fields', headers, rows}});
             }}
             
-            if (step === 'map') {{
+            if (step === 'map' || step === 'transform') {{
                 if (data.mappings) {{
-                    const headers = ['Target Field', 'Source Header', 'Required', 'Confidence', 'Status', 'Rationale'];
-                    const rows = data.mappings.map(m => [
-                        m.target_field || '',
-                        m.source_header || '',
-                        m.required ? 'Yes' : 'No',
-                        m.confidence ? m.confidence.toFixed(2) : '',
-                        m.status || '',
-                        m.rationale || ''
-                    ]);
+                    // Check if we have sample values (transform step)
+                    const hasSamples = data.mappings.length > 0 && data.mappings[0].source_samples !== undefined;
+                    
+                    const headers = hasSamples 
+                        ? ['Target Field', 'Source Header', 'Source Samples', 'Target Samples', 'Transformation', 'Required', 'Confidence', 'Status', 'Rationale']
+                        : ['Target Field', 'Source Header', 'Required', 'Confidence', 'Status', 'Rationale'];
+                    
+                    const rows = data.mappings.map(m => {{
+                        const baseRow = hasSamples 
+                            ? [
+                                m.target_field || '',
+                                m.source_header || '',
+                                (m.source_samples || []).join(', ') || '-',
+                                (m.target_samples || []).join(', ') || '-',
+                                m.transformation || '-',
+                                m.required ? 'Yes' : 'No',
+                                m.confidence ? m.confidence.toFixed(2) : '',
+                                m.status || '',
+                                m.rationale || ''
+                            ]
+                            : [
+                                m.target_field || '',
+                                m.source_header || '',
+                                m.required ? 'Yes' : 'No',
+                                m.confidence ? m.confidence.toFixed(2) : '',
+                                m.status || '',
+                                m.rationale || ''
+                            ];
+                        return baseRow;
+                    }});
                     tables.push({{id: 'mappings-table', title: 'Mappings', headers, rows}});
                 }}
                 
@@ -1092,7 +1215,7 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
                 lists.push({{id: 'anomalies-list', title: 'Anomalies', items: data.anomalies}});
             }}
             
-            if (step === 'map') {{
+            if (step === 'map' || step === 'transform') {{
                 if (data.unmapped_source_fields) {{
                     lists.push({{id: 'unmapped-source-list', title: 'Unmapped Source Fields', items: data.unmapped_source_fields}});
                 }}

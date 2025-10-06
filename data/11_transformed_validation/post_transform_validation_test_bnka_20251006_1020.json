@@ -1,0 +1,18 @@
+{
+  "step": "post_transform_validation",
+  "object": "test",
+  "variant": "bnka",
+  "structure": "S_BNKA",
+  "ts": "2025-10-06T10:20:50.633416",
+  "rows_in": 8,
+  "rows_out": 8,
+  "rows_rejected": 0,
+  "mapped_coverage": 0.9166666666666666,
+  "template_used": "data/06_template/S_BNKA#FreeText_Mandatory.csv",
+  "ignored_targets": [],
+  "errors_by_rule": {},
+  "errors_by_field": {},
+  "sample_rows": [],
+  "field_profiles": {},
+  "warnings": []
+}

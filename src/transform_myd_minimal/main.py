@@ -3482,6 +3482,86 @@ def run_transform_command(args, config):
             if not (args.json or not sys.stdout.isatty()):
                 print(f"report: {html_path_display_post}")
 
+        # Generate mapping report with sample values
+        if not getattr(args, "no_html", False):
+            from datetime import datetime as dt
+
+            from .reporting import generate_mapping_report_with_samples, write_html_report
+
+            timestamp_mapping = dt.now().strftime("%Y%m%d_%H%M")
+
+            # Determine report directory for mapping reports (F05)
+            if hasattr(args, "html_dir") and args.html_dir:
+                reports_dir = Path(args.html_dir)
+            else:
+                reports_dir = root_path / "data" / "05_map"
+
+            # Get unmapped fields from mapping
+            all_source_fields = set(raw_df.columns)
+            mapped_source_fields = set([m.get("source_header") for m in mapping_entries if m.get("source_header")])
+            unmapped_sources = list(all_source_fields - mapped_source_fields)
+
+            all_target_fields = [t.get("sap_field") for t in target_fields if t.get("sap_field")]
+            mapped_target_fields = set([m.get("target_field_name") or m.get("target_field") for m in mapping_entries if m.get("target_field_name") or m.get("target_field")])
+            unmapped_targets = [
+                {"target_field": tf, "required": False}
+                for tf in all_target_fields
+                if tf not in mapped_target_fields
+            ]
+
+            # Generate enriched mapping report with sample values
+            mapping_report = generate_mapping_report_with_samples(
+                mapping_entries,
+                raw_df,
+                skeleton,
+                unmapped_sources,
+                unmapped_targets,
+            )
+
+            # Build HTML summary for mapping report
+            html_summary_mapping = {
+                "step": "transform",
+                "object": args.object,
+                "variant": args.variant,
+                "ts": dt.now().isoformat(),
+                "source_index": str(
+                    migrations_dir / "index_source.yaml"
+                ).replace("\\", "/"),
+                "target_index": str(target_index_file).replace("\\", "/"),
+                "mapping_file": str(mapping_file).replace("\\", "/"),
+                "mappings": mapping_report["mappings"],
+                "coverage_stats": mapping_report["coverage_stats"],
+                "unmapped_source_fields": mapping_report["unmapped_source_fields"],
+                "unmapped_target_fields": mapping_report["unmapped_target_fields"],
+                "warnings": warnings,
+            }
+
+            # Write JSON summary
+            json_filename_mapping = (
+                f"{args.object}_{args.variant}_mapping_report_{timestamp_mapping}.json"
+            )
+            json_path_mapping = reports_dir / json_filename_mapping
+            json_path_mapping.parent.mkdir(parents=True, exist_ok=True)
+
+            with open(json_path_mapping, "w", encoding="utf-8") as f:
+                json.dump(html_summary_mapping, f, ensure_ascii=False, indent=2)
+
+            # Write HTML report
+            html_filename_mapping = (
+                f"{args.object}_{args.variant}_mapping_report_{timestamp_mapping}.html"
+            )
+            html_path_mapping = reports_dir / html_filename_mapping
+            title_mapping = f"Mapping Report · {args.object}/{args.variant}"
+
+            write_html_report(html_summary_mapping, html_path_mapping, title_mapping)
+
+            # Human-readable logging with forward slashes
+            html_path_display_mapping = str(
+                html_path_mapping.relative_to(root_path)
+            ).replace("\\", "/")
+            if not (args.json or not sys.stdout.isatty()):
+                print(f"report: {html_path_display_mapping}")
+
         # Calculate final metrics
         duration_ms = int((time.time() - start_time) * 1000)
 
