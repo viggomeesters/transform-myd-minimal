@@ -159,7 +159,7 @@ def _calculate_histogram(
                 f"{bin_edges[i]:.2f}-{bin_edges[i+1]:.2f}" for i in range(len(hist))
             ]
             return {"bins": bins, "counts": hist.tolist()}
-        except:
+        except Exception:
             return {"bins": [], "counts": []}
     elif field_type == "date":
         # Group by month YYYY-MM
@@ -171,7 +171,7 @@ def _calculate_histogram(
                 "counts": month_counts.values.tolist(),
                 "type": "monthly",
             }
-        except:
+        except Exception:
             return {"bins": [], "counts": []}
     elif field_type == "time":
         # Histogram on seconds (0-86400)
@@ -182,7 +182,7 @@ def _calculate_histogram(
                 for i in range(len(hist))
             ]
             return {"bins": bins, "counts": hist.tolist()}
-        except:
+        except Exception:
             return {"bins": [], "counts": []}
     else:  # string
         # Histogram on string length
@@ -196,7 +196,7 @@ def _calculate_histogram(
                 ]
                 return {"bins": bins, "counts": hist.tolist()}
             return {"bins": [], "counts": []}
-        except:
+        except Exception:
             return {"bins": [], "counts": []}
 
 
@@ -247,7 +247,7 @@ def profile_series(
             {"value": str(val), "count": int(count)}
             for val, count in top_values.items()
         ]
-    except:
+    except Exception:
         top_values_list = []
 
     # Calculate histogram
@@ -429,7 +429,7 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
     escaped_json = json_data.replace("</script>", '</scr" + "ipt>')
 
     # Determine step type and generate appropriate content
-    step = summary.get("step", "unknown")
+    _step = summary.get("step", "unknown")
 
     html_content = f"""<!DOCTYPE html>
 <html lang="en">
@@ -840,7 +840,7 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
             const container = document.getElementById('kpi-cards');
             const kpis = getKPIs(data);
             
-            container.innerHTML = kpis.map(kpi => 
+            container.innerHTML = kpis.map(kpi =>
                 `<div class="kpi-card">
                     <div class="kpi-value">${{kpi.value}}</div>
                     <div class="kpi-label">${{kpi.label}}</div>
@@ -940,7 +940,7 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
                     <div class="section">
                         <h2>${{table.title}}</h2>
                         <div class="controls">
-                            <input type="text" class="search-box" placeholder="Search ${{table.title.toLowerCase()}}..." 
+                            <input type="text" class="search-box" placeholder="Search ${{table.title.toLowerCase()}}..."
                                    onkeyup="filterTable(this, '${{table.id}}')">
                             <button class="download-btn" onclick="downloadCSV('${{table.id}}', '${{table.title}}')">
                                 Download CSV
@@ -949,13 +949,13 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
                         <table id="${{table.id}}">
                             <thead>
                                 <tr>
-                                    ${{table.headers.map((h, i) => 
+                                    ${{table.headers.map((h, i) =>
                                         `<th class="sortable" onclick="sortTable('${{table.id}}', ${{i}})">${{h}}</th>`
                                     ).join('')}}
                                 </tr>
                             </thead>
                             <tbody>
-                                ${{table.rows.map(row => 
+                                ${{table.rows.map(row =>
                                     `<tr>${{row.map(cell => `<td>${{cell}}</td>`).join('')}}</tr>`
                                 ).join('')}}
                             </tbody>
@@ -1098,7 +1098,7 @@ def write_html_report(summary: Dict[str, Any], out_html: Path, title: str) -> No
                 }}
                 
                 if (data.unmapped_target_fields) {{
-                    const items = data.unmapped_target_fields.map(f => 
+                    const items = data.unmapped_target_fields.map(f =>
                         typeof f === 'object' ? `${{f.target_table}}.${{f.target_field}}${{f.required ? ' (required)' : ''}}` : f
                     );
                     lists.push({{id: 'unmapped-target-list', title: 'Unmapped Target Fields', items}});

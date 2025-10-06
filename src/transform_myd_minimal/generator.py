@@ -318,10 +318,7 @@ def is_constant_field(field_name, field_description):
         return True
 
     # Check for single character fields (often flags)
-    if len(field_name) == 1 and field_name.upper() in "XYZQWERTY":
-        return True
-
-    return False
+    return bool(len(field_name) == 1 and field_name.upper() in "XYZQWERTY")
 
 
 def generate_column_map_yaml(

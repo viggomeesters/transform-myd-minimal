@@ -573,8 +573,8 @@ def _generate_html_template(data: Dict[str, Any]) -> str:
             
             // Apply global search
             if (globalSearch) {{
-                filtered = filtered.filter(row => 
-                    row.some(cell => 
+                filtered = filtered.filter(row =>
+                    row.some(cell =>
                         String(cell || '').toLowerCase().includes(globalSearch)
                     )
                 );
@@ -584,7 +584,7 @@ def _generate_html_template(data: Dict[str, Any]) -> str:
             if (columnFilter && columnSearch) {{
                 const columnIndex = data.columns.indexOf(columnFilter);
                 if (columnIndex !== -1) {{
-                    filtered = filtered.filter(row => 
+                    filtered = filtered.filter(row =>
                         String(row[columnIndex] || '').toLowerCase().includes(columnSearch)
                     );
                 }}

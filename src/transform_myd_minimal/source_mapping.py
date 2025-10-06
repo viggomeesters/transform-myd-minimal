@@ -101,12 +101,11 @@ class SourceBasedMatcher:
                     # Check synonym match first
                     if self.synonym_matcher.is_synonym_match(
                         source_header, target.get("sap_field", "")
-                    ):
-                        if best_confidence < 0.85:
-                            best_match = target
-                            best_confidence = 0.85
-                            match_type = "synonym"
-                            match_reason = "Synonym match found"
+                    ) and best_confidence < 0.85:
+                        best_match = target
+                        best_confidence = 0.85
+                        match_type = "synonym"
+                        match_reason = "Synonym match found"
 
                     # Try fuzzy matching on various target fields
                     for priority_field in priority_fields:

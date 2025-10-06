@@ -1176,7 +1176,7 @@ def run_index_source_command(args, config):
 
         # Prepare preview data for human output (first 8 headers)
         preview_data = []
-        for i, field in enumerate(source_fields[:8]):
+        for _i, field in enumerate(source_fields[:8]):
             preview_data.append(
                 {
                     "field_name": field.get("field_name", ""),
@@ -1415,7 +1415,7 @@ def _parse_spreadsheetml_target_fields(
     parsed_rows = []
     carry = {}  # For vertical propagation (ss:MergeDown)
 
-    for row_idx, row in enumerate(rows):
+    for _row_idx, row in enumerate(rows):
         col = 1  # 1-based column pointer
         row_data = [None] * 15  # Pre-allocate for up to 15 columns
 
@@ -1445,9 +1445,8 @@ def _parse_spreadsheetml_target_fields(
                     cell_value = None
 
             # Place value at current column (convert to 0-based)
-            if col <= len(row_data):
-                if col - 1 < len(row_data):
-                    row_data[col - 1] = cell_value
+            if col <= len(row_data) and col - 1 < len(row_data):
+                row_data[col - 1] = cell_value
 
             # Handle ss:MergeDown
             merge_down_attr = cell.get(f'{{{ns["ss"]}}}MergeDown')
@@ -2265,7 +2264,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
         candidates = []  # For tie-break detection
 
         # 1. EXACT MATCH: norm(header) == t_name
-        for i, header in enumerate(verbatim_headers):
+        for _i, header in enumerate(verbatim_headers):
             if norm(header) == t_name:
                 best_match = header
                 best_confidence = 1.00
@@ -2277,7 +2276,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             t_name_upper = t_name.upper()
             if t_name_upper in synonyms:
                 synonym_variants = synonyms[t_name_upper]
-                for i, header in enumerate(verbatim_headers):
+                for _i, header in enumerate(verbatim_headers):
                     if norm(header) in [norm(variant) for variant in synonym_variants]:
                         best_match = header
                         best_confidence = 0.95
@@ -2286,7 +2285,7 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
 
         # 3. FUZZY MATCH: against t_name and t_desc
         if not best_match:
-            for i, header in enumerate(verbatim_headers):
+            for _i, header in enumerate(verbatim_headers):
                 norm_header = normalizer.normalize_field_name(header)
 
                 # Try against target field name
@@ -2880,7 +2879,7 @@ def run_transform_command(args, config):
     )
 
     # Primary outputs
-    sap_csv = output_dir / f"S_{args.variant.upper()}#{args.object}_Data.csv"
+    _sap_csv = output_dir / f"S_{args.variant.upper()}#{args.object}_Data.csv"
     snapshot_csv = (
         output_dir / f"S_{args.variant.upper()}#{args.object}_{timestamp}_output.csv"
     )
@@ -3486,7 +3485,7 @@ def run_transform_command(args, config):
             preview_cols = final_headers[:8]
             preview_df = final_data[preview_cols].head(5)
 
-            for idx, row in preview_df.iterrows():
+            for _idx, row in preview_df.iterrows():
                 row_dict = {}
                 for col in preview_cols:
                     row_dict[col] = str(row[col])[:15] if pd.notna(row[col]) else ""

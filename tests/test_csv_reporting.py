@@ -132,7 +132,7 @@ class TestCSVReporting(unittest.TestCase):
         self.assertIn('"top_values"', content)
 
         # Should contain statistics for each column
-        for col in self.sample_data.keys():
+        for col in self.sample_data:
             self.assertIn(f'"{col}"', content)
 
     def test_html_report_responsive_design(self):
