@@ -2233,11 +2233,18 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
         return collapsed.strip()
 
     # Extract verbatim and normalized headers, creating a lookup map for field names
-    verbatim_headers = [field.get("field_name", "") for field in source_fields]
+    # Handle both "field_name" (internal) and "source_field_name" (from YAML)
+    verbatim_headers = [
+        field.get("source_field_name", field.get("field_name", ""))
+        for field in source_fields
+    ]
     [norm(header) for header in verbatim_headers]
 
     # Create lookup map from header to source field for preserving field_name information
-    header_to_field = {field.get("field_name", ""): field for field in source_fields}
+    header_to_field = {
+        field.get("source_field_name", field.get("field_name", "")): field
+        for field in source_fields
+    }
 
     # Create fuzzy matcher components
     normalizer = FieldNormalizer()
@@ -2253,10 +2260,14 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
 
     # Process each target field (target-centric approach)
     for target in target_fields:
-        t_name = target.get("sap_field", "").lower()
-        t_desc = (target.get("field_description") or "").lower()
-        t_table = target.get("sap_table", "").lower()
-        required = bool(target.get("mandatory", False))
+        # Handle both old key names (sap_field, etc.) and new key names (target_field_name, etc.)
+        t_name = target.get("sap_field", target.get("target_field_name", "")).lower()
+        t_desc = (
+            target.get("field_description", target.get("target_field_description", ""))
+            or ""
+        ).lower()
+        t_table = target.get("sap_table", target.get("target_table", "")).lower()
+        required = bool(target.get("mandatory", target.get("target_is_mandatory", False)))
 
         best_match = None
         best_confidence = 0.0
@@ -2344,8 +2355,10 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             # Tie detected - add to audit with field_name
             tie_field_name = "field_name onbekend"
             if best_match and best_match in header_to_field:
-                tie_field_name = header_to_field[best_match].get(
-                    "field_name", "field_name onbekend"
+                source_field = header_to_field[best_match]
+                # Handle both "field_name" (internal) and "source_field_name" (from YAML)
+                tie_field_name = source_field.get(
+                    "source_field_name", source_field.get("field_name", "field_name onbekend")
                 )
 
             to_audit.append(
@@ -2370,15 +2383,24 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
         source_field_description = None
         if best_match and best_match in header_to_field:
             source_field = header_to_field[best_match]
-            source_field_name = source_field.get("field_name", "field_name onbekend")
-            source_field_description = source_field.get("field_description")
+            # Handle both "field_name" (internal) and "source_field_name" (from YAML)
+            source_field_name = source_field.get(
+                "source_field_name", source_field.get("field_name", "field_name onbekend")
+            )
+            # Handle both "field_description" (internal) and "source_field_description" (from YAML)
+            source_field_description = source_field.get(
+                "source_field_description", source_field.get("field_description")
+            )
         elif not best_match:
             source_field_name = "field_name onbekend"
 
         mapping = {
             "target_field_name": t_name.upper(),  # Make target_field uppercase for SAP compliance
+            "source_header": best_match,  # Add source_header for preview table
             "source_field_name": source_field_name,  # Always show field_name
-            "target_field_description": target.get("field_description", ""),
+            "target_field_description": target.get(
+                "field_description", target.get("target_field_description", "")
+            ),
             "source_field_description": (
                 source_field_description if source_field_description else "none"
             ),
@@ -2403,8 +2425,10 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             # Get field_name for audit entries
             audit_field_name = "field_name onbekend"
             if best_match in header_to_field:
-                audit_field_name = header_to_field[best_match].get(
-                    "field_name", "field_name onbekend"
+                source_field = header_to_field[best_match]
+                # Handle both "field_name" (internal) and "source_field_name" (from YAML)
+                audit_field_name = source_field.get(
+                    "source_field_name", source_field.get("field_name", "field_name onbekend")
                 )
 
             # Low confidence fuzzy
