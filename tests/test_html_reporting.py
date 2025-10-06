@@ -15,8 +15,8 @@ def test_ensure_json_serializable():
     assert ensure_json_serializable("string") == "string"
     assert ensure_json_serializable(123) == 123
     assert ensure_json_serializable(12.34) == 12.34
-    assert ensure_json_serializable(True) == True
-    assert ensure_json_serializable(None) == None
+    assert ensure_json_serializable(True) is True
+    assert ensure_json_serializable(None) is None
 
     # Test Path objects - use as_posix() for cross-platform compatibility
     path_obj = Path("/some/path")

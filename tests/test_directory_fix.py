@@ -31,7 +31,9 @@ def test_template_directory_reference():
 
     # First, let's verify the path construction manually - use as_posix() for cross-platform compatibility
     root_path = Path.cwd()
-    expected_template_glob = (root_path / "data" / "06_template" / "S_BNKA#*.csv").as_posix()
+    expected_template_glob = (
+        root_path / "data" / "06_template" / "S_BNKA#*.csv"
+    ).as_posix()
 
     # The pattern should contain "06_template" not "03_template"
     assert "06_template" in expected_template_glob
