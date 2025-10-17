@@ -2,7 +2,7 @@ metadata:
   object: f100
   variant: aufk
   target_file: data/02_target/f100_aufk.xml
-  generated_at: '2025-10-17T15:14:01.793863'
+  generated_at: '2025-10-17T17:10:20.791950'
   structure: S_AUFK
   description: 'Transformation rules for f100/aufk'
 

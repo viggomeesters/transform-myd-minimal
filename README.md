@@ -8,23 +8,16 @@ CLI tool voor het genereren van column mapping en YAML bestanden met een stapsge
 # One-time setup (creates .venv and installs ALL deps)
 py -3.12 dev_bootstrap.py
 
-# Windows PowerShell: Add project to PATH for direct command access (optional)
-$env:PATH = "$PWD;$env:PATH"
-
-# Now you can use the wrapper script directly:
-.\transform-myd-minimal.ps1 --help
-transform-myd-minimal.ps1 transform --object f100 --variant aufk --force
-
-# Or via module (always works):
-py -3.12 -m transform_myd_minimal --help
-py -3.12 -m transform_myd_minimal transform --object f100 --variant aufk --force
-
-# Or activate venv for shorter syntax:
-.\.venv\Scripts\Activate.ps1
-.\.venv\Scripts\python.exe -m transform_myd_minimal --help
+# Run the CLI - choose your preferred method:
+.\scripts\transform-myd-minimal.ps1 --help                          # PowerShell wrapper (recommended)
+py -3.12 -m transform_myd_minimal --help                             # Python module (always works)
+.\.venv\Scripts\python.exe -m transform_myd_minimal --help           # After venv activation
 ```
 
-**📌 Recommended for Windows PowerShell:**
+**📌 For Colleagues/New Users:**
+See [**SETUP.md**](docs/SETUP.md) for detailed installation and usage instructions.
+
+**Recommended for Windows PowerShell:**
 - Use the **wrapper scripts**: `.\transform-myd-minimal.ps1` (PowerShell) or `transform-myd-minimal.bat` (CMD)
 - These automatically use the venv Python and all dependencies
 - Or use: `py -3.12 -m transform_myd_minimal <command>`

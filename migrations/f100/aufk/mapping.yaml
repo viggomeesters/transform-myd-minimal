@@ -1,0 +1,495 @@
+metadata:
+  object: f100
+  variant: aufk
+  generated_at: '2025-10-17T17:11:59.380505'
+  source_index: migrations/f100/aufk/index_source.yaml
+  target_index: migrations/f100/aufk/index_target.yaml
+  mapped_count: 34
+  unmapped_count: 1
+  to_audit: 1
+  unused_sources: 83
+  unused_targets: 0
+
+
+
+mappings:
+- map_confidence: 0.83
+  map_rationale: Fuzzy match with 83% confidence (mandatory field)
+  map_status: auto
+  source_field_description: None
+  source_field_name: ORDER_PROC_MODE
+  source_header: ORDER_PROC_MODE
+  target_field_description: Order Number
+  target_field_name: ORDERNUMBER
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: KOKRS
+  source_header: KOKRS
+  target_field_description: Controlling Area
+  target_field_name: KOKRS
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: AUART
+  source_header: AUART
+  target_field_description: Order Type
+  target_field_name: AUART
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: KTEXT
+  source_header: KTEXT
+  target_field_description: Description
+  target_field_name: KTEXT
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: BUKRS
+  source_header: BUKRS
+  target_field_description: Company Code
+  target_field_name: BUKRS
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: GSBER
+  source_header: GSBER
+  target_field_description: Business Area
+  target_field_name: GSBER
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: WERKS
+  source_header: WERKS
+  target_field_description: Plant
+  target_field_name: WERKS
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: PRCTR
+  source_header: PRCTR
+  target_field_description: Profit Center
+  target_field_name: PRCTR
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: KOSTV
+  source_header: KOSTV
+  target_field_description: Responsible Cost Center
+  target_field_name: KOSTV
+  target_table: aufk
+
+- map_confidence: 0.0
+  map_rationale: Added without source match, to comply with SAP template
+  map_status: unmapped
+  source_field_description: none
+  source_field_name: field_name onbekend
+  source_header: null
+  target_field_description: WBS Element
+  target_field_name: PS_POSID
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: AKSTL
+  source_header: AKSTL
+  target_field_description: Requesting Cost Center
+  target_field_name: AKSTL
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: ABUKR
+  source_header: ABUKR
+  target_field_description: Requesting Company Code
+  target_field_name: ABUKR
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: KDAUF
+  source_header: KDAUF
+  target_field_description: Sales Order Number
+  target_field_name: KDAUF
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: KDPOS
+  source_header: KDPOS
+  target_field_description: Sales Order Item Number
+  target_field_name: KDPOS
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: AUFEX
+  source_header: AUFEX
+  target_field_description: External Order Number
+  target_field_name: AUFEX
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: ANFAUFNR
+  source_header: ANFAUFNR
+  target_field_description: Requesting Order
+  target_field_name: ANFAUFNR
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Fuzzy match with 100% confidence
+  map_status: auto
+  source_field_description: None
+  source_field_name: FUNC_AREA
+  source_header: FUNC_AREA
+  target_field_description: Functional Area
+  target_field_name: FUNC_AREA
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Fuzzy match with 100% confidence
+  map_status: auto
+  source_field_description: None
+  source_field_name: VERAA_USER
+  source_header: VERAA_USER
+  target_field_description: User Responsible
+  target_field_name: VERAA_USER
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: CYCLE
+  source_header: CYCLE
+  target_field_description: Actual Posted Cost Center
+  target_field_name: CYCLE
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: WAERS
+  source_header: WAERS
+  target_field_description: Currency
+  target_field_name: WAERS
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: KALSM
+  source_header: KALSM
+  target_field_description: Costing Sheet
+  target_field_name: KALSM
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: ZSCHL
+  source_header: ZSCHL
+  target_field_description: Overhead Key
+  target_field_name: ZSCHL
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: ABGSL
+  source_header: ABGSL
+  target_field_description: Results Analysis Key
+  target_field_name: ABGSL
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: ZSCHM
+  source_header: ZSCHM
+  target_field_description: Interest Profile
+  target_field_name: ZSCHM
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: USER0
+  source_header: USER0
+  target_field_description: Applicant
+  target_field_name: USER0
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: USER1
+  source_header: USER1
+  target_field_description: Applicant's Telephone Number
+  target_field_name: USER1
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: USER2
+  source_header: USER2
+  target_field_description: Person Responsible
+  target_field_name: USER2
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: USER3
+  source_header: USER3
+  target_field_description: Telephone Number of Person in Charge
+  target_field_name: USER3
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: USER4
+  source_header: USER4
+  target_field_description: Estimated Costs
+  target_field_name: USER4
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: USER5
+  source_header: USER5
+  target_field_description: Application Date
+  target_field_name: USER5
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: USER6
+  source_header: USER6
+  target_field_description: Department
+  target_field_name: USER6
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: USER7
+  source_header: USER7
+  target_field_description: Work Start Date
+  target_field_name: USER7
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: USER8
+  source_header: USER8
+  target_field_description: Work End Date
+  target_field_name: USER8
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: USER9
+  source_header: USER9
+  target_field_description: 'Indicator: Work Approval'
+  target_field_name: USER9
+  target_table: aufk
+
+- map_confidence: 1.0
+  map_rationale: Exact field name match
+  map_status: auto
+  source_field_description: None
+  source_field_name: ABKRS
+  source_header: ABKRS
+  target_field_description: Processing Group
+  target_field_name: ABKRS
+  target_table: aufk
+
+
+
+to_audit:
+- target_table: aufk
+  target_field_name: ORDERNUMBER
+  source_header: ORDER_PROC_MODE
+  source_field_name: ORDER_PROC_MODE
+  confidence: 0.8310314685314686
+  reason: low_confidence_fuzzy
+
+
+
+unmapped_source_fields:
+- source_field_name: MANDT
+  source_field_description: Client (Mandant)
+  confidence: 1.0
+  rationale: Global skip field configured in central mapping memory
+  comment: 'Audit field: Client is not relevant for data mapping'
+  required: false
+  source_header: null
+  status: unmapped
+  target_field: null
+  target_table: null
+- AUFNR
+- AUTYP
+- REFNR
+- source_field_name: ERNAM
+  source_field_description: Name of Person who Created the Object
+  confidence: 1.0
+  rationale: Global skip field configured in central mapping memory
+  comment: 'Audit field: Creator name is not relevant for data mapping'
+  required: false
+  source_header: null
+  status: unmapped
+  target_field: null
+  target_table: null
+- source_field_name: ERDAT
+  source_field_description: Creation Date
+  confidence: 1.0
+  rationale: Global skip field configured in central mapping memory
+  comment: 'Audit field: Creation date is not relevant for data mapping'
+  required: false
+  source_header: null
+  status: unmapped
+  target_field: null
+  target_table: null
+- AENAM
+- AEDAT
+- LTEXT
+- CCKEY
+- STORT
+- SOWRK
+- ASTKZ
+- ASTNR
+- STDAT
+- ESTNR
+- PHAS0
+- PHAS1
+- PHAS2
+- PHAS3
+- PDAT1
+- PDAT2
+- PDAT3
+- IDAT1
+- IDAT2
+- IDAT3
+- OBJID
+- VOGRP
+- LOEKZ
+- PLGKZ
+- KVEWE
+- KAPPL
+- KSTAR
+- KOSTL
+- SAKNR
+- SETNM
+- SDATE
+- SEQNR
+- OBJNR
+- PSPEL
+- AWSLS
+- EB_POST
+- TXJCD
+- SCOPE
+- PLINT
+- IVPRO
+- LOGSYSTEM
+- FLG_MLTPS
+- SIZECL
+- IZWEK
+- UMWKZ
+- KSTEMPF
+- PKOSA
+- PROCNR
+- PROTY
+- RSORD
+- BEMOT
+- ADRNRA
+- ERFZEIT
+- AEZEIT
+- CSTG_VRNT
+- COSTESTNR
+- EEW_AUFK_PS_DUMMY
+- VNAME
+- RECID
+- ETYPE
+- OTYPE
+- JV_JIBCL
+- JV_JIBSA
+- JV_OCO
+- CPD_UPDAT
+- CUMINDCU
+- CUMCMNUM
+- CUMAUEST
+- CUMDESNUM
+- AD01PROFNR
+- VAPLZ
+- WAWRK
+- FERC_IND
+- CLAIM_CONTROL
+- UPDATE_NEEDED
+- UPDATE_CONTROL
+- AUFK_STATUS
+
+
+
+unmapped_target_fields:
+- target_table: aufk
+  target_field_name: PS_POSID
+  required: false
