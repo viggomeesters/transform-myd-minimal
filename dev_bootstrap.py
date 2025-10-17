@@ -11,18 +11,18 @@ Usage:
 
 import argparse
 import os
+import platform
+import shutil
 import subprocess
 import sys
 import time
 from pathlib import Path
-import shutil
-import platform
 
 # Rich imports with fallback
 try:
     from rich.console import Console
-    from rich.progress import Progress
     from rich.panel import Panel
+    from rich.progress import Progress
     from rich.text import Text
 
     RICH_AVAILABLE = True
@@ -213,6 +213,66 @@ def create_venv(venv_path: Path, python_cmd: str, recreate: bool = False):
         print_success(f"Created virtual environment: {normalize_path(venv_path)}")
 
 
+# Runtime dependencies (keep in sync with pyproject.toml [project.dependencies])
+RUNTIME_DEPS = [
+    {"package": "typer>=0.12", "import": "typer"},
+    {"package": "pandas>=2.2", "import": "pandas"},
+    {"package": "openpyxl>=3.1", "import": "openpyxl"},
+    {"package": "PyYAML>=6.0", "import": "yaml"},
+    {"package": "lxml>=5.2", "import": "lxml"},
+    {"package": "python-dateutil>=2.9", "import": "dateutil"},
+    {"package": "rapidfuzz>=3.9", "import": "rapidfuzz"},
+    {"package": "rich>=13.7", "import": "rich"},
+]
+
+
+def _can_import(venv_python: str, module_name: str) -> bool:
+    """Check whether a module can be imported within the venv."""
+    try:
+        code = (
+            "import importlib.util;"
+            f"import sys;sys.exit(0 if importlib.util.find_spec('{module_name}') is not None else 1)"
+        )
+        sh([venv_python, "-c", code], check=True)
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+
+def ensure_runtime_deps_installed(venv_path: Path) -> bool:
+    """Ensure all runtime dependencies are importable; install any missing ones.
+
+    Returns True if all runtime deps are importable after this step, False otherwise.
+    """
+    venv_python = get_venv_python(venv_path)
+    print_info("Verifying runtime dependencies...")
+
+    all_ok = True
+    for dep in RUNTIME_DEPS:
+        pkg_spec = dep["package"]
+        import_name = dep["import"]
+
+        if not _can_import(venv_python, import_name):
+            print_warning(
+                f"Missing dependency detected: {import_name} (installing {pkg_spec})"
+            )
+            try:
+                sh([venv_python, "-m", "pip", "install", "--timeout", "120", pkg_spec])
+            except subprocess.CalledProcessError:
+                print_warning(f"Failed to install {pkg_spec}, will retry import check")
+
+        # Re-check import
+        if not _can_import(venv_python, import_name):
+            print_error(
+                f"Dependency still missing after install attempt: {import_name}"
+            )
+            all_ok = False
+        else:
+            print_success(f"{import_name} OK")
+
+    return all_ok
+
+
 def get_venv_python(venv_path: Path) -> str:
     """Get the Python executable from virtual environment."""
     if platform.system() == "Windows":
@@ -263,17 +323,8 @@ def install_project_manual(venv_path: Path, extras: str = "dev"):
 
     print_info("Installing dependencies manually...")
 
-    # Core dependencies
-    core_deps = [
-        "typer>=0.12",
-        "pandas>=2.2",
-        "openpyxl>=3.1",
-        "PyYAML>=6.0",
-        "lxml>=5.2",
-        "python-dateutil>=2.9",
-        "rapidfuzz>=3.9",
-        "rich>=13.7",
-    ]
+    # Core dependencies (from RUNTIME_DEPS)
+    core_deps = [d["package"] for d in RUNTIME_DEPS]
 
     dev_deps = [
         "ruff>=0.6",
@@ -422,7 +473,13 @@ def run_smoke_tests(venv_path: Path):
 
     # Test 1: Import package
     try:
-        sh([venv_python, "-c", "import transform_myd_minimal; print('Package import: OK')"])
+        sh(
+            [
+                venv_python,
+                "-c",
+                "import transform_myd_minimal; print('Package import: OK')",
+            ]
+        )
         print_success("Package import test passed")
     except subprocess.CalledProcessError:
         print_error("Package import test failed")
@@ -612,6 +669,13 @@ def main():
 
         # Install project
         install_project(venv_path, args.extras, not args.no_editable, use_uv)
+
+        # Ensure runtime dependencies are present (auto-install any missing)
+        deps_ok = ensure_runtime_deps_installed(venv_path)
+        if not deps_ok:
+            print_warning(
+                "Some runtime dependencies could not be installed automatically. You may retry later or install manually with 'pip install -r requirements.txt'."
+            )
 
         # Setup pre-commit
         install_precommit_hooks(venv_path, args.no_precommit)

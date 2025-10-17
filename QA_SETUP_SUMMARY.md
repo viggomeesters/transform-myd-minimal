@@ -4,7 +4,41 @@
 
 A comprehensive, robust QA toolchain has been successfully implemented for the Transform MYD Minimal Python ETL project.
 
-## 📦 Deliverables
+## � Quick Onboarding (Windows PowerShell)
+
+Voor een foutloze start (met alle dependencies) op Windows/PowerShell:
+
+```powershell
+# 1) Bootstrap (maakt .venv aan en installeert ALLES)
+py -3.12 dev_bootstrap.py
+
+# 2) Activeer de omgeving
+.\.venv\Scripts\Activate.ps1
+
+# 3) Verifieer CLI
+py -3.12 -m transform_myd_minimal --help
+
+# 4) Voorbeeld run
+py -3.12 -m transform_myd_minimal index_source --object f100 --variant aufk --force
+```
+
+Handmatig alternatief (zonder bootstrap):
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+py -3.12 -m pip install -U pip setuptools wheel
+py -3.12 -m pip install -r requirements.txt
+
+# Optioneel: ontwikkel-setup (editable + dev-extras)
+py -3.12 -m pip install -e ".[dev]"
+```
+
+Note:
+- Project vereist Python 3.11 of hoger.
+- Gebruik bij voorkeur `py -3.12` om consistent dezelfde interpreter te gebruiken als de CLI.
+
+## �📦 Deliverables
 
 ### 1. Configuration Files
 

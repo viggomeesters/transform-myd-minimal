@@ -4,19 +4,32 @@ CLI tool voor het genereren van column mapping en YAML bestanden met een stapsge
 
 ## Quick start
 
-```bash
-# one-time setup
-python dev_bootstrap.py
+```powershell
+# One-time setup (creates .venv and installs ALL deps)
+py -3.12 dev_bootstrap.py
 
-# activate environment
-# Windows PowerShell
+# Activate environment (Windows PowerShell)
 .\.venv\Scripts\Activate.ps1
-# macOS/Linux
-source .venv/bin/activate
 
-# verify installation - both methods work
+# macOS/Linux (optional reference)
+# source .venv/bin/activate
+
+# Verify installation - both methods work
 transform-myd-minimal --help
-python -m transform_myd_minimal --help
+py -3.12 -m transform_myd_minimal --help
+```
+
+Als je dev_bootstrap niet wilt gebruiken:
+
+```powershell
+# Handmatige installatie (runtime deps)
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+py -3.12 -m pip install -U pip setuptools wheel
+py -3.12 -m pip install -r requirements.txt
+
+# Optioneel: ontwikkel-setup (editable + dev extras)
+py -3.12 -m pip install -e ".[dev]"
 ```
 
 ## Quality Assurance & Development Tools

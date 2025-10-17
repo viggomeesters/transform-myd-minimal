@@ -1,16 +1,23 @@
-# Transform MYD Minimal Dependencies
-# Excel file processing
-pandas>=2.0.0
-openpyxl>=3.1.0
+# Transform MYD Minimal - Runtime dependencies (keep in sync with pyproject.toml [project.dependencies])
 
-# YAML file generation and parsing  
+# CLI framework
+typer>=0.12
+
+# Data processing & file formats
+pandas>=2.2
+openpyxl>=3.1
 PyYAML>=6.0
+lxml>=5.2
+python-dateutil>=2.9
+rapidfuzz>=3.9
 
-# Rich text formatting for console output
+# Console UX
 rich>=13.7
 
-# Optional: Development dependencies (uncomment if needed)
-# pytest>=7.0.0
-# black>=22.0.0
-# flake8>=5.0.0
-# mypy>=1.0.0
+# Optional: Development dependencies (use extras via `pip install -e ".[dev]"` or install individually)
+# ruff>=0.6
+# black>=24.8
+# pytest>=8.3
+# pytest-cov>=5.0
+# pre-commit>=3.8
+# mypy>=1.0

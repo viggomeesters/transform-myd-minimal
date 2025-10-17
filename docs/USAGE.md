@@ -40,6 +40,14 @@ project/
             └── mapping.yaml         # F03 output
 ```
 
+## Quick Setup (Windows PowerShell)
+
+```powershell
+py -3.12 dev_bootstrap.py
+.\.venv\Scripts\Activate.ps1
+py -3.12 -m transform_myd_minimal --help
+```
+
 ## Complete Example Workflow
 
 ### Example: Object `m140`, Variant `bnka`
@@ -50,12 +58,14 @@ project/
 - `data/01_source/m140_bnka.xlsx` - Excel file with source system headers
 
 **Commands:**
-```bash
-# Linux/macOS
-./transform-myd-minimal index_source --object m140 --variant bnka
-
+```powershell
 # Windows PowerShell
-python -m transform_myd_minimal index_source --object m140 --variant bnka
+py -3.12 -m transform_myd_minimal index_source --object m140 --variant bnka
+```
+
+```bash
+# Linux/macOS (alternative)
+./transform-myd-minimal index_source --object m140 --variant bnka
 ```
 
 **Outputs:**
@@ -89,12 +99,14 @@ source_fields:
 - `data/02_target/m140_bnka.xml` - SpreadsheetML with target definitions
 
 **Commands:**
-```bash
-# Linux/macOS
-./transform-myd-minimal index_target --object m140 --variant bnka
-
+```powershell
 # Windows PowerShell  
-python -m transform_myd_minimal index_target --object m140 --variant bnka
+py -3.12 -m transform_myd_minimal index_target --object m140 --variant bnka
+```
+
+```bash
+# Linux/macOS (alternative)
+./transform-myd-minimal index_target --object m140 --variant bnka
 ```
 
 **Outputs:**
@@ -128,12 +140,14 @@ target_fields:
 - `migrations/m140/bnka/index_target.yaml` (from Step 2)
 
 **Commands:**
-```bash
-# Linux/macOS
-./transform-myd-minimal map --object m140 --variant bnka
-
+```powershell
 # Windows PowerShell
-python -m transform_myd_minimal map --object m140 --variant bnka
+py -3.12 -m transform_myd_minimal map --object m140 --variant bnka
+```
+
+```bash
+# Linux/macOS (alternative)
+./transform-myd-minimal map --object m140 --variant bnka
 ```
 
 **Outputs:**
@@ -186,12 +200,14 @@ unmapped_target_fields:
 - `data/06_template/S_BNKA#*.csv` - CSV template files
 
 **Commands:**
-```bash
-# Linux/macOS
-./transform-myd-minimal transform --object m140 --variant bnka
-
+```powershell
 # Windows PowerShell
-python -m transform_myd_minimal transform --object m140 --variant bnka
+py -3.12 -m transform_myd_minimal transform --object m140 --variant bnka
+```
+
+```bash
+# Linux/macOS (alternative)
+./transform-myd-minimal transform --object m140 --variant bnka
 ```
 
 **Outputs:**

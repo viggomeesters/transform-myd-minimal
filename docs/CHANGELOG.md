@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Automated runtime dependency verification in bootstrap**:
+  - `dev_bootstrap.py` now verifies that all runtime dependencies (typer, pandas, openpyxl, PyYAML, lxml, python-dateutil, rapidfuzz, rich) are importable after installation
+  - Automatically installs any missing dependencies to prevent `ModuleNotFoundError` at runtime
+  - Provides clear status feedback during bootstrap for each dependency
+
+### Changed
+- **requirements.txt synchronized with pyproject.toml**:
+  - Now includes all runtime dependencies from `[project.dependencies]`
+  - Prevents missing module errors when installing via `pip install -r requirements.txt`
+- **Documentation updates for Windows/PowerShell users**:
+  - Added quick start examples using `py -3.12` launcher in README.md
+  - Updated DEVELOPMENT.md with Windows venv setup instructions
+  - Updated USAGE.md with Windows command examples
+  - Added Quick Onboarding section to QA_SETUP_SUMMARY.md
+
+### Fixed
+- Missing runtime dependency `rich` now guaranteed to be installed via bootstrap
+- Windows PowerShell users no longer need to manually troubleshoot missing dependencies
+
 ## [4.1.0] - 2024-09-23
 
 ### Added

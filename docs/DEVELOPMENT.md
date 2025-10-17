@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Python 3.8 or higher
+- Python 3.11 or higher (project requires >=3.11)
 - pip (Python package installer)
 
 ## Quick Setup
@@ -14,25 +14,47 @@ cd transform-myd-minimal
 ```
 
 ### 2. Install Dependencies
-```bash
-# Install required dependencies
-pip install -r requirements.txt
 
-# Or install using pyproject.toml
-pip install -e .
+Preferred (Windows PowerShell):
 
-# Optional: Install development dependencies
-pip install -e ".[dev]"
+```powershell
+# Create full dev environment (.venv) and install ALL dependencies
+py -3.12 dev_bootstrap.py
+
+# Activate virtual environment
+.\.venv\Scripts\Activate.ps1
+
+# Verify CLI
+transform-myd-minimal --help
+py -3.12 -m transform_myd_minimal --help
+```
+
+Manual alternative:
+
+```powershell
+# Create and activate venv
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+# Upgrade packaging tools and install runtime deps
+py -3.12 -m pip install -U pip setuptools wheel
+py -3.12 -m pip install -r requirements.txt
+
+# Optional: dev dependencies + editable install
+py -3.12 -m pip install -e ".[dev]"
 ```
 
 ### 3. Verify Installation
-```bash
-# Test CLI functionality
-./transform-myd-minimal --help
-./transform-myd-minimal map --help
+```powershell
+# Windows PowerShell
+transform-myd-minimal --help
+py -3.12 -m transform_myd_minimal --help
+```
 
-# Or run via Python module
-python -m transform_myd_minimal --help
+```bash
+# Linux/macOS (alternative)
+./transform-myd-minimal --help
+python3 -m transform_myd_minimal --help
 ```
 
 ## Project Structure Overview
@@ -92,50 +114,59 @@ transform-myd-minimal/
 
 Transform MYD Minimal uses a 4-step pipeline:
 
+```powershell
+# Windows PowerShell
+py -3.12 -m transform_myd_minimal index_source  --object m140 --variant bnka
+py -3.12 -m transform_myd_minimal index_target  --object m140 --variant bnka
+py -3.12 -m transform_myd_minimal map           --object m140 --variant bnka
+py -3.12 -m transform_myd_minimal transform     --object m140 --variant bnka
+```
+
 ```bash
-# Step 1: Index source fields
-./transform-myd-minimal index_source --object m140 --variant bnka
-
-# Step 2: Index target fields  
-./transform-myd-minimal index_target --object m140 --variant bnka
-
-# Step 3: Generate mappings
-./transform-myd-minimal map --object m140 --variant bnka
-
-# Step 4: Transform data
-./transform-myd-minimal transform --object m140 --variant bnka
+# Linux/macOS (alternative)
+./transform-myd-minimal index_source  --object m140 --variant bnka
+./transform-myd-minimal index_target  --object m140 --variant bnka
+./transform-myd-minimal map           --object m140 --variant bnka
+./transform-myd-minimal transform     --object m140 --variant bnka
 ```
 
 ### View Available Options
-```bash
-# Main help
-./transform-myd-minimal --help
+```powershell
+# Windows PowerShell
+py -3.12 -m transform_myd_minimal --help
+py -3.12 -m transform_myd_minimal index_source  --help
+py -3.12 -m transform_myd_minimal index_target  --help
+py -3.12 -m transform_myd_minimal map           --help
+py -3.12 -m transform_myd_minimal transform     --help
+```
 
-# Command-specific help
-./transform-myd-minimal index_source --help
-./transform-myd-minimal index_target --help
-./transform-myd-minimal map --help
-./transform-myd-minimal transform --help
+```bash
+# Linux/macOS (alternative)
+./transform-myd-minimal --help
+./transform-myd-minimal index_source  --help
+./transform-myd-minimal index_target  --help
+./transform-myd-minimal map           --help
+./transform-myd-minimal transform     --help
 ```
 
 ### Advanced Options
+```powershell
+# Windows PowerShell examples
+py -3.12 -m transform_myd_minimal map          --object m140 --variant bnka --fuzzy-threshold 0.8
+py -3.12 -m transform_myd_minimal map          --object m140 --variant bnka --disable-fuzzy
+py -3.12 -m transform_myd_minimal map          --object m140 --variant bnka --max-suggestions 10
+py -3.12 -m transform_myd_minimal index_source --object m140 --variant bnka --no-html
+py -3.12 -m transform_myd_minimal index_source --object m140 --variant bnka --force
+py -3.12 -m transform_myd_minimal index_target --object m140 --variant bnka --quiet --log-file my_log.jsonl
+```
+
 ```bash
-# Adjust fuzzy matching threshold (map command)
-./transform-myd-minimal map --object m140 --variant bnka --fuzzy-threshold 0.8
-
-# Disable fuzzy matching for faster processing (map command)
-./transform-myd-minimal map --object m140 --variant bnka --disable-fuzzy
-
-# Increase number of suggestions shown (map command)
-./transform-myd-minimal map --object m140 --variant bnka --max-suggestions 10
-
-# Skip HTML report generation (all commands)
+# Linux/macOS (alternative)
+./transform-myd-minimal map          --object m140 --variant bnka --fuzzy-threshold 0.8
+./transform-myd-minimal map          --object m140 --variant bnka --disable-fuzzy
+./transform-myd-minimal map          --object m140 --variant bnka --max-suggestions 10
 ./transform-myd-minimal index_source --object m140 --variant bnka --no-html
-
-# Force overwrite existing files (all commands)
 ./transform-myd-minimal index_source --object m140 --variant bnka --force
-
-# Use quiet mode with custom log file (all commands)
 ./transform-myd-minimal index_target --object m140 --variant bnka --quiet --log-file my_log.jsonl
 ```
 

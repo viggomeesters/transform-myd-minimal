@@ -1,0 +1,946 @@
+metadata:
+  object: f100
+  variant: aufk
+  source_file: data\01_source\f100_aufk.xlsx
+  generated_at: '2025-10-17T14:47:47.961060'
+  sheet: Sheet1
+  source_fields_count: 117
+
+
+
+source_fields:
+- source_field: MANDT
+  source_field_name: MANDT
+  source_field_description: "Client (Mandant)"
+  source_example: '280'
+  source_field_count: 1
+  source_dtype: string
+  source_nullable: false
+
+- source_field: AUFNR
+  source_field_name: AUFNR
+  source_field_description: None
+  source_example: '000000003001'
+  source_field_count: 2
+  source_dtype: string
+  source_nullable: false
+
+- source_field: AUART
+  source_field_name: AUART
+  source_field_description: None
+  source_example: 'Z810'
+  source_field_count: 3
+  source_dtype: string
+  source_nullable: false
+
+- source_field: AUTYP
+  source_field_name: AUTYP
+  source_field_description: None
+  source_example: '01'
+  source_field_count: 4
+  source_dtype: string
+  source_nullable: false
+
+- source_field: REFNR
+  source_field_name: REFNR
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 5
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ERNAM
+  source_field_name: ERNAM
+  source_field_description: "Name of Person who Created the Object"
+  source_example: 'BCS'
+  source_field_count: 6
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ERDAT
+  source_field_name: ERDAT
+  source_field_description: "Creation Date"
+  source_example: '20100110'
+  source_field_count: 7
+  source_dtype: string
+  source_nullable: false
+
+- source_field: AENAM
+  source_field_name: AENAM
+  source_field_description: None
+  source_example: 'HSCHAAP'
+  source_field_count: 8
+  source_dtype: string
+  source_nullable: false
+
+- source_field: AEDAT
+  source_field_name: AEDAT
+  source_field_description: None
+  source_example: '20211213'
+  source_field_count: 9
+  source_dtype: string
+  source_nullable: false
+
+- source_field: KTEXT
+  source_field_name: KTEXT
+  source_field_description: None
+  source_example: 'BIGBAGS HU'
+  source_field_count: 10
+  source_dtype: string
+  source_nullable: false
+
+- source_field: LTEXT
+  source_field_name: LTEXT
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 11
+  source_dtype: string
+  source_nullable: false
+
+- source_field: BUKRS
+  source_field_name: BUKRS
+  source_field_description: None
+  source_example: '0030'
+  source_field_count: 12
+  source_dtype: string
+  source_nullable: false
+
+- source_field: WERKS
+  source_field_name: WERKS
+  source_field_description: None
+  source_example: '0030'
+  source_field_count: 13
+  source_dtype: string
+  source_nullable: false
+
+- source_field: GSBER
+  source_field_name: GSBER
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 14
+  source_dtype: string
+  source_nullable: false
+
+- source_field: KOKRS
+  source_field_name: KOKRS
+  source_field_description: None
+  source_example: '0030'
+  source_field_count: 15
+  source_dtype: string
+  source_nullable: false
+
+- source_field: CCKEY
+  source_field_name: CCKEY
+  source_field_description: None
+  source_example: '2'
+  source_field_count: 16
+  source_dtype: string
+  source_nullable: false
+
+- source_field: KOSTV
+  source_field_name: KOSTV
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 17
+  source_dtype: string
+  source_nullable: false
+
+- source_field: STORT
+  source_field_name: STORT
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 18
+  source_dtype: string
+  source_nullable: false
+
+- source_field: SOWRK
+  source_field_name: SOWRK
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 19
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ASTKZ
+  source_field_name: ASTKZ
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 20
+  source_dtype: string
+  source_nullable: false
+
+- source_field: WAERS
+  source_field_name: WAERS
+  source_field_description: None
+  source_example: 'HUF'
+  source_field_count: 21
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ASTNR
+  source_field_name: ASTNR
+  source_field_description: None
+  source_example: '00'
+  source_field_count: 22
+  source_dtype: string
+  source_nullable: false
+
+- source_field: STDAT
+  source_field_name: STDAT
+  source_field_description: None
+  source_example: '00000000'
+  source_field_count: 23
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ESTNR
+  source_field_name: ESTNR
+  source_field_description: None
+  source_example: '00'
+  source_field_count: 24
+  source_dtype: string
+  source_nullable: false
+
+- source_field: PHAS0
+  source_field_name: PHAS0
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 25
+  source_dtype: string
+  source_nullable: false
+
+- source_field: PHAS1
+  source_field_name: PHAS1
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 26
+  source_dtype: string
+  source_nullable: false
+
+- source_field: PHAS2
+  source_field_name: PHAS2
+  source_field_description: None
+  source_example: 'X'
+  source_field_count: 27
+  source_dtype: string
+  source_nullable: false
+
+- source_field: PHAS3
+  source_field_name: PHAS3
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 28
+  source_dtype: string
+  source_nullable: false
+
+- source_field: PDAT1
+  source_field_name: PDAT1
+  source_field_description: None
+  source_example: '00000000'
+  source_field_count: 29
+  source_dtype: string
+  source_nullable: false
+
+- source_field: PDAT2
+  source_field_name: PDAT2
+  source_field_description: None
+  source_example: '00000000'
+  source_field_count: 30
+  source_dtype: string
+  source_nullable: false
+
+- source_field: PDAT3
+  source_field_name: PDAT3
+  source_field_description: None
+  source_example: '00000000'
+  source_field_count: 31
+  source_dtype: string
+  source_nullable: false
+
+- source_field: IDAT1
+  source_field_name: IDAT1
+  source_field_description: None
+  source_example: '20100110'
+  source_field_count: 32
+  source_dtype: string
+  source_nullable: false
+
+- source_field: IDAT2
+  source_field_name: IDAT2
+  source_field_description: None
+  source_example: '20211213'
+  source_field_count: 33
+  source_dtype: string
+  source_nullable: false
+
+- source_field: IDAT3
+  source_field_name: IDAT3
+  source_field_description: None
+  source_example: '00000000'
+  source_field_count: 34
+  source_dtype: string
+  source_nullable: false
+
+- source_field: OBJID
+  source_field_name: OBJID
+  source_field_description: None
+  source_example: 'O'
+  source_field_count: 35
+  source_dtype: string
+  source_nullable: false
+
+- source_field: VOGRP
+  source_field_name: VOGRP
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 36
+  source_dtype: string
+  source_nullable: false
+
+- source_field: LOEKZ
+  source_field_name: LOEKZ
+  source_field_description: None
+  source_example: 'X'
+  source_field_count: 37
+  source_dtype: string
+  source_nullable: false
+
+- source_field: PLGKZ
+  source_field_name: PLGKZ
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 38
+  source_dtype: string
+  source_nullable: false
+
+- source_field: KVEWE
+  source_field_name: KVEWE
+  source_field_description: None
+  source_example: 'A'
+  source_field_count: 39
+  source_dtype: string
+  source_nullable: false
+
+- source_field: KAPPL
+  source_field_name: KAPPL
+  source_field_description: None
+  source_example: 'KA'
+  source_field_count: 40
+  source_dtype: string
+  source_nullable: false
+
+- source_field: KALSM
+  source_field_name: KALSM
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 41
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ZSCHL
+  source_field_name: ZSCHL
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 42
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ABKRS
+  source_field_name: ABKRS
+  source_field_description: None
+  source_example: '02'
+  source_field_count: 43
+  source_dtype: string
+  source_nullable: false
+
+- source_field: KSTAR
+  source_field_name: KSTAR
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 44
+  source_dtype: string
+  source_nullable: false
+
+- source_field: KOSTL
+  source_field_name: KOSTL
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 45
+  source_dtype: string
+  source_nullable: false
+
+- source_field: SAKNR
+  source_field_name: SAKNR
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 46
+  source_dtype: string
+  source_nullable: false
+
+- source_field: SETNM
+  source_field_name: SETNM
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 47
+  source_dtype: string
+  source_nullable: false
+
+- source_field: CYCLE
+  source_field_name: CYCLE
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 48
+  source_dtype: string
+  source_nullable: false
+
+- source_field: SDATE
+  source_field_name: SDATE
+  source_field_description: None
+  source_example: '00000000'
+  source_field_count: 49
+  source_dtype: string
+  source_nullable: false
+
+- source_field: SEQNR
+  source_field_name: SEQNR
+  source_field_description: None
+  source_example: '0000'
+  source_field_count: 50
+  source_dtype: string
+  source_nullable: false
+
+- source_field: USER0
+  source_field_name: USER0
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 51
+  source_dtype: string
+  source_nullable: false
+
+- source_field: USER1
+  source_field_name: USER1
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 52
+  source_dtype: string
+  source_nullable: false
+
+- source_field: USER2
+  source_field_name: USER2
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 53
+  source_dtype: string
+  source_nullable: false
+
+- source_field: USER3
+  source_field_name: USER3
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 54
+  source_dtype: string
+  source_nullable: false
+
+- source_field: USER4
+  source_field_name: USER4
+  source_field_description: None
+  source_example: '0'
+  source_field_count: 55
+  source_dtype: string
+  source_nullable: false
+
+- source_field: USER5
+  source_field_name: USER5
+  source_field_description: None
+  source_example: '00000000'
+  source_field_count: 56
+  source_dtype: string
+  source_nullable: false
+
+- source_field: USER6
+  source_field_name: USER6
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 57
+  source_dtype: string
+  source_nullable: false
+
+- source_field: USER7
+  source_field_name: USER7
+  source_field_description: None
+  source_example: '00000000'
+  source_field_count: 58
+  source_dtype: string
+  source_nullable: false
+
+- source_field: USER8
+  source_field_name: USER8
+  source_field_description: None
+  source_example: '00000000'
+  source_field_count: 59
+  source_dtype: string
+  source_nullable: false
+
+- source_field: USER9
+  source_field_name: USER9
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 60
+  source_dtype: string
+  source_nullable: false
+
+- source_field: OBJNR
+  source_field_name: OBJNR
+  source_field_description: None
+  source_example: 'OR000000003001'
+  source_field_count: 61
+  source_dtype: string
+  source_nullable: false
+
+- source_field: PRCTR
+  source_field_name: PRCTR
+  source_field_description: None
+  source_example: '0000003001'
+  source_field_count: 62
+  source_dtype: string
+  source_nullable: false
+
+- source_field: PSPEL
+  source_field_name: PSPEL
+  source_field_description: None
+  source_example: '00000000'
+  source_field_count: 63
+  source_dtype: string
+  source_nullable: false
+
+- source_field: AWSLS
+  source_field_name: AWSLS
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 64
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ABGSL
+  source_field_name: ABGSL
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 65
+  source_dtype: string
+  source_nullable: false
+
+- source_field: EB_POST
+  source_field_name: EB_POST
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 66
+  source_dtype: string
+  source_nullable: false
+
+- source_field: TXJCD
+  source_field_name: TXJCD
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 67
+  source_dtype: string
+  source_nullable: false
+
+- source_field: FUNC_AREA
+  source_field_name: FUNC_AREA
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 68
+  source_dtype: string
+  source_nullable: false
+
+- source_field: SCOPE
+  source_field_name: SCOPE
+  source_field_description: None
+  source_example: 'OC'
+  source_field_count: 69
+  source_dtype: string
+  source_nullable: false
+
+- source_field: PLINT
+  source_field_name: PLINT
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 70
+  source_dtype: string
+  source_nullable: false
+
+- source_field: KDAUF
+  source_field_name: KDAUF
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 71
+  source_dtype: string
+  source_nullable: false
+
+- source_field: KDPOS
+  source_field_name: KDPOS
+  source_field_description: None
+  source_example: '000000'
+  source_field_count: 72
+  source_dtype: string
+  source_nullable: false
+
+- source_field: AUFEX
+  source_field_name: AUFEX
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 73
+  source_dtype: string
+  source_nullable: false
+
+- source_field: IVPRO
+  source_field_name: IVPRO
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 74
+  source_dtype: string
+  source_nullable: false
+
+- source_field: LOGSYSTEM
+  source_field_name: LOGSYSTEM
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 75
+  source_dtype: string
+  source_nullable: false
+
+- source_field: FLG_MLTPS
+  source_field_name: FLG_MLTPS
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 76
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ABUKR
+  source_field_name: ABUKR
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 77
+  source_dtype: string
+  source_nullable: false
+
+- source_field: AKSTL
+  source_field_name: AKSTL
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 78
+  source_dtype: string
+  source_nullable: false
+
+- source_field: SIZECL
+  source_field_name: SIZECL
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 79
+  source_dtype: string
+  source_nullable: false
+
+- source_field: IZWEK
+  source_field_name: IZWEK
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 80
+  source_dtype: string
+  source_nullable: false
+
+- source_field: UMWKZ
+  source_field_name: UMWKZ
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 81
+  source_dtype: string
+  source_nullable: false
+
+- source_field: KSTEMPF
+  source_field_name: KSTEMPF
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 82
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ZSCHM
+  source_field_name: ZSCHM
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 83
+  source_dtype: string
+  source_nullable: false
+
+- source_field: PKOSA
+  source_field_name: PKOSA
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 84
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ANFAUFNR
+  source_field_name: ANFAUFNR
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 85
+  source_dtype: string
+  source_nullable: false
+
+- source_field: PROCNR
+  source_field_name: PROCNR
+  source_field_description: None
+  source_example: '000000000000'
+  source_field_count: 86
+  source_dtype: string
+  source_nullable: false
+
+- source_field: PROTY
+  source_field_name: PROTY
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 87
+  source_dtype: string
+  source_nullable: false
+
+- source_field: RSORD
+  source_field_name: RSORD
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 88
+  source_dtype: string
+  source_nullable: false
+
+- source_field: BEMOT
+  source_field_name: BEMOT
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 89
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ADRNRA
+  source_field_name: ADRNRA
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 90
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ERFZEIT
+  source_field_name: ERFZEIT
+  source_field_description: None
+  source_example: '181639'
+  source_field_count: 91
+  source_dtype: string
+  source_nullable: false
+
+- source_field: AEZEIT
+  source_field_name: AEZEIT
+  source_field_description: None
+  source_example: '110908'
+  source_field_count: 92
+  source_dtype: string
+  source_nullable: false
+
+- source_field: CSTG_VRNT
+  source_field_name: CSTG_VRNT
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 93
+  source_dtype: string
+  source_nullable: false
+
+- source_field: COSTESTNR
+  source_field_name: COSTESTNR
+  source_field_description: None
+  source_example: '000000000000'
+  source_field_count: 94
+  source_dtype: string
+  source_nullable: false
+
+- source_field: VERAA_USER
+  source_field_name: VERAA_USER
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 95
+  source_dtype: string
+  source_nullable: false
+
+- source_field: EEW_AUFK_PS_DUMMY
+  source_field_name: EEW_AUFK_PS_DUMMY
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 96
+  source_dtype: string
+  source_nullable: false
+
+- source_field: VNAME
+  source_field_name: VNAME
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 97
+  source_dtype: string
+  source_nullable: false
+
+- source_field: RECID
+  source_field_name: RECID
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 98
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ETYPE
+  source_field_name: ETYPE
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 99
+  source_dtype: string
+  source_nullable: false
+
+- source_field: OTYPE
+  source_field_name: OTYPE
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 100
+  source_dtype: string
+  source_nullable: false
+
+- source_field: JV_JIBCL
+  source_field_name: JV_JIBCL
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 101
+  source_dtype: string
+  source_nullable: false
+
+- source_field: JV_JIBSA
+  source_field_name: JV_JIBSA
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 102
+  source_dtype: string
+  source_nullable: false
+
+- source_field: JV_OCO
+  source_field_name: JV_OCO
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 103
+  source_dtype: string
+  source_nullable: false
+
+- source_field: CPD_UPDAT
+  source_field_name: CPD_UPDAT
+  source_field_description: None
+  source_example: '0'
+  source_field_count: 104
+  source_dtype: string
+  source_nullable: false
+
+- source_field: CUMINDCU
+  source_field_name: CUMINDCU
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 105
+  source_dtype: string
+  source_nullable: false
+
+- source_field: CUMCMNUM
+  source_field_name: CUMCMNUM
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 106
+  source_dtype: string
+  source_nullable: false
+
+- source_field: CUMAUEST
+  source_field_name: CUMAUEST
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 107
+  source_dtype: string
+  source_nullable: false
+
+- source_field: CUMDESNUM
+  source_field_name: CUMDESNUM
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 108
+  source_dtype: string
+  source_nullable: false
+
+- source_field: AD01PROFNR
+  source_field_name: AD01PROFNR
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 109
+  source_dtype: string
+  source_nullable: false
+
+- source_field: VAPLZ
+  source_field_name: VAPLZ
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 110
+  source_dtype: string
+  source_nullable: false
+
+- source_field: WAWRK
+  source_field_name: WAWRK
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 111
+  source_dtype: string
+  source_nullable: false
+
+- source_field: FERC_IND
+  source_field_name: FERC_IND
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 112
+  source_dtype: string
+  source_nullable: false
+
+- source_field: CLAIM_CONTROL
+  source_field_name: CLAIM_CONTROL
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 113
+  source_dtype: string
+  source_nullable: false
+
+- source_field: UPDATE_NEEDED
+  source_field_name: UPDATE_NEEDED
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 114
+  source_dtype: string
+  source_nullable: false
+
+- source_field: UPDATE_CONTROL
+  source_field_name: UPDATE_CONTROL
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 115
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ORDER_PROC_MODE
+  source_field_name: ORDER_PROC_MODE
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 116
+  source_dtype: string
+  source_nullable: false
+
+- source_field: AUFK_STATUS
+  source_field_name: AUFK_STATUS
+  source_field_description: None
+  source_example: '0'
+  source_field_count: 117
+  source_dtype: string
+  source_nullable: false
