@@ -3170,22 +3170,12 @@ def run_transform_command(args, config):
         skeleton_columns = {}
         ignored_targets = []
 
-        logger.info(
-            f"First target field sample: {target_fields[0] if target_fields else 'NO FIELDS'}"
-        )
         for target in target_fields:
             # Support both old format (sap_field) and new format (target_field)
             sap_field = target.get("sap_field", "") or target.get("target_field", "")
-            logger.debug(
-                f"Processing target: sap_field={sap_field}, type={type(sap_field)}, bool={bool(sap_field)}"
-            )
             base_name = sap_field.upper() if sap_field else ""
             if base_name:
                 skeleton_columns[base_name.lower()] = base_name
-
-        logger.info(
-            f"Target fields count: {len(target_fields)}, skeleton_columns count: {len(skeleton_columns)}"
-        )
 
         # Initialize skeleton with all target columns (lowercase keys, empty values)
         skeleton = pd.DataFrame(index=raw_df.index)
@@ -3198,24 +3188,10 @@ def run_transform_command(args, config):
 
         # 4) Fill skeleton from mapping
         logger.info("Filling skeleton from mapping...")
-        logger.info(f"Raw data shape: {raw_df.shape}")
-        logger.info(
-            f"Before mapping: skeleton shape={skeleton.shape}, columns={list(skeleton.columns)[:3]}..."
-        )
-        logger.info(
-            f"Raw data columns sample: {list(raw_df.columns)[:3] if len(raw_df.columns) > 0 else 'NO COLUMNS'}..."
-        )
-
-        # Check raw data sample
-        if len(raw_df) > 0:
-            sample_raw = raw_df.iloc[0] if len(raw_df) > 0 else None
-            logger.info(
-                f"First raw row AUFNR: {sample_raw.get('AUFNR', 'N/A') if sample_raw is not None else 'No data'}"
-            )
 
         mapping_applied = 0
         mapping_skipped = 0
-        for idx, mapping in enumerate(mapping_entries):
+        for _idx, mapping in enumerate(mapping_entries):
             # Support both old format (target_field) and new format (target_field_name)
             target_field = mapping.get("target_field", "") or mapping.get(
                 "target_field_name", ""
@@ -3229,10 +3205,6 @@ def run_transform_command(args, config):
                 if target_lower in skeleton.columns:
                     if source_header in raw_df.columns:
                         skeleton[target_lower] = raw_df[source_header]
-                        if idx < 3:
-                            logger.info(
-                                f"Applied mapping {idx}: {source_header} -> {target_lower}, first value: {skeleton[target_lower].iloc[0] if len(skeleton) > 0 else 'N/A'}"
-                            )
                         mapping_applied += 1
                     else:
                         # Already warned about missing source column
@@ -3241,28 +3213,7 @@ def run_transform_command(args, config):
                 else:
                     mapping_skipped += 1
             else:
-                if idx < 3:
-                    logger.info(
-                        f"Skipped mapping {idx}: target_field={target_field}, source_header={source_header}"
-                    )
                 mapping_skipped += 1
-
-        logger.info(f"Mappings applied: {mapping_applied}, skipped: {mapping_skipped}")
-        logger.info(f"After mapping: skeleton shape={skeleton.shape}")
-
-        # Check if data was actually mapped
-        first_col = list(skeleton.columns)[0] if len(skeleton.columns) > 0 else None
-        if first_col:
-            non_empty_count = (
-                (skeleton[first_col] != "").sum()
-                if first_col in skeleton.columns
-                else 0
-            )
-            logger.info(f"First column '{first_col}' non-empty rows: {non_empty_count}")
-            sample_values = (
-                skeleton[first_col].head(3).tolist() if len(skeleton) > 0 else []
-            )
-            logger.info(f"First column sample values: {sample_values}")
 
         # 5) Apply transformations (basic implementation)
         logger.info("Applying transformations...")
@@ -3361,16 +3312,10 @@ def run_transform_command(args, config):
 
         # Split into accepted and rejected
         rejected_indices = [r["__rownum"] - 1 for r in rejected_rows]
-        logger.info(
-            f"Before split: skeleton shape={skeleton.shape}, rejected_indices count={len(rejected_indices)}"
-        )
         accepted_skeleton = (
             skeleton.drop(index=rejected_indices)
             if rejected_indices
             else skeleton.copy()
-        )
-        logger.info(
-            f"After split: accepted_skeleton shape={accepted_skeleton.shape}, columns={list(accepted_skeleton.columns)[:5]}..."
         )
 
         logger.info(
@@ -3452,17 +3397,8 @@ def run_transform_command(args, config):
                 )
                 final_data[annotated_header] = ""
 
-        logger.info(
-            f"After loop: final_data shape={final_data.shape}, columns={len(final_data.columns)}"
-        )
-
         # 9) Write Snapshot CSV only (removing SAP CSV generation as per requirement 4)
         logger.info("Writing snapshot CSV...")
-        logger.info(
-            f"final_data shape: {final_data.shape}, final_headers count: {len(final_headers)}"
-        )
-        logger.info(f"final_data columns: {list(final_data.columns)}")
-        logger.info(f"final_headers: {final_headers[:5]}...")  # Log first 5 headers
 
         def write_sap_csv(df, filepath):
             """Write CSV with SAP requirements: UTF-8, CRLF, proper quoting"""

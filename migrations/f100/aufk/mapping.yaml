@@ -13,12 +13,12 @@ metadata:
 
 
 mappings:
-- map_confidence: 0.83
-  map_rationale: Fuzzy match with 83% confidence (mandatory field)
-  map_status: auto
+- map_confidence: 1.0
+  map_rationale: Exact field name match - AUFNR maps to ORDERNUMBER
+  map_status: manual
   source_field_description: None
-  source_field_name: ORDER_PROC_MODE
-  source_header: ORDER_PROC_MODE
+  source_field_name: AUFNR
+  source_header: AUFNR
   target_field_description: Order Number
   target_field_name: ORDERNUMBER
   target_table: aufk
