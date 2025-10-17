@@ -1,7 +1,7 @@
 metadata:
   object: f100
   variant: aufk
-  generated_at: '2025-10-17T17:11:59.380505'
+  generated_at: '2025-10-17T17:24:21.024611'
   source_index: migrations/f100/aufk/index_source.yaml
   target_index: migrations/f100/aufk/index_target.yaml
   mapped_count: 34

@@ -2239,14 +2239,18 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
     # Extract verbatim and normalized headers, creating a lookup map for field names
     # Prioritize new names (source_field) but support old names (source_field_name) for backward compatibility
     verbatim_headers = [
-        field.get("source_field", field.get("source_field_name", field.get("field_name", "")))
+        field.get(
+            "source_field", field.get("source_field_name", field.get("field_name", ""))
+        )
         for field in source_fields
     ]
     [norm(header) for header in verbatim_headers]
 
     # Create lookup map from header to source field for preserving field_name information
     header_to_field = {
-        field.get("source_field", field.get("source_field_name", field.get("field_name", ""))): field
+        field.get(
+            "source_field", field.get("source_field_name", field.get("field_name", ""))
+        ): field
         for field in source_fields
     }
 
@@ -2265,13 +2269,17 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
     # Process each target field (target-centric approach)
     for target in target_fields:
         # Prioritize new names (target_field) but support old names (target_field_name, sap_field) for backward compatibility
-        t_name = target.get("target_field", target.get("target_field_name", target.get("sap_field", ""))).lower()
+        t_name = target.get(
+            "target_field", target.get("target_field_name", target.get("sap_field", ""))
+        ).lower()
         t_desc = (
             target.get("target_field_description", target.get("field_description", ""))
             or ""
         ).lower()
         t_table = target.get("target_table", target.get("sap_table", "")).lower()
-        required = bool(target.get("target_is_mandatory", target.get("mandatory", False)))
+        required = bool(
+            target.get("target_is_mandatory", target.get("mandatory", False))
+        )
 
         best_match = None
         best_confidence = 0.0
@@ -2362,7 +2370,11 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
                 source_field = header_to_field[best_match]
                 # Prioritize new name (source_field) but support old names for backward compatibility
                 tie_field_name = source_field.get(
-                    "source_field", source_field.get("source_field_name", source_field.get("field_name", "field_name onbekend"))
+                    "source_field",
+                    source_field.get(
+                        "source_field_name",
+                        source_field.get("field_name", "field_name onbekend"),
+                    ),
                 )
 
             to_audit.append(
@@ -2389,7 +2401,11 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
             source_field = header_to_field[best_match]
             # Prioritize new name (source_field) but support old names for backward compatibility
             source_field_name = source_field.get(
-                "source_field", source_field.get("source_field_name", source_field.get("field_name", "field_name onbekend"))
+                "source_field",
+                source_field.get(
+                    "source_field_name",
+                    source_field.get("field_name", "field_name onbekend"),
+                ),
             )
             # Use source_field_description (already standardized)
             source_field_description = source_field.get("source_field_description")
@@ -2430,7 +2446,11 @@ def process_f03_mapping(source_fields, target_fields, synonyms, object_name, var
                 source_field = header_to_field[best_match]
                 # Prioritize new name (source_field) but support old names for backward compatibility
                 audit_field_name = source_field.get(
-                    "source_field", source_field.get("source_field_name", source_field.get("field_name", "field_name onbekend"))
+                    "source_field",
+                    source_field.get(
+                        "source_field_name",
+                        source_field.get("field_name", "field_name onbekend"),
+                    ),
                 )
 
             # Low confidence fuzzy
@@ -2821,14 +2841,25 @@ def run_map_command(args, config):
                     "mapped_with_source": mapped_count,
                     "unmapped_count": unmapped_count,
                     "unmapped_sources_count": unused_sources_count,
-                    "unmapped_targets_count": len(mapping_result["unmapped_target_fields"]),
-                    "coverage_pct": round((mapped_count / len(mapping_result["mappings"]) * 100) if len(mapping_result["mappings"]) > 0 else 0.0, 2),
+                    "unmapped_targets_count": len(
+                        mapping_result["unmapped_target_fields"]
+                    ),
+                    "coverage_pct": round(
+                        (
+                            (mapped_count / len(mapping_result["mappings"]) * 100)
+                            if len(mapping_result["mappings"]) > 0
+                            else 0.0
+                        ),
+                        2,
+                    ),
                 },
                 "warnings": [],
             }
 
             # Write JSON summary
-            json_filename = f"{args.object}_{args.variant}_mapping_report_{timestamp}.json"
+            json_filename = (
+                f"{args.object}_{args.variant}_mapping_report_{timestamp}.json"
+            )
             json_path = reports_dir / json_filename
             json_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -2836,7 +2867,9 @@ def run_map_command(args, config):
                 json.dump(html_summary, f, ensure_ascii=False, indent=2)
 
             # Write HTML report
-            html_filename = f"{args.object}_{args.variant}_mapping_report_{timestamp}.html"
+            html_filename = (
+                f"{args.object}_{args.variant}_mapping_report_{timestamp}.html"
+            )
             html_path = reports_dir / html_filename
             title = f"Mapping Report · {args.object}/{args.variant}"
 
@@ -3137,21 +3170,56 @@ def run_transform_command(args, config):
         skeleton_columns = {}
         ignored_targets = []
 
+        logger.info(
+            f"First target field sample: {target_fields[0] if target_fields else 'NO FIELDS'}"
+        )
         for target in target_fields:
-            sap_field = target.get("sap_field", "")
+            # Support both old format (sap_field) and new format (target_field)
+            sap_field = target.get("sap_field", "") or target.get("target_field", "")
+            logger.debug(
+                f"Processing target: sap_field={sap_field}, type={type(sap_field)}, bool={bool(sap_field)}"
+            )
             base_name = sap_field.upper() if sap_field else ""
             if base_name:
                 skeleton_columns[base_name.lower()] = base_name
+
+        logger.info(
+            f"Target fields count: {len(target_fields)}, skeleton_columns count: {len(skeleton_columns)}"
+        )
 
         # Initialize skeleton with all target columns (lowercase keys, empty values)
         skeleton = pd.DataFrame(index=raw_df.index)
         for col_lower in skeleton_columns:
             skeleton[col_lower] = ""
 
+        logger.info(
+            f"After init: skeleton shape={skeleton.shape}, columns={list(skeleton.columns)[:5]}..."
+        )
+
         # 4) Fill skeleton from mapping
         logger.info("Filling skeleton from mapping...")
-        for mapping in mapping_entries:
-            target_field = mapping.get("target_field", "")
+        logger.info(f"Raw data shape: {raw_df.shape}")
+        logger.info(
+            f"Before mapping: skeleton shape={skeleton.shape}, columns={list(skeleton.columns)[:3]}..."
+        )
+        logger.info(
+            f"Raw data columns sample: {list(raw_df.columns)[:3] if len(raw_df.columns) > 0 else 'NO COLUMNS'}..."
+        )
+
+        # Check raw data sample
+        if len(raw_df) > 0:
+            sample_raw = raw_df.iloc[0] if len(raw_df) > 0 else None
+            logger.info(
+                f"First raw row AUFNR: {sample_raw.get('AUFNR', 'N/A') if sample_raw is not None else 'No data'}"
+            )
+
+        mapping_applied = 0
+        mapping_skipped = 0
+        for idx, mapping in enumerate(mapping_entries):
+            # Support both old format (target_field) and new format (target_field_name)
+            target_field = mapping.get("target_field", "") or mapping.get(
+                "target_field_name", ""
+            )
             source_header = mapping.get("source_header")
 
             if target_field and source_header:
@@ -3161,17 +3229,51 @@ def run_transform_command(args, config):
                 if target_lower in skeleton.columns:
                     if source_header in raw_df.columns:
                         skeleton[target_lower] = raw_df[source_header]
+                        if idx < 3:
+                            logger.info(
+                                f"Applied mapping {idx}: {source_header} -> {target_lower}, first value: {skeleton[target_lower].iloc[0] if len(skeleton) > 0 else 'N/A'}"
+                            )
+                        mapping_applied += 1
                     else:
                         # Already warned about missing source column
                         skeleton[target_lower] = ""
+                        mapping_skipped += 1
+                else:
+                    mapping_skipped += 1
+            else:
+                if idx < 3:
+                    logger.info(
+                        f"Skipped mapping {idx}: target_field={target_field}, source_header={source_header}"
+                    )
+                mapping_skipped += 1
+
+        logger.info(f"Mappings applied: {mapping_applied}, skipped: {mapping_skipped}")
+        logger.info(f"After mapping: skeleton shape={skeleton.shape}")
+
+        # Check if data was actually mapped
+        first_col = list(skeleton.columns)[0] if len(skeleton.columns) > 0 else None
+        if first_col:
+            non_empty_count = (
+                (skeleton[first_col] != "").sum()
+                if first_col in skeleton.columns
+                else 0
+            )
+            logger.info(f"First column '{first_col}' non-empty rows: {non_empty_count}")
+            sample_values = (
+                skeleton[first_col].head(3).tolist() if len(skeleton) > 0 else []
+            )
+            logger.info(f"First column sample values: {sample_values}")
 
         # 5) Apply transformations (basic implementation)
         logger.info("Applying transformations...")
-        # TODO: Implement full transformation pipeline from transformations.yaml
+        # If transform.yaml is empty/templates, skeleton is already the transformed data
+        # TODO: Implement full transformation pipeline from transformations.yaml when value_mappings are filled
 
         # 6) Apply value rules (basic implementation)
         logger.info("Applying value rules...")
-        # TODO: Implement value rules from value_rules.yaml
+        # TODO: Implement value rules from value_rules.yaml when rules are filled in value_rules.yaml
+
+        # For now, skeleton contains the mapped data which is ready for validation
 
         # 7) Validation and splitting
         logger.info("Validating data and splitting good/bad records...")
@@ -3181,12 +3283,20 @@ def run_transform_command(args, config):
 
         # First, get key/required from F02 (index_target.yaml)
         for target in target_fields:
-            sap_field = target.get("sap_field", "")
+            sap_field = target.get("sap_field", "") or target.get("target_field", "")
             if sap_field:
                 base_name = sap_field.upper()
+                # Support both old format (key, mandatory) and new format (target_is_key, target_is_mandatory)
+                is_key = bool(
+                    target.get("key", False) or target.get("target_is_key", False)
+                )
+                is_mandatory = bool(
+                    target.get("mandatory", False)
+                    or target.get("target_is_mandatory", False)
+                )
                 key_required_config[base_name] = {
-                    "key": bool(target.get("key", False)),
-                    "required": bool(target.get("mandatory", False)),
+                    "key": is_key,
+                    "required": is_mandatory,
                 }
 
         # Override with validation.yaml if present
@@ -3251,10 +3361,20 @@ def run_transform_command(args, config):
 
         # Split into accepted and rejected
         rejected_indices = [r["__rownum"] - 1 for r in rejected_rows]
+        logger.info(
+            f"Before split: skeleton shape={skeleton.shape}, rejected_indices count={len(rejected_indices)}"
+        )
         accepted_skeleton = (
             skeleton.drop(index=rejected_indices)
             if rejected_indices
             else skeleton.copy()
+        )
+        logger.info(
+            f"After split: accepted_skeleton shape={accepted_skeleton.shape}, columns={list(accepted_skeleton.columns)[:5]}..."
+        )
+
+        logger.info(
+            f"Validation results: skeleton rows={len(skeleton)}, rejected={len(rejected_rows)}, accepted={len(accepted_skeleton)}"
         )
 
         rows_out = len(accepted_skeleton)
@@ -3293,7 +3413,13 @@ def run_transform_command(args, config):
 
         # Apply correct annotation based on validation config
         final_headers = []
-        final_data = pd.DataFrame()
+        final_data = pd.DataFrame(
+            index=accepted_skeleton.index
+        )  # Initialize with same index!
+
+        logger.info(
+            f"Before loop: final_data shape={final_data.shape}, accepted_skeleton shape={accepted_skeleton.shape}"
+        )
 
         for base_name in final_column_order:
             if base_name in ignored_targets:
@@ -3313,15 +3439,30 @@ def run_transform_command(args, config):
 
             final_headers.append(annotated_header)
 
-            # Get data from skeleton
+            # Get data from skeleton - ensure we get the data even if column names don't match exactly
             col_lower = base_name.lower()
             if col_lower in accepted_skeleton.columns:
                 final_data[annotated_header] = accepted_skeleton[col_lower]
+            elif base_name.lower() in accepted_skeleton.columns:
+                final_data[annotated_header] = accepted_skeleton[base_name.lower()]
             else:
+                # Column doesn't exist in skeleton - fill with empty
+                logger.warning(
+                    f"Column {base_name} not found in skeleton, filling with empty"
+                )
                 final_data[annotated_header] = ""
+
+        logger.info(
+            f"After loop: final_data shape={final_data.shape}, columns={len(final_data.columns)}"
+        )
 
         # 9) Write Snapshot CSV only (removing SAP CSV generation as per requirement 4)
         logger.info("Writing snapshot CSV...")
+        logger.info(
+            f"final_data shape: {final_data.shape}, final_headers count: {len(final_headers)}"
+        )
+        logger.info(f"final_data columns: {list(final_data.columns)}")
+        logger.info(f"final_headers: {final_headers[:5]}...")  # Log first 5 headers
 
         def write_sap_csv(df, filepath):
             """Write CSV with SAP requirements: UTF-8, CRLF, proper quoting"""
@@ -3335,9 +3476,20 @@ def run_transform_command(args, config):
                 )
                 # Write headers
                 writer.writerow(final_headers)
-                # Write data
-                for _, row in df.iterrows():
-                    writer.writerow([row[col] for col in final_headers])
+                # Write data rows
+                for idx, row in df.iterrows():
+                    try:
+                        # Build row data matching final_headers column order
+                        row_data = []
+                        for col in final_headers:
+                            if col in df.columns:
+                                row_data.append(row[col])
+                            else:
+                                row_data.append("")
+                        writer.writerow(row_data)
+                    except Exception as e:
+                        logger.error(f"Error writing row {idx}: {e}")
+                        raise
 
         # Write only snapshot CSV (timestamped format: S_{variant}#{object}_{timestamp}_output.csv)
         # This format is accepted by SAP Migrate Your Data as long as S_ prefix and # separator are used
@@ -3494,7 +3646,10 @@ def run_transform_command(args, config):
         if not getattr(args, "no_html", False):
             from datetime import datetime as dt
 
-            from .reporting import generate_mapping_report_with_samples, write_html_report
+            from .reporting import (
+                generate_mapping_report_with_samples,
+                write_html_report,
+            )
 
             timestamp_mapping = dt.now().strftime("%Y%m%d_%H%M")
 
@@ -3506,11 +3661,21 @@ def run_transform_command(args, config):
 
             # Get unmapped fields from mapping
             all_source_fields = set(raw_df.columns)
-            mapped_source_fields = set([m.get("source_header") for m in mapping_entries if m.get("source_header")])
+            mapped_source_fields = {
+                m.get("source_header")
+                for m in mapping_entries
+                if m.get("source_header")
+            }
             unmapped_sources = list(all_source_fields - mapped_source_fields)
 
-            all_target_fields = [t.get("sap_field") for t in target_fields if t.get("sap_field")]
-            mapped_target_fields = set([m.get("target_field_name") or m.get("target_field") for m in mapping_entries if m.get("target_field_name") or m.get("target_field")])
+            all_target_fields = [
+                t.get("sap_field") for t in target_fields if t.get("sap_field")
+            ]
+            mapped_target_fields = {
+                m.get("target_field_name") or m.get("target_field")
+                for m in mapping_entries
+                if m.get("target_field_name") or m.get("target_field")
+            }
             unmapped_targets = [
                 {"target_field": tf, "required": False}
                 for tf in all_target_fields
@@ -3532,9 +3697,9 @@ def run_transform_command(args, config):
                 "object": args.object,
                 "variant": args.variant,
                 "ts": dt.now().isoformat(),
-                "source_index": str(
-                    migrations_dir / "index_source.yaml"
-                ).replace("\\", "/"),
+                "source_index": str(migrations_dir / "index_source.yaml").replace(
+                    "\\", "/"
+                ),
                 "target_index": str(target_index_file).replace("\\", "/"),
                 "mapping_file": str(mapping_file).replace("\\", "/"),
                 "mappings": mapping_report["mappings"],
