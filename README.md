@@ -14,10 +14,16 @@ py -3.12 dev_bootstrap.py
 # macOS/Linux (optional reference)
 # source .venv/bin/activate
 
-# Verify installation - both methods work
-transform-myd-minimal --help
+# Run CLI via module (recommended - ensures all dependencies are found)
 py -3.12 -m transform_myd_minimal --help
+
+# Or use the console script (after venv activation)
+transform-myd-minimal --help
 ```
+
+**⚠️ Important for Windows PowerShell users:**
+- After `Activate.ps1`, always use `py -3.12 -m transform_myd_minimal <command>` to ensure the venv's packages are used
+- The `transform-myd-minimal` console script may point to your system Python 3.12 instead of the venv
 
 Als je dev_bootstrap niet wilt gebruiken:
 

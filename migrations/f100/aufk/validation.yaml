@@ -1,0 +1,221 @@
+metadata:
+  object: f100
+  variant: aufk
+  target_file: data/02_target/f100_aufk.xml
+  generated_at: '2025-10-17T15:14:01.793507'
+  structure: S_AUFK
+
+
+
+validation:
+- field: ORDERNUMBER
+  key: true
+  required: true
+  type: string
+  max_length: 80
+
+- field: KOKRS
+  key: false
+  required: true
+  type: string
+  max_length: 80
+
+- field: AUART
+  key: false
+  required: true
+  type: string
+  max_length: 80
+
+- field: KTEXT
+  key: false
+  required: true
+  type: string
+  max_length: 40
+
+- field: BUKRS
+  key: false
+  required: true
+  type: string
+  max_length: 80
+
+- field: GSBER
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: WERKS
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: PRCTR
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: KOSTV
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: PS_POSID
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: AKSTL
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: ABUKR
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: KDAUF
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: KDPOS
+  key: false
+  required: false
+  type: decimal
+  max_length: 6
+
+- field: AUFEX
+  key: false
+  required: false
+  type: string
+  max_length: 20
+
+- field: ANFAUFNR
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: FUNC_AREA
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: VERAA_USER
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: CYCLE
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: WAERS
+  key: false
+  required: true
+  type: string
+  max_length: 80
+
+- field: KALSM
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: ZSCHL
+  key: false
+  required: false
+  type: string
+  max_length: 6
+
+- field: ABGSL
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: ZSCHM
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+- field: USER0
+  key: false
+  required: false
+  type: string
+  max_length: 20
+
+- field: USER1
+  key: false
+  required: false
+  type: string
+  max_length: 20
+
+- field: USER2
+  key: false
+  required: false
+  type: string
+  max_length: 20
+
+- field: USER3
+  key: false
+  required: false
+  type: string
+  max_length: 20
+
+- field: USER4
+  key: false
+  required: false
+  type: decimal
+  max_length: 23
+
+- field: USER5
+  key: false
+  required: false
+  type: date
+
+- field: USER6
+  key: false
+  required: false
+  type: string
+  max_length: 15
+
+- field: USER7
+  key: false
+  required: false
+  type: date
+
+- field: USER8
+  key: false
+  required: false
+  type: date
+
+- field: USER9
+  key: false
+  required: false
+  type: string
+  max_length: 1
+
+- field: ABKRS
+  key: false
+  required: false
+  type: string
+  max_length: 80
+
+
+numeric_defaults:
+  decimal_separator: "."
+  thousands_separator: ""

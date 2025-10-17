@@ -1,0 +1,465 @@
+metadata:
+  object: f100
+  variant: aufk
+  target_file: data\02_target\f100_aufk.xml
+  generated_at: '2025-10-17T15:14:01.793018'
+  structure: S_AUFK
+  target_fields_count: 35
+
+
+
+target_fields:
+- target_field: ORDERNUMBER
+  target_field_name: ORDERNUMBER
+  target_field_description: "Order Number"
+  target_table: aufk
+  target_is_mandatory: true
+  target_field_group: key
+  target_is_key: true
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 1
+
+- target_field: KOKRS
+  target_field_name: KOKRS
+  target_field_description: "Controlling Area"
+  target_table: aufk
+  target_is_mandatory: true
+  target_field_group: general data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 2
+
+- target_field: AUART
+  target_field_name: AUART
+  target_field_description: "Order Type"
+  target_table: aufk
+  target_is_mandatory: true
+  target_field_group: general data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 3
+
+- target_field: KTEXT
+  target_field_name: KTEXT
+  target_field_description: "Description"
+  target_table: aufk
+  target_is_mandatory: true
+  target_field_group: general data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 40
+  target_decimal: None
+  target_field_count: 4
+
+- target_field: BUKRS
+  target_field_name: BUKRS
+  target_field_description: "Company Code"
+  target_table: aufk
+  target_is_mandatory: true
+  target_field_group: assignments
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 5
+
+- target_field: GSBER
+  target_field_name: GSBER
+  target_field_description: "Business Area"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: assignments
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 6
+
+- target_field: WERKS
+  target_field_name: WERKS
+  target_field_description: "Plant"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: assignments
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 7
+
+- target_field: PRCTR
+  target_field_name: PRCTR
+  target_field_description: "Profit Center"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: assignments
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 8
+
+- target_field: KOSTV
+  target_field_name: KOSTV
+  target_field_description: "Responsible Cost Center"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: assignments
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 9
+
+- target_field: PS_POSID
+  target_field_name: PS_POSID
+  target_field_description: "WBS Element"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: assignments
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 10
+
+- target_field: AKSTL
+  target_field_name: AKSTL
+  target_field_description: "Requesting Cost Center"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: assignments
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 11
+
+- target_field: ABUKR
+  target_field_name: ABUKR
+  target_field_description: "Requesting Company Code"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: assignments
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 12
+
+- target_field: KDAUF
+  target_field_name: KDAUF
+  target_field_description: "Sales Order Number"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: assignments
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 13
+
+- target_field: KDPOS
+  target_field_name: KDPOS
+  target_field_description: "Sales Order Item Number"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: assignments
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Number
+  target_length: 6
+  target_decimal: None
+  target_field_count: 14
+
+- target_field: AUFEX
+  target_field_name: AUFEX
+  target_field_description: "External Order Number"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: assignments
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 20
+  target_decimal: None
+  target_field_count: 15
+
+- target_field: ANFAUFNR
+  target_field_name: ANFAUFNR
+  target_field_description: "Requesting Order"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: assignments
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 16
+
+- target_field: FUNC_AREA
+  target_field_name: FUNC_AREA
+  target_field_description: "Functional Area"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: assignments
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 17
+
+- target_field: VERAA_USER
+  target_field_name: VERAA_USER
+  target_field_description: "User Responsible"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: assignments
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 18
+
+- target_field: CYCLE
+  target_field_name: CYCLE
+  target_field_description: "Actual Posted Cost Center"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: control data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 19
+
+- target_field: WAERS
+  target_field_name: WAERS
+  target_field_description: "Currency"
+  target_table: aufk
+  target_is_mandatory: true
+  target_field_group: control data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 20
+
+- target_field: KALSM
+  target_field_name: KALSM
+  target_field_description: "Costing Sheet"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: period-end closing
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 21
+
+- target_field: ZSCHL
+  target_field_name: ZSCHL
+  target_field_description: "Overhead Key"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: period-end closing
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 6
+  target_decimal: None
+  target_field_count: 22
+
+- target_field: ABGSL
+  target_field_name: ABGSL
+  target_field_description: "Results Analysis Key"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: period-end closing
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 23
+
+- target_field: ZSCHM
+  target_field_name: ZSCHM
+  target_field_description: "Interest Profile"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: period-end closing
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 24
+
+- target_field: USER0
+  target_field_name: USER0
+  target_field_description: "Applicant"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: general data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 20
+  target_decimal: None
+  target_field_count: 25
+
+- target_field: USER1
+  target_field_name: USER1
+  target_field_description: "Applicant's Telephone Number"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: general data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 20
+  target_decimal: None
+  target_field_count: 26
+
+- target_field: USER2
+  target_field_name: USER2
+  target_field_description: "Person Responsible"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: general data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 20
+  target_decimal: None
+  target_field_count: 27
+
+- target_field: USER3
+  target_field_name: USER3
+  target_field_description: "Telephone Number of Person in Charge"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: general data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 20
+  target_decimal: None
+  target_field_count: 28
+
+- target_field: USER4
+  target_field_name: USER4
+  target_field_description: "Estimated Costs"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: general data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Number
+  target_length: 23
+  target_decimal: 2
+  target_field_count: 29
+
+- target_field: USER5
+  target_field_name: USER5
+  target_field_description: "Application Date"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: general data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Date
+  target_length: None
+  target_decimal: None
+  target_field_count: 30
+
+- target_field: USER6
+  target_field_name: USER6
+  target_field_description: "Department"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: general data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 15
+  target_decimal: None
+  target_field_count: 31
+
+- target_field: USER7
+  target_field_name: USER7
+  target_field_description: "Work Start Date"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: general data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Date
+  target_length: None
+  target_decimal: None
+  target_field_count: 32
+
+- target_field: USER8
+  target_field_name: USER8
+  target_field_description: "Work End Date"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: general data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Date
+  target_length: None
+  target_decimal: None
+  target_field_count: 33
+
+- target_field: USER9
+  target_field_name: USER9
+  target_field_description: "Indicator: Work Approval"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: general data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 1
+  target_decimal: None
+  target_field_count: 34
+
+- target_field: ABKRS
+  target_field_name: ABKRS
+  target_field_description: "Processing Group"
+  target_table: aufk
+  target_is_mandatory: false
+  target_field_group: general data
+  target_is_key: false
+  target_sheet_name: Field List
+  target_data_type: Text
+  target_length: 80
+  target_decimal: None
+  target_field_count: 35

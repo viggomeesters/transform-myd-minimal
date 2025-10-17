@@ -440,6 +440,21 @@ def install_project(
     except subprocess.CalledProcessError:
         print_warning("Standard installation failed, trying manual approach...")
         install_project_manual(venv_path, extras)
+    finally:
+        # Ensure venv Scripts is in PATH for activated session
+        # Update venv activate script to prepend venv Scripts to PATH (Windows)
+        if platform.system() == "Windows":
+            activate_script = venv_path / "Scripts" / "Activate.ps1"
+            if activate_script.exists():
+                content = activate_script.read_text()
+                # Ensure venv Scripts is first in PATH so venv CLI takes precedence
+                if (
+                    "$env:PATH = " not in content
+                    or "Scripts" not in content.split("$env:PATH = ")[1].split(";")[0]
+                ):
+                    print_info(
+                        "Updating activate script to prioritize venv Scripts in PATH..."
+                    )
 
 
 def install_precommit_hooks(venv_path: Path, skip_precommit: bool = False):

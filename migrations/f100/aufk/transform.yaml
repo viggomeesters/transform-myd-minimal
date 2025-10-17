@@ -1,0 +1,333 @@
+metadata:
+  object: f100
+  variant: aufk
+  target_file: data/02_target/f100_aufk.xml
+  generated_at: '2025-10-17T15:14:01.793863'
+  structure: S_AUFK
+  description: 'Transformation rules for f100/aufk'
+
+
+
+transformations:
+- target_field: ORDERNUMBER
+  target_field_description: 'Order Number'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: KOKRS
+  target_field_description: 'Controlling Area'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: AUART
+  target_field_description: 'Order Type'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: KTEXT
+  target_field_description: 'Description'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: BUKRS
+  target_field_description: 'Company Code'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: GSBER
+  target_field_description: 'Business Area'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: WERKS
+  target_field_description: 'Plant'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: PRCTR
+  target_field_description: 'Profit Center'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: KOSTV
+  target_field_description: 'Responsible Cost Center'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: PS_POSID
+  target_field_description: 'WBS Element'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: AKSTL
+  target_field_description: 'Requesting Cost Center'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: ABUKR
+  target_field_description: 'Requesting Company Code'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: KDAUF
+  target_field_description: 'Sales Order Number'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: KDPOS
+  target_field_description: 'Sales Order Item Number'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: AUFEX
+  target_field_description: 'External Order Number'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: ANFAUFNR
+  target_field_description: 'Requesting Order'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: FUNC_AREA
+  target_field_description: 'Functional Area'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: VERAA_USER
+  target_field_description: 'User Responsible'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: CYCLE
+  target_field_description: 'Actual Posted Cost Center'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: WAERS
+  target_field_description: 'Currency'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: KALSM
+  target_field_description: 'Costing Sheet'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: ZSCHL
+  target_field_description: 'Overhead Key'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: ABGSL
+  target_field_description: 'Results Analysis Key'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: ZSCHM
+  target_field_description: 'Interest Profile'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: USER0
+  target_field_description: 'Applicant'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: USER1
+  target_field_description: "Applicant's Telephone Number"
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: USER2
+  target_field_description: 'Person Responsible'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: USER3
+  target_field_description: 'Telephone Number of Person in Charge'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: USER4
+  target_field_description: 'Estimated Costs'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: USER5
+  target_field_description: 'Application Date'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: USER6
+  target_field_description: 'Department'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: USER7
+  target_field_description: 'Work Start Date'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: USER8
+  target_field_description: 'Work End Date'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: USER9
+  target_field_description: 'Indicator: Work Approval'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+- target_field: ABKRS
+  target_field_description: 'Processing Group'
+  transformation_type: direct
+  placeholder_value: ''
+  value_mappings:
+    # Example: map source values to target values
+    # - source_value: 'OLD_VALUE'
+    #   target_value: 'NEW_VALUE'
+
+
+# General transformation settings
+transformation_settings:
+  null_handling: 'use_placeholder'  # Options: 'use_placeholder', 'skip', 'error'
+  empty_string_handling: 'use_placeholder'  # Options: 'use_placeholder', 'skip', 'keep'
+  case_sensitive_mappings: false
+  trim_whitespace: true
