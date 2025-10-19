@@ -79,6 +79,7 @@ See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for detailed development guidelines.
 
 ## Verdere Documentatie
 - [Gebruik - USAGE.md](docs/USAGE.md)
+- [Directory Structure - DIRECTORY_STRUCTURE.md](docs/DIRECTORY_STRUCTURE.md)
 - [Logging - LOGGING.md](docs/LOGGING.md)
 - [Development Setup - DEVELOPMENT.md](docs/DEVELOPMENT.md)
 - [CLI Opties - CLI_OPTIONS.md](docs/CLI_OPTIONS.md)
@@ -211,7 +212,7 @@ migrations/
 **Default behavior:**
 - Interactive terminal → Human summary + preview table
 - Piped/redirected → JSONL lines
-- Automatic log files: `data/09_logging/<step>_<object>_<variant>_<YYYYMMDD_HHmm>.jsonl`
+- Automatic log files: `data/99_logging/<step>_<object>_<variant>_<YYYYMMDD_HHmm>.jsonl`
 
 **Examples:**
 ```bash

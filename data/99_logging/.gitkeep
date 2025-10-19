@@ -1,0 +1,2 @@
+# This directory stores all log files generated during pipeline execution
+# Log files are automatically excluded from git via .gitignore

@@ -31,6 +31,10 @@ Thumbs.db
 ~$*.xlsx
 ~$*.xls
 
+# Backup files
+*.backup
+*_backup.*
+
 # Test files
 /tmp/
 test_output/
@@ -46,35 +50,47 @@ config/*/value_rules.yaml
 # Data files per spec F01-F04
 data/01_source/*
 !data/01_source/*test*
+!data/01_source/.gitkeep
 
 data/02_target/*
 !data/02_target/*test*
+!data/02_target/.gitkeep
 
 data/03_index_source/*
 !data/03_index_source/*test*
+!data/03_index_source/.gitkeep
 
 data/04_index_target/*
 !data/04_index_target/*test*
+!data/04_index_target/.gitkeep
 
 data/05_map/*
 !data/05_map/*test*
+!data/05_map/.gitkeep
 
 data/07_raw/*
 !data/07_raw/*test*
+!data/07_raw/.gitkeep
 
 data/08_raw_validation/*
 !data/08_raw_validation/*test*
+!data/08_raw_validation/.gitkeep
 
 data/09_rejected/*
 !data/09_rejected/*test*
+!data/09_rejected/.gitkeep
 
 data/10_transformed/*
 !data/10_transformed/*test*
+!data/10_transformed/.gitkeep
 
 data/11_transformed_validation/*
 !data/11_transformed_validation/*test*
+!data/11_transformed_validation/.gitkeep
 
-data/09_logging/*
+# Logging directory (exclude all logs)
+data/99_logging/*
+!data/99_logging/.gitkeep
 
 # Test migrations output
 migrations/test
