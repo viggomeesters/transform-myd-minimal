@@ -197,7 +197,7 @@ class TargetFieldSchema(BaseModel):
     target_sheet_name: str | None = None
     target_data_type: str | None = None
     target_length: int | str | None = None
-    target_decimal: int | str | None | None = None
+    target_decimal: int | str | None = None
     target_field_count: int | None = None
 
 
