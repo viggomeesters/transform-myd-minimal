@@ -24,6 +24,13 @@ from pandas.api.types import infer_dtype
 from .cli import setup_cli
 from .fuzzy import FieldNormalizer, FuzzyConfig, FuzzyMatcher
 from .logging_config import get_logger
+from .schema import (
+    ValidationError,
+    validate_central_mapping_memory,
+    validate_index_source,
+    validate_index_target,
+    validate_mapping,
+)
 from .synonym import SynonymMatcher
 
 # Initialize logger for this module
@@ -517,6 +524,14 @@ def load_central_mapping_memory(base_path: Path) -> Optional[CentralMappingMemor
 
         if not data:
             return None
+
+        # Validate the central mapping memory data
+        try:
+            validate_central_mapping_memory(data)
+            logger.debug(f"Central mapping memory from {central_memory_path} validated successfully")
+        except ValidationError as e:
+            logger.error(f"Central mapping memory validation failed: {e}")
+            raise
 
         # Parse global skip fields
         global_skip_fields = []
@@ -2587,13 +2602,27 @@ def run_map_command(args, config):
         sys.exit(5)
 
     try:
-        # Load source fields
+        # Load and validate source fields
         with open(source_index_file, encoding="utf-8") as f:
             source_data = yaml.safe_load(f)
+        
+        try:
+            validate_index_source(source_data)
+            logger.debug(f"Source index from {source_index_file} validated successfully")
+        except ValidationError as e:
+            logger.error(f"Source index validation failed: {e}")
+            raise
 
-        # Load target fields
+        # Load and validate target fields
         with open(target_index_file, encoding="utf-8") as f:
             target_data = yaml.safe_load(f)
+        
+        try:
+            validate_index_target(target_data)
+            logger.debug(f"Target index from {target_index_file} validated successfully")
+        except ValidationError as e:
+            logger.error(f"Target index validation failed: {e}")
+            raise
 
         source_fields = source_data.get("source_fields", [])
         target_fields = target_data.get("target_fields", [])
@@ -3008,13 +3037,28 @@ def run_transform_command(args, config):
         rows_in = len(raw_df)
         logger.info(f"Loaded {rows_in} rows from raw data")
 
-        # Load mapping configuration
+        # Load and validate mapping configuration
         with open(mapping_file, encoding="utf-8") as f:
             mapping_data = yaml.safe_load(f)
+        
+        try:
+            validate_mapping(mapping_data)
+            logger.debug(f"Mapping from {mapping_file} validated successfully")
+        except ValidationError as e:
+            logger.error(f"Mapping validation failed: {e}")
+            raise
 
-        # Load target index
+        # Load and validate target index
         with open(target_index_file, encoding="utf-8") as f:
             target_data = yaml.safe_load(f)
+        
+        try:
+            validate_index_target(target_data)
+            logger.debug(f"Target index from {target_index_file} validated successfully")
+        except ValidationError as e:
+            logger.error(f"Target index validation failed: {e}")
+            raise
+        
         target_fields = target_data.get("target_fields", [])
 
         # Load optional configurations
