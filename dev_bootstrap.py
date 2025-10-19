@@ -398,8 +398,8 @@ import os
 sys.path.insert(0, '{Path.cwd() / "src"}')
 
 if __name__ == '__main__':
-    from tmm.cli import main
-    main()
+    from transform_myd_minimal.cli import app
+    app()
 """
 
     cli_path.write_text(cli_content)
