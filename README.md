@@ -79,6 +79,7 @@ See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for detailed development guidelines.
 
 ## Verdere Documentatie
 - [Gebruik - USAGE.md](docs/USAGE.md)
+- [Directory Structure - DIRECTORY_STRUCTURE.md](docs/DIRECTORY_STRUCTURE.md)
 - [Logging - LOGGING.md](docs/LOGGING.md)
 - [Development Setup - DEVELOPMENT.md](docs/DEVELOPMENT.md)
 - [CLI Opties - CLI_OPTIONS.md](docs/CLI_OPTIONS.md)

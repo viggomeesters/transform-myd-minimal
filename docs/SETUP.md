@@ -134,11 +134,12 @@ py -3.12 dev_bootstrap.py
 
 ## 📖 Documentatie
 
-- [Gebruik - USAGE.md](docs/USAGE.md)
-- [Development Setup - DEVELOPMENT.md](docs/DEVELOPMENT.md)
-- [Logging - LOGGING.md](docs/LOGGING.md)
-- [CLI Opties - CLI_OPTIONS.md](docs/CLI_OPTIONS.md)
-- [Contributie - CONTRIBUTING.md](docs/CONTRIBUTING.md)
+- [Gebruik - USAGE.md](USAGE.md)
+- [Directory Structure - DIRECTORY_STRUCTURE.md](DIRECTORY_STRUCTURE.md)
+- [Development Setup - DEVELOPMENT.md](DEVELOPMENT.md)
+- [Logging - LOGGING.md](LOGGING.md)
+- [CLI Opties - CLI_OPTIONS.md](CLI_OPTIONS.md)
+- [Contributie - CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## ✨ Tips
 
