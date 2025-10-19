@@ -31,6 +31,10 @@ Thumbs.db
 ~$*.xlsx
 ~$*.xls
 
+# Backup files
+*.backup
+*_backup.*
+
 # Test files
 /tmp/
 test_output/
