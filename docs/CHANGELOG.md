@@ -44,9 +44,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - F03: Mapping results with confidence scores and audit items
   - F04: Dual reports for RAW validation + POST-transform validation
 - **Report locations**:
-  - F01-F03: `migrations/<object>/<variant>/reports/`
-  - F04 RAW: `data/05_raw_validation/`
-  - F04 POST: `data/08_transformed_validation/`
+  - F01-F03: `data/03_index_source/`, `data/04_index_target/`, `data/05_map/`
+  - F04 RAW: `data/08_raw_validation/`
+  - F04 POST: `data/11_transformed_validation/`
 - **Comprehensive test suite** for HTML reporting functionality
 - **Enhanced documentation** in README.md and USAGE.md with HTML reporting examples
 

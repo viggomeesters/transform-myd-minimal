@@ -9,7 +9,7 @@ Transform MYD Minimal processes SAP migration data through a 4-step pipeline:
 1. **F01 - index_source**: Parse source Excel headers → `migrations/<object>/<variant>/index_source.yaml`
 2. **F02 - index_target**: Parse target XML fields → `migrations/<object>/<variant>/index_target.yaml`  
 3. **F03 - map**: Generate field mappings → `migrations/<object>/<variant>/mapping.yaml`
-4. **F04 - transform**: Transform raw data → CSV files in `data/07_transformed/`
+4. **F04 - transform**: Transform raw data → CSV files in `data/10_transformed/`
 
 ## Directory Structure
 

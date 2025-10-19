@@ -211,7 +211,7 @@ migrations/
 **Default behavior:**
 - Interactive terminal → Human summary + preview table
 - Piped/redirected → JSONL lines
-- Automatic log files: `data/09_logging/<step>_<object>_<variant>_<YYYYMMDD_HHmm>.jsonl`
+- Automatic log files: `data/99_logging/<step>_<object>_<variant>_<YYYYMMDD_HHmm>.jsonl`
 
 **Examples:**
 ```bash
