@@ -5,7 +5,7 @@ Thank you for your interest in contributing to Transform MYD Minimal! This docum
 ## Development Setup
 
 ### Prerequisites
-- Python 3.8 or higher
+- Python 3.11 or higher
 - pip (Python package installer)
 
 ### Quick Setup

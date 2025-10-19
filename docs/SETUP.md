@@ -5,7 +5,7 @@ Volg deze stappen om het project op je computer te laten werken.
 ## ✅ Vereisten
 
 Zorg dat je deze hebt geïnstalleerd:
-- **Python 3.12 of hoger** - [Download van python.org](https://www.python.org/downloads/)
+- **Python 3.11 of hoger** - [Download van python.org](https://www.python.org/downloads/) (aanbevolen: 3.12)
 - **Git** (optioneel, voor cloning) - [Download van git-scm.com](https://git-scm.com/download/win)
 
 ### Check of Python is geïnstalleerd:

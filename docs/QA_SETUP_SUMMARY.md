@@ -44,12 +44,12 @@ Note:
 
 #### `pyproject.toml`
 Enhanced with comprehensive tool configurations:
-- **Ruff**: Fast linting with 88-char line length, Python 3.8+ target
+- **Ruff**: Fast linting with 88-char line length, Python 3.11+ target
   - Enabled rules: pycodestyle, pyflakes, isort, pep8-naming, pyupgrade, bugbear, comprehensions, simplify
   - Smart ignores for line length (handled by black), ternary operators
-- **Black**: Code formatter with standard 88-char line length
+- **Black**: Code formatter with standard 88-char line length, Python 3.11+ target
 - **mypy**: Type checking with gradual adoption strategy
-  - Python 3.9+ target, ignore missing imports initially
+  - Python 3.11+ target, ignore missing imports initially
   - Per-module strict mode for incremental improvement
 - **pytest**: Enhanced test configuration
   - Verbose output, strict markers, coverage reporting
