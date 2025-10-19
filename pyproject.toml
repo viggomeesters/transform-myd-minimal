@@ -16,11 +16,9 @@ classifiers = [
     "Topic :: Database",
     "Topic :: Office/Business",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
     "typer>=0.12",
@@ -63,7 +61,7 @@ where = ["src"]
 
 [tool.black]
 line-length = 88
-target-version = ['py38']
+target-version = ['py311']
 include = '\.pyi?$'
 exclude = '''
 /(
@@ -81,7 +79,7 @@ exclude = '''
 
 [tool.ruff]
 line-length = 88
-target-version = "py38"
+target-version = "py311"
 exclude = [
     ".git",
     ".mypy_cache",
@@ -118,7 +116,7 @@ ignore = [
 "tests/*" = ["N802", "N806"]  # Allow non-lowercase function/variable names in tests
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
