@@ -11,12 +11,14 @@ Provides a simple web interface to access all CLI commands:
 """
 
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
 from flask import Flask, jsonify, render_template_string, request, send_file
 
 app = Flask(__name__)
+app.secret_key = "transform-myd-minimal-dev-key-change-in-production"
 
 # HTML template for the frontend
 HTML_TEMPLATE = """
@@ -558,9 +560,9 @@ def run_cli_command(
         Dictionary with success status and output/error message
     """
     try:
-        # Build command
+        # Build command using sys.executable to ensure same Python interpreter
         cmd = [
-            "python",
+            sys.executable,
             "-m",
             "transform_myd_minimal",
             command,
@@ -673,7 +675,27 @@ def download():
         return jsonify({"success": False, "error": "Missing path parameter"}), 400
 
     try:
-        return send_file(file_path, as_attachment=True)
+        # Security: Validate path to prevent directory traversal attacks
+        requested_path = Path(file_path).resolve()
+        base_path = Path(".").resolve()
+
+        # Ensure the requested file is within the project directory
+        if not str(requested_path).startswith(str(base_path)):
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "error": "Access denied: Path outside project directory",
+                    }
+                ),
+                403,
+            )
+
+        # Ensure file exists and is a file (not a directory)
+        if not requested_path.is_file():
+            return jsonify({"success": False, "error": "File not found"}), 404
+
+        return send_file(requested_path, as_attachment=True)
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
