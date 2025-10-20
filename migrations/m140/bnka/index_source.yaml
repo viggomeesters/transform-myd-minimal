@@ -1,80 +1,306 @@
 metadata:
   object: m140
   variant: bnka
-  source_file: data/01_source/m140_bnka.csv
-  generated_at: '2025-09-26T09:28:53.347740'
-  format: csv_field_definitions
-  source_fields_count: 10
+  source_file: data\01_source\m140_bnka.xlsx
+  generated_at: '2025-10-20T17:19:22.054077'
+  sheet: Sheet1
+  source_fields_count: 37
 
 
 
 source_fields:
-- source_field_name: MANDT
+- source_field: MANDT
+  source_field_name: MANDT
   source_field_description: "Client (Mandant)"
-  source_example: null
+  source_example: '280'
   source_field_count: 1
   source_dtype: string
   source_nullable: false
 
-- source_field_name: BANKS
-  source_field_description: "Bank Country (BANK)"
-  source_example: null
+- source_field: BANKS
+  source_field_name: BANKS
+  source_field_description: None
+  source_example: 'nan'
   source_field_count: 2
   source_dtype: string
   source_nullable: false
 
-- source_field_name: BANKL
-  source_field_description: "Bank Key (BKEY)"
-  source_example: null
+- source_field: BANKL
+  source_field_name: BANKL
+  source_field_description: None
+  source_example: 'IBTFAEAS'
   source_field_count: 3
   source_dtype: string
   source_nullable: false
 
-- source_field_name: BANKA
-  source_field_description: "Bank Name (BNAM)"
-  source_example: null
+- source_field: ERDAT
+  source_field_name: ERDAT
+  source_field_description: "Creation Date"
+  source_example: '20150714'
   source_field_count: 4
   source_dtype: string
-  source_nullable: true
+  source_nullable: false
 
-- source_field_name: PROVZ
-  source_field_description: "Region (REGN)"
-  source_example: null
+- source_field: ERNAM
+  source_field_name: ERNAM
+  source_field_description: "Name of Person who Created the Object"
+  source_example: 'VGOUW'
   source_field_count: 5
   source_dtype: string
-  source_nullable: true
+  source_nullable: false
 
-- source_field_name: STRAS
-  source_field_description: "Street (STRT)"
-  source_example: null
+- source_field: BANKA
+  source_field_name: BANKA
+  source_field_description: None
+  source_example: 'Investbank'
   source_field_count: 6
   source_dtype: string
-  source_nullable: true
+  source_nullable: false
 
-- source_field_name: ORT01
-  source_field_description: "City (CITY)"
-  source_example: null
+- source_field: PROVZ
+  source_field_name: PROVZ
+  source_field_description: None
+  source_example: 'nan'
   source_field_count: 7
   source_dtype: string
-  source_nullable: true
+  source_nullable: false
 
-- source_field_name: SWIFT
-  source_field_description: "SWIFT Code (SWFT)"
-  source_example: null
+- source_field: STRAS
+  source_field_name: STRAS
+  source_field_description: None
+  source_example: 'nan'
   source_field_count: 8
   source_dtype: string
-  source_nullable: true
+  source_nullable: false
 
-- source_field_name: BGRUP
-  source_field_description: "Bank Group (BGRP)"
-  source_example: null
+- source_field: ORT01
+  source_field_name: ORT01
+  source_field_description: None
+  source_example: 'Sharjah'
   source_field_count: 9
   source_dtype: string
-  source_nullable: true
+  source_nullable: false
 
-- source_field_name: XPGRO
-  source_field_description: "Post Office Bank (PSTB)"
-  source_example: null
+- source_field: SWIFT
+  source_field_name: SWIFT
+  source_field_description: None
+  source_example: 'IBTFAEAS'
   source_field_count: 10
   source_dtype: string
-  source_nullable: true
+  source_nullable: false
+
+- source_field: BGRUP
+  source_field_name: BGRUP
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 11
+  source_dtype: string
+  source_nullable: false
+
+- source_field: XPGRO
+  source_field_name: XPGRO
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 12
+  source_dtype: string
+  source_nullable: false
+
+- source_field: LOEVM
+  source_field_name: LOEVM
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 13
+  source_dtype: string
+  source_nullable: false
+
+- source_field: BNKLZ
+  source_field_name: BNKLZ
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 14
+  source_dtype: string
+  source_nullable: false
+
+- source_field: PSKTO
+  source_field_name: PSKTO
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 15
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ADRNR
+  source_field_name: ADRNR
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 16
+  source_dtype: string
+  source_nullable: false
+
+- source_field: BRNCH
+  source_field_name: BRNCH
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 17
+  source_dtype: string
+  source_nullable: false
+
+- source_field: CHKME
+  source_field_name: CHKME
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 18
+  source_dtype: string
+  source_nullable: false
+
+- source_field: VERS
+  source_field_name: VERS
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 19
+  source_dtype: string
+  source_nullable: false
+
+- source_field: IBAN_RULE
+  source_field_name: IBAN_RULE
+  source_field_description: "IBAN Validation Rule"
+  source_example: 'nan'
+  source_field_count: 20
+  source_dtype: string
+  source_nullable: false
+
+- source_field: SDD_B2B
+  source_field_name: SDD_B2B
+  source_field_description: None
+  source_example: '0'
+  source_field_count: 21
+  source_dtype: string
+  source_nullable: false
+
+- source_field: SDD_COR1
+  source_field_name: SDD_COR1
+  source_field_description: None
+  source_example: '0'
+  source_field_count: 22
+  source_dtype: string
+  source_nullable: false
+
+- source_field: SDD_RTRANS
+  source_field_name: SDD_RTRANS
+  source_field_description: None
+  source_example: '0'
+  source_field_count: 23
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ZNOCHECK
+  source_field_name: ZNOCHECK
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 24
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ZACC_LEN
+  source_field_name: ZACC_LEN
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 25
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ZRES1
+  source_field_name: ZRES1
+  source_field_description: "Reserved field 1"
+  source_example: '000'
+  source_field_count: 26
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ZRES2
+  source_field_name: ZRES2
+  source_field_description: "Reserved field 2"
+  source_example: '000'
+  source_field_count: 27
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ZRES3
+  source_field_name: ZRES3
+  source_field_description: "Reserved field 3"
+  source_example: '000'
+  source_field_count: 28
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ZRES4
+  source_field_name: ZRES4
+  source_field_description: None
+  source_example: '000'
+  source_field_count: 29
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ZRES5
+  source_field_name: ZRES5
+  source_field_description: None
+  source_example: '000'
+  source_field_count: 30
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ZRES6
+  source_field_name: ZRES6
+  source_field_description: None
+  source_example: '000'
+  source_field_count: 31
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ZRES7
+  source_field_name: ZRES7
+  source_field_description: None
+  source_example: '000'
+  source_field_count: 32
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ZRES8
+  source_field_name: ZRES8
+  source_field_description: None
+  source_example: '000'
+  source_field_count: 33
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ZRES9
+  source_field_name: ZRES9
+  source_field_description: None
+  source_example: '000'
+  source_field_count: 34
+  source_dtype: string
+  source_nullable: false
+
+- source_field: ZRES10
+  source_field_name: ZRES10
+  source_field_description: None
+  source_example: '000'
+  source_field_count: 35
+  source_dtype: string
+  source_nullable: false
+
+- source_field: BICKY
+  source_field_name: BICKY
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 36
+  source_dtype: string
+  source_nullable: false
+
+- source_field: RCCODE
+  source_field_name: RCCODE
+  source_field_description: None
+  source_example: 'nan'
+  source_field_count: 37
+  source_dtype: string
+  source_nullable: false

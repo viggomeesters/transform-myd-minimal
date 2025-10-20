@@ -1,15 +1,16 @@
 metadata:
   object: m140
   variant: bnka
-  target_file: data/02_target/m140_bnka.xml
-  generated_at: '2025-09-26T06:53:38.214005'
+  target_file: data\02_target\m140_bnka.xml
+  generated_at: '2025-10-20T17:19:23.479327'
   structure: S_BNKA
   target_fields_count: 12
 
 
 
 target_fields:
-- target_field_name: BANKS
+- target_field: BANKS
+  target_field_name: BANKS
   target_field_description: "Bank Country/Region Key"
   target_table: bnka
   target_is_mandatory: true
@@ -21,7 +22,8 @@ target_fields:
   target_decimal: None
   target_field_count: 1
 
-- target_field_name: BANKL
+- target_field: BANKL
+  target_field_name: BANKL
   target_field_description: "Bank Key"
   target_table: bnka
   target_is_mandatory: true
@@ -33,7 +35,8 @@ target_fields:
   target_decimal: None
   target_field_count: 2
 
-- target_field_name: BANKA
+- target_field: BANKA
+  target_field_name: BANKA
   target_field_description: "Name of Bank"
   target_table: bnka
   target_is_mandatory: true
@@ -45,7 +48,8 @@ target_fields:
   target_decimal: None
   target_field_count: 3
 
-- target_field_name: PROVZ
+- target_field: PROVZ
+  target_field_name: PROVZ
   target_field_description: "Region (State, Province, Country)"
   target_table: bnka
   target_is_mandatory: false
@@ -57,7 +61,8 @@ target_fields:
   target_decimal: None
   target_field_count: 4
 
-- target_field_name: STRAS
+- target_field: STRAS
+  target_field_name: STRAS
   target_field_description: "House Number and Street"
   target_table: bnka
   target_is_mandatory: false
@@ -69,7 +74,8 @@ target_fields:
   target_decimal: None
   target_field_count: 5
 
-- target_field_name: ORT01
+- target_field: ORT01
+  target_field_name: ORT01
   target_field_description: "City"
   target_table: bnka
   target_is_mandatory: false
@@ -81,7 +87,8 @@ target_fields:
   target_decimal: None
   target_field_count: 6
 
-- target_field_name: BRNCH
+- target_field: BRNCH
+  target_field_name: BRNCH
   target_field_description: "Bank Branch"
   target_table: bnka
   target_is_mandatory: false
@@ -93,7 +100,8 @@ target_fields:
   target_decimal: None
   target_field_count: 7
 
-- target_field_name: SWIFT
+- target_field: SWIFT
+  target_field_name: SWIFT
   target_field_description: "SWIFT Code for International Payments"
   target_table: bnka
   target_is_mandatory: false
@@ -105,7 +113,8 @@ target_fields:
   target_decimal: None
   target_field_count: 8
 
-- target_field_name: XPGRO
+- target_field: XPGRO
+  target_field_name: XPGRO
   target_field_description: "Post Office Bank Current Account"
   target_table: bnka
   target_is_mandatory: false
@@ -117,7 +126,8 @@ target_fields:
   target_decimal: None
   target_field_count: 9
 
-- target_field_name: BNKLZ
+- target_field: BNKLZ
+  target_field_name: BNKLZ
   target_field_description: "Bank Number"
   target_table: bnka
   target_is_mandatory: false
@@ -129,7 +139,8 @@ target_fields:
   target_decimal: None
   target_field_count: 10
 
-- target_field_name: BGRUP
+- target_field: BGRUP
+  target_field_name: BGRUP
   target_field_description: "Bank Group (Bank Network)"
   target_table: bnka
   target_is_mandatory: false
@@ -141,7 +152,8 @@ target_fields:
   target_decimal: None
   target_field_count: 11
 
-- target_field_name: ISNOTOVERWRITE
+- target_field: ISNOTOVERWRITE
+  target_field_name: ISNOTOVERWRITE
   target_field_description: "Do Not Overwrite Existing Data"
   target_table: bnka
   target_is_mandatory: false
