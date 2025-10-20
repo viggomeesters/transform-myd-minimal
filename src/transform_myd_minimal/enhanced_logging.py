@@ -11,7 +11,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from rich.console import Console
 from rich.table import Table
@@ -19,6 +19,12 @@ from rich.table import Table
 
 class EnhancedLogger:
     """Enhanced logger with Rich output, TTY detection, and JSONL file support."""
+
+    def debug(self, msg: str) -> None:
+        """Print debug message if debug flag is set in args."""
+        if getattr(self.args, "debug", False):
+            self.console.print(f"[cyan][debug][/cyan] {msg}")
+        # If no debug flag, do nothing (silent)
 
     def __init__(
         self, args, step: str, object_name: str, variant: str, root_path: Path
@@ -77,7 +83,7 @@ class EnhancedLogger:
             # If path is not relative to root, use as-is
             return path.as_posix()
 
-    def get_log_file_path(self) -> Optional[Path]:
+    def get_log_file_path(self) -> Path | None:
         """Get the log file path based on naming convention."""
         if self.no_log_file:
             return None
@@ -92,7 +98,7 @@ class EnhancedLogger:
         log_dir.mkdir(parents=True, exist_ok=True)
         return log_dir / filename
 
-    def write_jsonl_to_file(self, event: Dict[str, Any]) -> None:
+    def write_jsonl_to_file(self, event: dict[str, Any]) -> None:
         """Write JSONL event to log file."""
         log_file = self.get_log_file_path()
         if not log_file:
@@ -103,7 +109,7 @@ class EnhancedLogger:
             f.write(jsonl_line + "\n")
 
     def output_to_stdout(
-        self, event: Dict[str, Any], preview_data: Optional[List[Dict]] = None
+        self, event: dict[str, Any], preview_data: list[dict] | None = None
     ) -> None:
         """Output event to stdout based on format settings."""
         if self.stdout_format == "none":
@@ -115,7 +121,7 @@ class EnhancedLogger:
             self._output_human_format(event, preview_data)
 
     def _output_human_format(
-        self, event: Dict[str, Any], preview_data: Optional[List[Dict]] = None
+        self, event: dict[str, Any], preview_data: list[dict] | None = None
     ) -> None:
         """Output event in human-readable Rich format."""
         # Determine check mark color
@@ -236,7 +242,7 @@ class EnhancedLogger:
         if not self.no_preview and preview_data:
             self._output_preview_table(preview_data)
 
-    def _output_preview_table(self, preview_data: List[Dict]) -> None:
+    def _output_preview_table(self, preview_data: list[dict]) -> None:
         """Output preview table for human format."""
         if not preview_data:
             return
@@ -250,7 +256,7 @@ class EnhancedLogger:
         elif self.step == "transform":
             self._output_transform_preview_table(preview_data)
 
-    def _output_source_preview_table(self, preview_data: List[Dict]) -> None:
+    def _output_source_preview_table(self, preview_data: list[dict]) -> None:
         """Output preview table for index_source with first 8 headers."""
         table = Table(title="Headers (sample)")
         table.add_column("#", style="dim")
@@ -271,7 +277,7 @@ class EnhancedLogger:
 
         self.console.print(table)
 
-    def _output_target_preview_table(self, preview_data: List[Dict]) -> None:
+    def _output_target_preview_table(self, preview_data: list[dict]) -> None:
         """Output preview table for index_target with first 8 fields."""
         table = Table(title="Fields (sample)")
         table.add_column("sap_field")
@@ -298,7 +304,7 @@ class EnhancedLogger:
 
         self.console.print(table)
 
-    def _output_map_preview_table(self, preview_data: List[Dict]) -> None:
+    def _output_map_preview_table(self, preview_data: list[dict]) -> None:
         """Output preview table for map with first 8 mappings."""
         table = Table(title="Mappings (sample)")
         table.add_column("target_field")
@@ -321,7 +327,7 @@ class EnhancedLogger:
 
         self.console.print(table)
 
-    def _output_transform_preview_table(self, preview_data: List[Dict]) -> None:
+    def _output_transform_preview_table(self, preview_data: list[dict]) -> None:
         """Output preview table for transform with first 8 columns of data."""
         table = Table(title="Transformed data (sample)")
         table.add_column("#", style="dim")
@@ -344,7 +350,7 @@ class EnhancedLogger:
         self.console.print(table)
 
     def log_event(
-        self, event: Dict[str, Any], preview_data: Optional[List[Dict]] = None
+        self, event: dict[str, Any], preview_data: list[dict] | None = None
     ) -> None:
         """Log an event to both file and stdout as configured."""
         # Add duration if not present
@@ -363,7 +369,7 @@ class EnhancedLogger:
         # Output to stdout
         self.output_to_stdout(event, preview_data)
 
-    def log_error(self, error_event: Dict[str, Any]) -> None:
+    def log_error(self, error_event: dict[str, Any]) -> None:
         """Log an error event."""
         error_event["duration_ms"] = self.get_duration_ms()
 
@@ -384,7 +390,7 @@ class EnhancedLogger:
                 error_msg = self._format_error_message(error_event)
                 self.console.print(f"[red]✗[/red] Error: {error_msg}")
 
-    def _format_error_message(self, error_event: Dict[str, Any]) -> str:
+    def _format_error_message(self, error_event: dict[str, Any]) -> str:
         """Format error message for human-readable output."""
         error_type = error_event.get("error", "unknown")
 
