@@ -17,6 +17,9 @@ rich>=13.7
 # Schema validation
 pydantic>=2.0
 
+# Web frontend
+flask>=3.0
+
 # Optional: Development dependencies (use extras via `pip install -e ".[dev]"` or install individually)
 # ruff>=0.6
 # black>=24.8

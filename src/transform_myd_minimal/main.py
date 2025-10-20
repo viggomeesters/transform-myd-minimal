@@ -3779,6 +3779,13 @@ def main():
         run_map_command(args, config)
     elif args.command == "transform":
         run_transform_command(args, config)
+    elif args.command == "frontend":
+        from .frontend import start_frontend
+        start_frontend(
+            host=args.host,
+            port=args.port,
+            debug=args.debug
+        )
     else:
         logger.error(f"Unknown command: {args.command}")
         sys.exit(1)

@@ -12,6 +12,9 @@ py -3.12 dev_bootstrap.py
 .\scripts\transform-myd-minimal.ps1 --help                          # PowerShell wrapper (recommended)
 py -3.12 -m transform_myd_minimal --help                             # Python module (always works)
 .\.venv\Scripts\python.exe -m transform_myd_minimal --help           # After venv activation
+
+# Or use the visual web frontend (NEW!)
+py -3.12 -m transform_myd_minimal frontend                           # Start web interface at http://127.0.0.1:5000
 ```
 
 **📌 For Colleagues/New Users:**
@@ -126,6 +129,7 @@ Schema validation is designed to be backward compatible:
 - Error messages guide you to fix issues quickly
 
 ## Verdere Documentatie
+- [Web Frontend - FRONTEND.md](docs/FRONTEND.md) - **NEW!** Visual workflow designer
 - [Gebruik - USAGE.md](docs/USAGE.md)
 - [Directory Structure - DIRECTORY_STRUCTURE.md](docs/DIRECTORY_STRUCTURE.md)
 - [Logging - LOGGING.md](docs/LOGGING.md)
@@ -133,6 +137,38 @@ Schema validation is designed to be backward compatible:
 - [CLI Opties - CLI_OPTIONS.md](docs/CLI_OPTIONS.md)
 - [Contributie - CONTRIBUTING.md](docs/CONTRIBUTING.md)
 - [Changelog - CHANGELOG.md](docs/CHANGELOG.md)
+
+## 🆕 NEW: Visual Web Frontend (v4.2)
+
+**Geïnspireerd door Alteryx Designer** - Transform MYD Minimal heeft nu een gebruiksvriendelijke web-interface!
+
+### 🌐 Start de Web Frontend
+
+```bash
+# Start de visuele workflow designer
+python -m transform_myd_minimal frontend
+
+# Open browser naar: http://127.0.0.1:5000
+```
+
+**Features:**
+- ✨ **Visual Workflow Designer** - Klik-en-uitvoer interface voor alle commando's
+- 📊 **Real-time Status** - Zie direct wat er gebeurt met kleurgecodeerde feedback
+- 📁 **Bestandsbeheer** - Browse en download files met één klik
+- 🎯 **Intuïtief** - Geen command-line kennis vereist
+- 📱 **Responsive** - Werkt op desktop, tablet en mobiel
+
+**Workflow Stappen:**
+1. **Input** - Bekijk source en target bestanden
+2. **Index Source** - Parse source fields
+3. **Index Target** - Parse target fields  
+4. **Map** - Genereer field mappings
+5. **Transform** - Voer data transformatie uit
+6. **Output** - Bekijk resultaten en rapporten
+
+Zie [FRONTEND.md](docs/FRONTEND.md) voor volledige documentatie.
+
+---
 
 ## 🆕 NEW: Step-by-Step Workflow (v4.0)
 

@@ -33,6 +33,7 @@ def setup_cli():
         "index_source",
         "index_target",
         "transform",
+        "frontend",
         "-h",
         "--help",
         "--version",
@@ -349,6 +350,20 @@ def setup_cli():
         "--html-dir", type=str, help="Custom directory for HTML and JSON reports"
     )
 
+    # Frontend subcommand
+    frontend_parser = subparsers.add_parser(
+        "frontend", help="Start the web-based visual workflow designer"
+    )
+    frontend_parser.add_argument(
+        "--host", default="127.0.0.1", help="Host to bind to (default: 127.0.0.1)"
+    )
+    frontend_parser.add_argument(
+        "--port", type=int, default=5000, help="Port to listen on (default: 5000)"
+    )
+    frontend_parser.add_argument(
+        "--debug", action="store_true", help="Enable debug mode"
+    )
+
     # Parse arguments
     args = parser.parse_args()
 
@@ -358,9 +373,13 @@ def setup_cli():
         sys.exit(1)
 
     # Validate command
-    if args.command not in ["map", "index_source", "index_target", "transform"]:
+    if args.command not in ["map", "index_source", "index_target", "transform", "frontend"]:
         parser.print_help()
         sys.exit(1)
+
+    # Frontend command doesn't need config merging
+    if args.command == "frontend":
+        return args, config, False
 
     config.merge_with_cli_args(args)
 
