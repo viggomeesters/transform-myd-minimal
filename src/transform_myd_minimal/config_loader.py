@@ -7,11 +7,11 @@ CLI arguments take precedence over config.yaml values.
 """
 
 from pathlib import Path
-from typing import Optional
 
 import yaml
 
 from .logging_config import get_logger
+from .schema import ValidationError, validate_config
 
 # Initialize logger for this module
 logger = get_logger(__name__)
@@ -20,7 +20,7 @@ logger = get_logger(__name__)
 class Config:
     """Configuration management class for transform-myd-minimal."""
 
-    def __init__(self, config_path: Optional[Path] = None):
+    def __init__(self, config_path: Path | None = None):
         """Initialize configuration with defaults and load from file if available."""
         # Set default values
         self.fuzzy_threshold = 0.6
@@ -87,6 +87,14 @@ class Config:
                 config_data = yaml.safe_load(f)
 
             if config_data:
+                # Validate the configuration
+                try:
+                    validate_config(config_data)
+                    logger.debug(f"Configuration from {config_path} validated successfully")
+                except ValidationError as e:
+                    logger.error(f"Configuration validation failed: {e}")
+                    raise
+
                 # Update existing configuration values
                 if "object" in config_data:
                     self.object = str(config_data["object"])
@@ -133,6 +141,9 @@ class Config:
                 if "matching" in config_data:
                     self.matching.update(config_data["matching"])
 
+        except ValidationError:
+            # Re-raise validation errors as they should fail
+            raise
         except Exception as e:
             logger.warning(f"Could not load config.yaml: {e}")
             logger.info("Using default values")
@@ -193,6 +204,6 @@ class Config:
         return base_dir / self.output_dir / object_name / variant
 
 
-def load_config(config_path: Optional[Path] = None) -> Config:
+def load_config(config_path: Path | None = None) -> Config:
     """Load configuration from file or use defaults."""
     return Config(config_path)
