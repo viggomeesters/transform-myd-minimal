@@ -2,7 +2,236 @@
 
 CLI tool voor het genereren van column mapping en YAML bestanden met een stapsgewijze Object+Variant pipeline. Alle input en output wordt per **object** en **variant** geadministreerd, zonder globale output-bestanden.
 
-## Quick start
+---
+
+## 🚀 Voor Nieuwe Gebruikers: Snel Aan de Slag
+
+**Je collega heeft dit pakket gedownload van GitHub, uitgepakt, en wil het nu gebruiken.**  
+Dit is de eenvoudigste manier om te starten, zonder technische voorkennis.
+
+### Wat Heb Je Nodig?
+
+- **Python 3.12 of hoger** geïnstalleerd op je Windows computer
+  - [Download Python hier](https://www.python.org/downloads/) als je het nog niet hebt
+  - Tijdens installatie: vink "Add Python to PATH" aan!
+
+### Stap 1: Download en Uitpakken (Eenmalig)
+
+1. Download het project als ZIP van GitHub
+2. Pak het uit naar een map op je computer (bijv. `C:\Users\JouwNaam\transform-myd-minimal`)
+3. Open **PowerShell** in die map:
+   - In de bestandsverkenner: klik rechts op de map → "Open in Terminal" of "Open PowerShell hier"
+
+### Stap 2: Installatie (Eenmalig - 2 minuten)
+
+**Waarom?** Python heeft extra modules (libraries) nodig om te werken. Deze stap installeert alles automatisch.
+
+```powershell
+# Voer dit commando uit in PowerShell:
+py -3.12 dev_bootstrap.py
+```
+
+**Wat gebeurt er?**
+- Er wordt een virtuele omgeving (`.venv`) aangemaakt
+- Alle benodigde software wordt geïnstalleerd
+- Je hoeft dit maar één keer te doen!
+
+**Problemen?** Zie de [Veelgestelde Vragen](#-veelgestelde-vragen--problemen-oplossen) onderaan.
+
+### Stap 3: Het Programma Gebruiken
+
+**Er zijn 3 hoofdcommando's die je na elkaar uitvoert:**
+
+#### Commando 1: `index_source` - Brongegevens Inlezen
+**Wat doet het?** Leest de kolomnamen uit je Excel-bestand met brondata.
+
+```powershell
+py -3.12 -m transform_myd_minimal index_source --object m140 --variant bnka
+```
+
+**Je moet hebben:** Een bestand `data/01_source/m140_bnka.xlsx` met je brondata.
+
+**Het maakt aan:** `migrations/m140/bnka/index_source.yaml` met alle kolomnamen.
+
+---
+
+#### Commando 2: `index_target` - Doelvelden Inlezen
+**Wat doet het?** Leest welke velden SAP verwacht (uit een XML-bestand).
+
+```powershell
+py -3.12 -m transform_myd_minimal index_target --object m140 --variant bnka
+```
+
+**Je moet hebben:** Een bestand `data/02_target/m140_bnka.xml` met SAP velddefinities.
+
+**Het maakt aan:** `migrations/m140/bnka/index_target.yaml` met alle SAP-velden.
+
+---
+
+#### Commando 3: `map` - Koppeling Maken
+**Wat doet het?** Koppelt automatisch je bronkolommen aan de SAP-velden.
+
+```powershell
+py -3.12 -m transform_myd_minimal map --object m140 --variant bnka
+```
+
+**Je moet hebben:** De output van stap 1 en 2 (de twee YAML-bestanden).
+
+**Het maakt aan:** `migrations/m140/bnka/mapping.yaml` met de koppelingen.
+
+---
+
+### Belangrijk: Object en Variant
+
+- `--object m140`: De naam van je dataset (bijv. banken = m140, profit centers = m120)
+- `--variant bnka`: De specifieke tabel variant (bijv. BNKA voor bankgegevens)
+
+**Vervang deze waardes** met jouw eigen object/variant namen!
+
+### Snel Overzicht: Alle 3 Stappen
+
+```powershell
+# Stap 1: Brondata indexeren
+py -3.12 -m transform_myd_minimal index_source --object m140 --variant bnka
+
+# Stap 2: Doelvelden indexeren
+py -3.12 -m transform_myd_minimal index_target --object m140 --variant bnka
+
+# Stap 3: Mapping genereren
+py -3.12 -m transform_myd_minimal map --object m140 --variant bnka
+```
+
+### Hulp Nodig?
+
+- **Voor meer details:** Zie [SETUP.md](docs/SETUP.md) en [USAGE.md](docs/USAGE.md)
+- **Problemen?** Zie [Veelgestelde Vragen](#-veelgestelde-vragen--problemen-oplossen) hieronder
+- **Alle commando's:** Voer uit: `py -3.12 -m transform_myd_minimal --help`
+
+---
+
+## 📚 Veelgestelde Vragen & Problemen Oplossen
+
+### ❌ "Python is not recognized" of "py is not recognized"
+
+**Probleem:** Windows kan Python niet vinden.
+
+**Oplossing:**
+1. Installeer Python van [python.org/downloads](https://www.python.org/downloads/)
+2. **Belangrijk:** Vink "Add Python to PATH" aan tijdens installatie!
+3. Herstart PowerShell na installatie
+4. Test met: `py --version` (moet iets tonen zoals "Python 3.12.0")
+
+---
+
+### ❌ "File not found: data/01_source/m140_bnka.xlsx"
+
+**Probleem:** Het programma kan je bronbestand niet vinden.
+
+**Oplossing:**
+1. Controleer of je bestand op de juiste locatie staat:
+   - Voor `index_source`: `data/01_source/m140_bnka.xlsx`
+   - Voor `index_target`: `data/02_target/m140_bnka.xml`
+2. Controleer de bestandsnaam (inclusief object/variant)
+3. Let op hoofdletters/kleine letters in de bestandsnaam!
+
+---
+
+### ❌ "cannot be loaded because running scripts is disabled"
+
+**Probleem:** PowerShell mag geen scripts uitvoeren (Windows beveiliging).
+
+**Oplossing:**
+```powershell
+# Voer dit uit in PowerShell (als Administrator):
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Dan werkt het programma normaal
+py -3.12 -m transform_myd_minimal --help
+```
+
+---
+
+### ❌ "No module named 'transform_myd_minimal'"
+
+**Probleem:** De installatie is niet compleet.
+
+**Oplossing:**
+```powershell
+# Voer de installatie opnieuw uit:
+py -3.12 dev_bootstrap.py
+
+# Als dat niet werkt, probeer handmatig:
+py -3.12 -m pip install -e .
+```
+
+---
+
+### ❌ "Output file exists. Use --force to overwrite"
+
+**Probleem:** Er bestaat al output van een eerdere run.
+
+**Oplossing:**
+```powershell
+# Voeg --force toe om te overschrijven:
+py -3.12 -m transform_myd_minimal index_source --object m140 --variant bnka --force
+```
+
+---
+
+### ❌ Ik wil de virtuele omgeving handmatig activeren
+
+**Waarom?** Makkelijker typen als je veel commando's achter elkaar uitvoert.
+
+**Oplossing:**
+```powershell
+# Activeer de virtuele omgeving:
+.\.venv\Scripts\Activate.ps1
+
+# Nu kun je korter typen (zonder "py -3.12 -m"):
+python -m transform_myd_minimal --help
+python -m transform_myd_minimal index_source --object m140 --variant bnka
+
+# Om te deactiveren (terug naar normaal):
+deactivate
+```
+
+---
+
+### ❓ Waar vind ik mijn output bestanden?
+
+**Antwoord:**
+- **YAML-bestanden:** In `migrations/{object}/{variant}/`
+  - `index_source.yaml` - Jouw bronkolommen
+  - `index_target.yaml` - SAP doelvelden
+  - `mapping.yaml` - Koppelingen tussen bron en doel
+- **Log-bestanden:** In `data/99_logging/`
+- **Rapporten (HTML):** In `data/03_index_source/`, `data/04_index_target/`, `data/05_map/`
+
+---
+
+### ❓ Hoe weet ik of het gelukt is?
+
+**Antwoord:**  
+Als het commando succesvol is, zie je:
+- Groene tekst met "✓ Success" of vergelijkbare bevestiging
+- Een bericht over waar de output is opgeslagen
+- Geen rode error-meldingen
+
+Je kunt de output-bestanden openen met een teksteditor (zoals Notepad++) om te controleren.
+
+---
+
+## 📖 Voor Meer Informatie
+
+- **[SETUP.md](docs/SETUP.md)** - Gedetailleerde installatie-instructies en alternatieve methoden
+- **[USAGE.md](docs/USAGE.md)** - Complete gebruiksvoorbeelden en workflows
+- **[CLI_OPTIONS.md](docs/CLI_OPTIONS.md)** - Alle beschikbare commando's en opties
+- **[DIRECTORY_STRUCTURE.md](docs/DIRECTORY_STRUCTURE.md)** - Uitleg over alle mappen en bestanden
+- **[CONTRIBUTING.md](docs/CONTRIBUTING.md)** - Voor ontwikkelaars die code willen aanpassen
+
+---
+
+## 💻 Technische Quick Start (Voor Ervaren Gebruikers)
 
 ```powershell
 # One-time setup (creates .venv and installs ALL deps)
@@ -13,9 +242,6 @@ py -3.12 dev_bootstrap.py
 py -3.12 -m transform_myd_minimal --help                             # Python module (always works)
 .\.venv\Scripts\python.exe -m transform_myd_minimal --help           # After venv activation
 ```
-
-**📌 For Colleagues/New Users:**
-See [**SETUP.md**](docs/SETUP.md) for detailed installation and usage instructions.
 
 **Recommended for Windows PowerShell:**
 - Use the **wrapper scripts**: `.\transform-myd-minimal.ps1` (PowerShell) or `transform-myd-minimal.bat` (CMD)
@@ -34,6 +260,8 @@ py -3.12 -m pip install -r requirements.txt
 # Optioneel: ontwikkel-setup (editable + dev extras)
 py -3.12 -m pip install -e ".[dev]"
 ```
+
+---
 
 ## Quality Assurance & Development Tools
 
