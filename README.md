@@ -36,7 +36,7 @@ py -3.12 dev_bootstrap.py
 - Alle benodigde software wordt geïnstalleerd
 - Je hoeft dit maar één keer te doen!
 
-**Problemen?** Zie de [Veelgestelde Vragen](#-veelgestelde-vragen--problemen-oplossen) onderaan.
+**Problemen?** Zie de [Veelgestelde Vragen](#veelgestelde-vragen--problemen-oplossen) onderaan.
 
 ### Stap 3: Het Programma Gebruiken
 
@@ -104,7 +104,7 @@ py -3.12 -m transform_myd_minimal map --object m140 --variant bnka
 ### Hulp Nodig?
 
 - **Voor meer details:** Zie [SETUP.md](docs/SETUP.md) en [USAGE.md](docs/USAGE.md)
-- **Problemen?** Zie [Veelgestelde Vragen](#-veelgestelde-vragen--problemen-oplossen) hieronder
+- **Problemen?** Zie [Veelgestelde Vragen](#veelgestelde-vragen--problemen-oplossen) hieronder
 - **Alle commando's:** Voer uit: `py -3.12 -m transform_myd_minimal --help`
 
 ---
