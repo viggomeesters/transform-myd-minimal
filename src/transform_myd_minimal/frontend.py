@@ -559,6 +559,29 @@ def run_cli_command(
     Returns:
         Dictionary with success status and output/error message
     """
+    # Security: Validate command to prevent command injection
+    valid_commands = ["index_source", "index_target", "map", "transform"]
+    if command not in valid_commands:
+        return {
+            "success": False,
+            "error": f"Invalid command. Must be one of: {', '.join(valid_commands)}",
+        }
+
+    # Security: Validate object and variant names (alphanumeric, underscore, hyphen only)
+    import re
+
+    if not re.match(r"^[a-zA-Z0-9_-]+$", object_name):
+        return {
+            "success": False,
+            "error": "Invalid object name. Only alphanumeric, underscore, and hyphen allowed.",
+        }
+
+    if not re.match(r"^[a-zA-Z0-9_-]+$", variant_name):
+        return {
+            "success": False,
+            "error": "Invalid variant name. Only alphanumeric, underscore, and hyphen allowed.",
+        }
+
     try:
         # Build command using sys.executable to ensure same Python interpreter
         cmd = [
@@ -587,8 +610,11 @@ def run_cli_command(
         }
     except subprocess.TimeoutExpired:
         return {"success": False, "error": "Command timed out after 5 minutes"}
-    except Exception as e:
-        return {"success": False, "error": str(e)}
+    except Exception:
+        return {
+            "success": False,
+            "error": "An error occurred while executing the command",
+        }
 
 
 def list_directory_files(directory: str, root: Path = Path(".")) -> list:
@@ -602,7 +628,18 @@ def list_directory_files(directory: str, root: Path = Path(".")) -> list:
     Returns:
         List of file information dictionaries
     """
-    dir_path = root / "data" / directory
+    # Security: Validate directory name to prevent path traversal
+    import re
+
+    if not re.match(r"^[a-zA-Z0-9_]+$", directory):
+        return []
+
+    dir_path = (root / "data" / directory).resolve()
+    base_data_path = (root / "data").resolve()
+
+    # Security: Ensure the directory is within the data folder
+    if not str(dir_path).startswith(str(base_data_path)):
+        return []
 
     if not dir_path.exists():
         return []
@@ -662,8 +699,12 @@ def list_files():
     try:
         files = list_directory_files(directory)
         return jsonify({"success": True, "files": files})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+    except Exception:
+        # Security: Don't expose stack trace details
+        return (
+            jsonify({"success": False, "error": "Error listing directory files"}),
+            500,
+        )
 
 
 @app.route("/download")
@@ -696,8 +737,9 @@ def download():
             return jsonify({"success": False, "error": "File not found"}), 404
 
         return send_file(requested_path, as_attachment=True)
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+    except Exception:
+        # Security: Don't expose stack trace details
+        return jsonify({"success": False, "error": "Error downloading file"}), 500
 
 
 def start_frontend(host: str = "127.0.0.1", port: int = 5000, debug: bool = False):
@@ -707,14 +749,21 @@ def start_frontend(host: str = "127.0.0.1", port: int = 5000, debug: bool = Fals
     Args:
         host: Host to bind to
         port: Port to listen on
-        debug: Enable debug mode
+        debug: Enable debug mode (WARNING: Do not use in production!)
+
+    Security Warning:
+        This is a development server. Do not use debug mode or expose this
+        server to untrusted networks without proper security measures.
     """
     print("\n🔄 Transform MYD Minimal - Web Frontend")
     print("=" * 50)
     print(f"Starting server on http://{host}:{port}")
+    if debug:
+        print("⚠️  WARNING: Debug mode enabled - not for production use!")
     print("Press Ctrl+C to stop")
     print("=" * 50)
 
+    # Security: This is a development server
     app.run(host=host, port=port, debug=debug)
 
 
